@@ -1030,6 +1030,30 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 /* 虎字印章：字置中（標題的字距不套用到印章上） */
 .masthead h1::before{text-shadow:none!important;letter-spacing:0!important;text-indent:0;line-height:1!important;display:grid!important;place-items:center;padding:0 0 .06em!important;box-sizing:border-box;font-family:var(--f-display)}
 .lg-seal{letter-spacing:0;line-height:1;place-items:center;padding-bottom:.06em;box-sizing:border-box}
+
+:root,:root[data-theme="light"]{--ep:#5f8a4c;--gl:#c4566a;--c4:#8a7356;--c5:#3d6ea8;--c6:#a08a2f}
+.ctr-l{display:grid;gap:8px}
+.ctr-r{display:grid;grid-template-columns:14px minmax(0,2fr) minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,.8fr);gap:8px;align-items:end}
+.ctr-r label{display:grid;gap:2px;font-size:12px;color:var(--ink-3)}
+.ctr-r .sw{margin-bottom:12px}
+@media (max-width:640px){.ctr-r{grid-template-columns:14px 1fr 1fr}}
+.dp-sum h2 .sw{margin-right:6px}
+
+.todo .ph .btn{margin-left:auto}
+.td-r{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px dashed var(--rule)}
+.td-r .sw{align-self:start;margin-top:5px}
+.td-m{display:grid;gap:2px;min-width:0}.td-m span{color:var(--ink-2);font-size:14px}.td-m small{color:var(--ink-3);font-size:12px}
+.td-a{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.td-r.done{grid-template-columns:1fr;opacity:.7}
+.td-f{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--rule)}
+.td-f .wide,.td-f .fx-act{grid-column:1/-1}
+@media (max-width:640px){.td-f{grid-template-columns:1fr 1fr}.td-r{grid-template-columns:12px 1fr}.td-a{grid-column:2}}
+.td-done summary{cursor:pointer;color:var(--ink-3);font-size:13px;margin-top:8px}
+.td-banner{display:grid;gap:8px}
+.td-warn,.td-note{border-radius:12px;padding:10px 14px;font-size:14px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.td-warn{background:color-mix(in srgb,var(--mustard) 22%,var(--paper));border:1px solid color-mix(in srgb,var(--mustard) 60%,transparent)}
+.td-note{background:var(--soft);border:1px solid var(--rule)}
+.td-warn small{color:var(--ink-2);font-size:12px}
 </style>
 </head>
 <body>
@@ -1069,21 +1093,27 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 
 <script>
 /* 伯虎在二樓 收支總覽：恆春本店、台南小伯虎、百貨櫃位 一起管理 */
-const BR = ['hc','tn','dp'];
+/* 店點：恆春本店、台南小伯虎是固定的；百貨外展櫃位可以有好幾個（設定在 misc/cfg.counters），各有開始和結束月份 */
+const BR = ['hc','tn'];
 const B = {
   hc:{name:'恆春本店', short:'恆春', nick:'本店', color:'--hc'},
-  tn:{name:'台南・小伯虎', short:'台南', nick:'小伯虎', color:'--tn'},
-  dp:{name:'百貨櫃位', short:'百貨', nick:'櫃位', color:'--dp'}
+  tn:{name:'台南・小伯虎', short:'台南', nick:'小伯虎', color:'--tn'}
 };
-const ALLNAME='三點合計';
+const CTR_COLORS=['--dp','--ep','--gl','--c4','--c5','--c6'];
+const COUNTERS0=[
+  {id:'ep',name:'台南誠品',short:'誠品',start:'2025-01',end:'2026-05',rate:0},
+  {id:'gl',name:'高雄 FOCUS13（高流）',short:'高流',start:'2025-12',end:'2026-04',rate:11},
+  {id:'dp',name:'新竹巨城',short:'巨城',start:'2026-11',end:'',rate:30}];
+const isCtr=b=>!!(B[b]&&B[b].counter);
+const ALLNAME='全部合計';
 const BOSS='妃妃';
 const MAILDOM='bohu-ledger.app';
-const EXP_COMMON=['食材原料','包材耗材','人事薪資','房租','水電瓦斯','物流運費','設備維修','行銷推廣','金流手續費','稅費','雜支','其他'];
+const EXP_COMMON=['食材','包材','雜項支出','人事支出','勞健保','房租','水電','保險','選物寄售','器具','設備','佈置陳列','活動與市集','尾牙公關聚餐','進修學習','啤酒','物流運費','行銷推廣','金流手續費','稅費','其他'];
 const CATS = {
   hc:{ rev:['門市銷售','企業・團購訂單','宅配・網購','活動・市集','其他'], exp:EXP_COMMON },
   tn:{ rev:['門市銷售','企業・團購訂單','活動・市集','其他'], exp:EXP_COMMON },
-  dp:{ rev:['櫃位銷售','企業・團購訂單','其他'], exp:['百貨抽成・費用','食材原料','包材耗材','人事薪資','物流運費','設備維修','行銷推廣','雜支','其他'] }
 };
+const CTR_CATS={ rev:['櫃位銷售','企業・團購訂單','其他'], exp:['百貨抽成・費用','食材','包材','雜項支出','人事支出','勞健保','選物寄售','器具','設備','佈置陳列','物流運費','行銷推廣','其他'] };
 const KIND = {
   rev:{label:'營收', unit:'元', val:'金額（元）', money:true},
   exp:{label:'支出', unit:'元', val:'金額（元）', money:true, date:true},
@@ -1095,7 +1125,7 @@ const SECS = [
   {id:'dept', name:'百貨櫃位'}
 ];
 const catsOf=(b,k)=>KIND[k].money?CATS[b][k]:[];
-const RECUR = ['人事薪資','房租','水電瓦斯','金流手續費'];
+const RECUR = ['人事支出','房租','水電','勞健保','金流手續費'];
 const MONTHS = Array.from({length:12},(_,i)=>i+1);
 const FIRST_YEAR=2026;
 const yearsList=()=>{ const ys=new Set([FIRST_YEAR,new Date().getFullYear()]); Object.values(S.docs||{}).forEach(d=>{ if(+d.year) ys.add(+d.year); }); return [...ys].filter(y=>y>=2020).sort(); };
@@ -1125,12 +1155,22 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const bname=b=>B[b].name;
 const bshort=b=>B[b].short;
 
-/* 設定（老闆可改）：百貨櫃位名稱、抽成率、零用金額度 */
-const CFG0={venue:'新竹巨城', rate:30, petty:{hc:3000,tn:2000,dp:2000}};
-const cfg=()=>{ const c=((S.misc||{}).cfg)||{}; return {...CFG0,...c,petty:{...CFG0.petty,...(c.petty||{})}}; };
-const dpName=()=>`百貨櫃位・${cfg().venue||'百貨'}`;
-B.dp.full=()=>dpName();
-const bfull=b=>b==='dp'?dpName():B[b].name;
+/* 設定（老闆可改）：櫃位清單、零用金額度 */
+const CFG0={petty:{hc:3000,tn:2000,dp:2000,ep:0,gl:0}};
+const cfg=()=>{ const c=((S.misc||{}).cfg)||{}; const counters=Array.isArray(c.counters)&&c.counters.length?c.counters:COUNTERS0; return {...CFG0,...c,counters,petty:{...CFG0.petty,...(c.petty||{})}}; };
+const counters=()=>cfg().counters;
+const ctrOf=b=>counters().find(c=>c.id===b);
+/* 依設定重建店點清單（櫃位在恆春、台南後面），BR 陣列原地更新 */
+function setupBranches(){
+  const cs=counters(); BR.length=0; BR.push('hc','tn');
+  cs.forEach((c,i)=>{ B[c.id]={name:c.name,short:c.short||c.name.slice(0,2),nick:'櫃位',color:(['dp','ep','gl'].includes(c.id)?'--'+c.id:CTR_COLORS[(i+3)%CTR_COLORS.length]),counter:true,start:c.start||'',end:c.end||''}; CATS[c.id]=CTR_CATS; BR.push(c.id); });
+}
+const ymNow=()=>todayStr().slice(0,7);
+/* 櫃位在某月份有沒有營業（還沒結束的都算） */
+const ctrOpen=(b,ym=ymNow())=>!isCtr(b)||((!B[b].start||B[b].start<=ym)&&(!B[b].end||B[b].end>=ym));
+const ctrLive=b=>!isCtr(b)||!B[b].end||B[b].end>=ymNow();
+const bfull=b=>isCtr(b)?`${B[b].name}櫃`:B[b].name;
+const ctrRange=b=>isCtr(b)?`${B[b].start?B[b].start.replace('-','/'):'?'} – ${B[b].end?B[b].end.replace('-','/'):'營業中'}`:'';
 
 /* 每日結帳自動帶入：那個月沒有手動營收時，用每日結帳的資料計算（不會存進資料庫） */
 function dailyOf(b,y,m){ const ym=`${y}-${pad(m)}`; return Object.values(S.allDaily||{}).filter(d=>d&&d.branch===b&&String(d.date||'').startsWith(ym)); }
@@ -1145,8 +1185,8 @@ const listOf=(b,m,k,y=YEAR)=>{ const raw=listOfRaw(b,m,k,y);
   if(k==='rev') return raw.length?raw:autoRev(b,y,m);
   if(k==='pay') return raw.length?raw:autoPayroll(b,y,m);
   if(k==='exp'){ let out=raw;
-    if(!raw.some(e=>e.cat==='人事薪資')){ const a=autoPayroll(b,y,m); if(a.length) out=out.concat(a.map(e=>({id:e.id.replace('pay','payx'),cat:'人事薪資',item:e.item,amt:e.amt,date:'',note:'薪資表',auto:true,sysAuto:true}))); }
-    if(b==='dp'&&!raw.some(e=>e.cat==='百貨抽成・費用')){ const a=autoDept(y,m); if(a.length) out=out.concat(a); }
+    if(!raw.some(e=>e.cat==='人事支出')){ const a=autoPayroll(b,y,m); if(a.length) out=out.concat(a.map(e=>({id:e.id.replace('pay','payx'),cat:'人事支出',item:e.item,amt:e.amt,date:'',note:'薪資表',auto:true,sysAuto:true}))); }
+    if(isCtr(b)&&!raw.some(e=>e.cat==='百貨抽成・費用')){ const a=autoDept(b,y,m); if(a.length) out=out.concat(a); }
     return out; }
   return raw; };
 const tot=(b,m,k)=>sum(listOf(b,m,k).map(e=>+e.amt||0));
@@ -1159,6 +1199,8 @@ function latestMonth(){for(let m=12;m>=1;m--) if(BR.some(b=>has(b,m))) return m;
 
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2400);}
 function setStatus(cls,txt){const s=$('#status');if(!s)return;s.className='status '+cls;s.lastElementChild.textContent=txt;}
+
+setupBranches();
 
 /* ---------- ribbon & tabs ---------- */
 function renderRibbon(){
@@ -1282,8 +1324,10 @@ function teamStats(ms,y=YEAR){
   const bonus=sum(ms.map(m=>{const d=(S.payroll||{})[`${y}-${pad(m)}`]; return d&&d.rows?sum(Object.values(d.rows).filter(r=>bs.includes(r.branch||'hc')).map(r=>+r.bonus||0)):0;}));
   return [['薪資實發',pay,'元'],['人數',ppl,'人'],['其中業績獎金',bonus,'元'],['佔營收',rev?Math.round(pay/rev*100)+'%':'—','']];
 }
+const ctrScope=()=>branches().filter(isCtr);
+const ctrScopeName=()=>{ const cs=ctrScope(); return cs.length===1?bfull(cs[0]):'所有百貨櫃位'; };
 function deptStats(ms,y=YEAR){
-  const rows=ms.map(m=>deptCalc(`${y}-${pad(m)}`));
+  const rows=ms.map(m=>deptCalcAll(ctrScope(),`${y}-${pad(m)}`));
   const sales=sum(rows.map(r=>r.sales)), fee=sum(rows.map(r=>r.comm+r.fees)), due=sum(rows.map(r=>r.due)), rec=sum(rows.map(r=>r.received??0));
   return [['櫃位業績',sales,'元'],['抽成＋費用',fee,'元'],['應撥款',due,'元'],['已入帳',rec,'元']];
 }
@@ -1295,14 +1339,16 @@ function renderSecMonth(m){
     h+=`<div class="ledger">${books.join('')}</div><p class="hint" style="margin:0">薪資由「薪資」頁計算後自動帶入，${isMgr()?'要修改請到薪資頁。':'只有管理者可以修改。'}</p>`;
   } else if(S.sec==='dept'){
     const ym=`${YEAR}-${pad(m)}`;
-    h+=statStrip(deptStats([m]),`${YEAR} 年 ${m} 月 ・ ${esc(dpName())}`);
-    h+=deptSummaryHTML(ym);
+    const cs=ctrScope();
+    if(!cs.length) return `<div class="panel emptyb">${esc(scopeName())}不是百貨櫃位，請在上方選「全部合計」或某個櫃位。</div>`;
+    h+=statStrip(deptStats([m]),`${YEAR} 年 ${m} 月 ・ ${esc(ctrScopeName())}`);
+    cs.forEach(b=>{ if(ctrOpen(b,ym)||dpDoc(b,ym)||branchSales(b,ym)) h+=deptSummaryHTML(b,ym); });
   }
   return h;
 }
 function renderMonth(m){
   if(S.sec!=='money') return renderSecMonth(m);
-  let h=`<div class="hero">${headline(m)}${S.branch==='all'?branchCards(m):singleSide(m)}</div>`;
+  let h=todoBannerHTML(m)+`<div class="hero">${headline(m)}${S.branch==='all'?branchCards(m):singleSide(m)}</div>`;
   if(S.branch==='all'){
     h+=`<p class="hint" style="margin:0">要新增或修改項目，請先選上方的店。</p>`;
   } else {
@@ -1429,19 +1475,22 @@ function renderSecYear(){
       h+=matrixTable(`${esc(bshort(b))} ・ 每月薪資`,rows,'元');
     }
   } else if(S.sec==='dept'){
-    h+=statStrip(deptStats(MONTHS),`${YEAR} 年 ・ ${esc(dpName())}`);
-    const r=MONTHS.map(m=>deptCalc(`${YEAR}-${pad(m)}`));
-    const rows=[{k:'櫃位業績',v:r.map(x=>x.sales)},{k:'百貨抽成',v:r.map(x=>x.comm)},{k:'其他費用',v:r.map(x=>x.fees)},{k:'應撥款',v:r.map(x=>x.due)},{k:'實際入帳',v:r.map(x=>x.received||0)}];
-    h+=`<div class="panel"><div class="ph"><h2>每月櫃位業績與撥款</h2><div class="legend"><span><i class="sw" style="background:var(--dp)"></i>業績</span><span><i class="sw" style="background:var(--exp)"></i>抽成＋費用</span></div></div><div class="chart" id="deptChart"></div></div>`;
-    h+=matrixTable(`${esc(dpName())} ・ 每月對帳`,rows,'元');
+    const cs=ctrScope();
+    if(!cs.length) return `<div class="panel emptyb">${esc(scopeName())}不是百貨櫃位，請在上方選「全部合計」或某個櫃位。</div>`;
+    h+=statStrip(deptStats(MONTHS),`${YEAR} 年 ・ ${esc(ctrScopeName())}`);
+    h+=`<div class="panel"><div class="ph"><h2>每月櫃位業績</h2><div class="legend">${cs.map(b=>`<span><i class="sw" style="background:var(${B[b].color})"></i>${esc(B[b].short)}</span>`).join('')}</div></div><div class="chart" id="deptChart"></div></div>`;
+    for(const b of cs){ const r=MONTHS.map(m=>deptCalc(b,`${YEAR}-${pad(m)}`)); if(!r.some(x=>x.sales||x.fees||x.received!=null)) continue;
+      const rows=[{k:'櫃位業績',v:r.map(x=>x.sales)},{k:'百貨抽成',v:r.map(x=>x.comm)},{k:'其他費用',v:r.map(x=>x.fees)},{k:'應撥款',v:r.map(x=>x.due)},{k:'實際入帳',v:r.map(x=>x.received||0)}];
+      h+=matrixTable(`${esc(bfull(b))} ・ 每月對帳`,rows,'元'); }
   }
   return h;
 }
 function drawSecCharts(){
   const box=document.getElementById('deptChart'); if(!box) return;
-  const r=MONTHS.map(m=>deptCalc(`${YEAR}-${pad(m)}`)); const last=Math.max(1,...r.map((x,i)=>x.sales?i+1:0));
-  const ms=MONTHS.slice(0,last);
-  drawGroup(box,ms.map(m=>m+'月'),[{name:'業績',color:'--dp',vals:ms.map(m=>r[m-1].sales)},{name:'抽成＋費用',color:'--exp',vals:ms.map(m=>r[m-1].comm+r[m-1].fees)}],'元');
+  const cs=ctrScope(), series=cs.map(b=>({name:B[b].short,color:B[b].color,vals:MONTHS.map(m=>deptCalc(b,`${YEAR}-${pad(m)}`).sales)})).filter(s=>s.vals.some(v=>v));
+  if(!series.length){ box.innerHTML='<p class="hint">這一年沒有櫃位業績。</p>'; return; }
+  const last=Math.max(1,...series.flatMap(s=>s.vals.map((v,i)=>v?i+1:0))), ms=MONTHS.slice(0,last);
+  drawGroup(box,ms.map(m=>m+'月'),series.map(s=>({...s,vals:s.vals.slice(0,last)})),'元');
 }
 function renderYear(){ return S.sec==='money'?renderYearMoney():renderSecYear(); }
 
@@ -1449,7 +1498,7 @@ function renderYear(){ return S.sec==='money'?renderYearMoney():renderSecYear();
 const PAYN={cash:'現金',card:'信用卡',linepay:'LINE Pay',jko:'街口支付',transfer:'轉帳',delivery:'外送平台',mall:'百貨代收'};
 const PAYC={cash:'#8a7356',card:'#7a5cc7',linepay:'#1baf4a',jko:'#d6455b',transfer:'#2a78d6',delivery:'#eb6834',mall:'#8c6f9e'};
 const PAYK_ALL=Object.keys(PAYN);
-const payKeys=b=>b==='dp'?['mall']:['cash','card','linepay','jko','transfer','delivery'];
+const payKeys=b=>isCtr(b)?['mall']:['cash','card','linepay','jko','transfer','delivery'];
 const DF0=[['revenue','當日營業額','元','money'],['tx','交易筆數','筆','count'],['loss','報廢・招待','元','loss']];
 const dFields=b=>DF0.concat(payKeys(b).map(k=>[k,PAYN[k],'元','pay']));
 const D={ day:todayStr(), branch:null, docs:{}, unsub:null, subMonth:null, dirty:{} };
@@ -1492,7 +1541,7 @@ function renderChooser(){
       <span class="pk-month num"><span>${+today.slice(5,7)} 月累計</span><b>${fmt(mrev)} 元</b><span>${fmt(mtx)} 筆交易・${mrows.length} 天</span></span>
       <span class="pk-go">開始結帳 →</span>
     </button>`;};
-  return `<div class="chooser"><button class="mclose" data-mclose="1" aria-label="關閉">×</button><div class="ch-head"><h2 id="pickTitle">今天要幫哪一間店結帳？</h2><p class="hint">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</p></div><div class="picks p${myBR().length}">${myBR().map(card).join('')}</div></div>`;
+  return `<div class="chooser"><button class="mclose" data-mclose="1" aria-label="關閉">×</button><div class="ch-head"><h2 id="pickTitle">今天要幫哪一間店結帳？</h2><p class="hint">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</p></div><div class="picks p${Math.min(3,liveBR().length)}">${liveBR().map(card).join('')}</div></div>`;
 }
 
 /* step 2: closing sheet */
@@ -1505,18 +1554,18 @@ function field(b,[k,lb,u,g],big){
   return `<label class="dfield ${g}${big?' big':''}">${g==='pay'?`<span class="pdot" style="background:${PAYC[k]}"></span>`:''}<span class="fl">${lb}</span><span class="din"><input id="d-${b}-${k}" data-b="${b}" data-k="${k}" type="number" inputmode="numeric" min="0" step="1" value="${esc(val(b,k))}" placeholder="0" ${editable?'':'disabled'}><small>${u}</small></span></label>`;
 }
 function summaryHTML(b){
-  const rev=nval(b,'revenue'), ks=payKeys(b), paid=b==='dp'?rev:sum(ks.map(k=>nval(b,k))), diff=paid-rev, tx=nval(b,'tx');
+  const rev=nval(b,'revenue'), ks=payKeys(b), paid=isCtr(b)?rev:sum(ks.map(k=>nval(b,k))), diff=paid-rev, tx=nval(b,'tx');
   const lw=dDoc(b,addDays(D.day,-7)), lwr=lw?+lw.revenue||0:null;
   const mrows=Object.values(D.docs).filter(x=>x.branch===b&&x.month===dMonth()&&x.date!==D.day&&dStatusOf(x)==='營業');
   const mrev=sum(mrows.map(r=>+r.revenue||0))+rev, mtx=sum(mrows.map(r=>+r.tx||0))+tx;
-  const st=b==='dp'?`<div class="recon idle">櫃位收款都由百貨代收，月底依對帳單撥款</div>`:!rev&&!paid?`<div class="recon idle">填入營業額和收款後會自動對帳</div>`:diff===0?`<div class="recon ok"><b>✓ 對帳相符</b><span>收款合計等於當日營業額</span></div>`:`<div class="recon warn"><b>收款${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元</b><span>請檢查是否漏記或重複</span></div>`;
+  const st=isCtr(b)?`<div class="recon idle">櫃位收款都由百貨代收，月底依對帳單撥款</div>`:!rev&&!paid?`<div class="recon idle">填入營業額和收款後會自動對帳</div>`:diff===0?`<div class="recon ok"><b>✓ 對帳相符</b><span>收款合計等於當日營業額</span></div>`:`<div class="recon warn"><b>收款${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元</b><span>請檢查是否漏記或重複</span></div>`;
   return `<div class="sum-card">
     <div class="sc-t">結帳摘要</div>
     <div class="sc-big num"><span>當日營業額</span><b>${fmt(rev)}</b></div>
-    ${b==='dp'?'':`<div class="sc-row num"><span>收款合計</span><b>${fmt(paid)}</b></div>`}
+    ${isCtr(b)?'':`<div class="sc-row num"><span>收款合計</span><b>${fmt(paid)}</b></div>`}
     ${nval(b,'deposit')?`<div class="sc-row num dep"><span>今日存入銀行</span><b>−${fmt(nval(b,'deposit'))}</b></div>`:''}
-    ${b==='dp'?'':payBlock(b)}
-    ${b==='dp'?'':`<div class="paylegend">${ks.filter(k=>nval(b,k)).map(k=>`<span><i style="background:${PAYC[k]}"></i>${PAYN[k]} ${fmt(nval(b,k))}</span>`).join('')}</div>`}
+    ${isCtr(b)?'':payBlock(b)}
+    ${isCtr(b)?'':`<div class="paylegend">${ks.filter(k=>nval(b,k)).map(k=>`<span><i style="background:${PAYC[k]}"></i>${PAYN[k]} ${fmt(nval(b,k))}</span>`).join('')}</div>`}
     ${st}
     <div class="sc-grid num">
       <div><span>客單價</span><b>${tx?fmt(rev/tx):'—'}</b></div>
@@ -1531,7 +1580,7 @@ function monthStrip(b){
   const rows={}; Object.values(D.docs).filter(d=>d.branch===b&&d.month===dMonth()).forEach(d=>rows[d.date]=d);
   const mx=Math.max(1,...Object.values(rows).map(r=>+r.revenue||0));
   let h=`<div class="mstrip">`;
-  for(let i=1;i<=days;i++){const day=`${dMonth()}-${pad(i)}`, r=rows[day], v=r?+r.revenue||0:0, df=r&&b!=='dp'?paidOf(b,r)-v:0;
+  for(let i=1;i<=days;i++){const day=`${dMonth()}-${pad(i)}`, r=rows[day], v=r?+r.revenue||0:0, df=r&&!isCtr(b)?paidOf(b,r)-v:0;
     const st=dStatusOf(r); const sc=st==='公休'?'off':st==='颱風假'?'ty':'';
     h+=`<button class="ms ${day===D.day?'cur':''} ${st?'has':''} ${r&&df&&st==='營業'?'bad':''} ${sc}" data-dday="${day}" title="${m}/${i} ${st?(st!=='營業'?st:fmt(v)+' 元'):'未結帳'}"><span class="msb"><i style="height:${st==='營業'?Math.max(6,v/mx*100):0}%"></i></span><span class="msd">${i}</span><span class="msw">${wk(day)}</span></button>`;}
   return h+`</div><div class="statline">${statusLine(statusCount(b,dMonth(),D.docs))}</div>`;
@@ -1539,12 +1588,12 @@ function monthStrip(b){
 function monthTable(b){
   const rows=Object.values(D.docs).filter(d=>d.branch===b&&d.month===dMonth()&&dStatusOf(d)).sort((a,c)=>a.date<c.date?-1:1);
   if(!rows.length) return '';
-  const F=dFields(b).filter(f=>b!=='dp'||f[3]!=='pay'), cols=F.map(f=>f[0]), tt=k=>sum(rows.map(r=>+r[k]||0)), diffOf=r=>b==='dp'||dStatusOf(r)!=='營業'?0:paidOf(b,r)-(+r.revenue||0);
-  let h=`<div class="panel scroll"><div class="ph"><h2>${+dMonth().slice(5)} 月結帳紀錄</h2><span class="hint">點日期可修改那天</span></div><table class="dtab"><thead><tr><th>日期</th>${F.map(f=>`<th>${f[1]}</th>`).join('')}${b==='dp'?'':'<th>差額</th>'}<th>存入銀行</th><th>結帳人</th></tr></thead><tbody>`;
+  const F=dFields(b).filter(f=>!isCtr(b)||f[3]!=='pay'), cols=F.map(f=>f[0]), tt=k=>sum(rows.map(r=>+r[k]||0)), diffOf=r=>isCtr(b)||dStatusOf(r)!=='營業'?0:paidOf(b,r)-(+r.revenue||0);
+  let h=`<div class="panel scroll"><div class="ph"><h2>${+dMonth().slice(5)} 月結帳紀錄</h2><span class="hint">點日期可修改那天</span></div><table class="dtab"><thead><tr><th>日期</th>${F.map(f=>`<th>${f[1]}</th>`).join('')}${isCtr(b)?'':'<th>差額</th>'}<th>存入銀行</th><th>結帳人</th></tr></thead><tbody>`;
   for(const r of rows){const df=diffOf(r), st=dStatusOf(r);
-    h+=`<tr class="${r.date===D.day?'cur':''}"><td><button class="ibtn" data-dday="${r.date}">${+r.date.slice(8)} 日（${wk(r.date)}）</button></td>${st!=='營業'?`<td colspan="${cols.length}" class="hint st-offc">${esc(st)}</td>`:cols.map(k=>`<td class="num">${r[k]?fmt(r[k]):''}</td>`).join('')}${b==='dp'?'':`<td class="num ${df?'neg':'pos'}">${st!=='營業'?'':df?sgn(df):'✓'}</td>`}<td class="num">${r.deposit?fmt(r.deposit):''}</td><td>${esc(r.staff||'')}</td></tr>`;}
+    h+=`<tr class="${r.date===D.day?'cur':''}"><td><button class="ibtn" data-dday="${r.date}">${+r.date.slice(8)} 日（${wk(r.date)}）</button></td>${st!=='營業'?`<td colspan="${cols.length}" class="hint st-offc">${esc(st)}</td>`:cols.map(k=>`<td class="num">${r[k]?fmt(r[k]):''}</td>`).join('')}${isCtr(b)?'':`<td class="num ${df?'neg':'pos'}">${st!=='營業'?'':df?sgn(df):'✓'}</td>`}<td class="num">${r.deposit?fmt(r.deposit):''}</td><td>${esc(r.staff||'')}</td></tr>`;}
   const td=sum(rows.map(diffOf));
-  h+=`<tr class="net"><td>合計 ${rows.filter(r=>dStatusOf(r)==='營業').length} 天</td>${cols.map(k=>`<td class="num">${fmt(tt(k))}</td>`).join('')}${b==='dp'?'':`<td class="num ${td?'neg':'pos'}">${td?sgn(td):'✓'}</td>`}<td class="num">${fmt(tt('deposit'))}</td><td></td></tr></tbody></table></div>`;
+  h+=`<tr class="net"><td>合計 ${rows.filter(r=>dStatusOf(r)==='營業').length} 天</td>${cols.map(k=>`<td class="num">${fmt(tt(k))}</td>`).join('')}${isCtr(b)?'':`<td class="num ${td?'neg':'pos'}">${td?sgn(td):'✓'}</td>`}<td class="num">${fmt(tt('deposit'))}</td><td></td></tr></tbody></table></div>`;
   const [y,m]=dMonth().split('-').map(Number), led=sum(listOfRaw(b,m,'rev',y).map(e=>+e.amt||0));
   if(led&&isMgr()) h+=`<p class="hint" style="margin:-8px 4px 0">營業分析裡 ${y} 年 ${m} 月${esc(bshort(b))}手動填的營收是 ${fmt(led)} 元，每日結帳合計 ${fmt(tt('revenue'))} 元。</p>`;
   return h;
@@ -1565,10 +1614,10 @@ function closedHTML(b,d){
   if(st!=='營業'){
     body=`<div class="cl-card off"><div class="cl-off"><span class="cl-badge ${st==='颱風假'?'ty':'off'}">${esc(st)}</span><p>這天${esc(st)}，沒有營業。</p>${d.note?`<p class="hint">備註：${esc(d.note)}</p>`:''}</div>${editable?`<button class="btn cl-edit" data-dedit="1">✎ 編輯</button>`:''}</div>`;
   } else {
-    const rev=+d.revenue||0, paid=paidOf(b,d), diff=b==='dp'?0:paid-rev, tx=+d.tx||0;
-    const pays=b==='dp'?'':payKeys(b).filter(k=>+d[k]).map(k=>`<span class="cl-pay"><i style="background:${PAYC[k]}"></i>${PAYN[k]}<b class="num">${fmt(+d[k])}</b></span>`).join('');
+    const rev=+d.revenue||0, paid=paidOf(b,d), diff=isCtr(b)?0:paid-rev, tx=+d.tx||0;
+    const pays=isCtr(b)?'':payKeys(b).filter(k=>+d[k]).map(k=>`<span class="cl-pay"><i style="background:${PAYC[k]}"></i>${PAYN[k]}<b class="num">${fmt(+d[k])}</b></span>`).join('');
     body=`<div class="cl-card">
-      <div class="cl-main"><div class="cl-rev"><span>今日營業額</span><b class="num">${fmt(rev)}</b><em class="${diff?'bad':'ok'}">${b==='dp'?'百貨代收':diff?`收款${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元`:'✓ 對帳相符'}</em></div>
+      <div class="cl-main"><div class="cl-rev"><span>今日營業額</span><b class="num">${fmt(rev)}</b><em class="${diff?'bad':'ok'}">${isCtr(b)?'百貨代收':diff?`收款${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元`:'✓ 對帳相符'}</em></div>
         <div class="cl-nums num"><div><span>交易筆數</span><b>${fmt(tx)}</b><small>筆</small></div><div><span>客單價</span><b>${tx?fmt(rev/tx):'—'}</b></div><div><span>報廢・招待</span><b>${fmt(+d.loss||0)}</b><small>元</small></div></div></div>
       ${pays?`<div class="cl-pays">${pays}</div>`:''}
       ${(+d.deposit||0)||d.note?`<div class="cl-extra">${+d.deposit?`<span>存入銀行 <b class="num">${fmt(+d.deposit)}</b></span>`:''}${d.note?`<span>備註：${esc(d.note)}</span>`:''}</div>`:''}
@@ -1590,10 +1639,10 @@ function renderSheet(b){
           <div class="chips dstat">${DSTAT.map(([v,l])=>`<button type="button" class="chip ${stv===v?'on':''} st-${v==='營業'?'op':v==='公休'?'off':'ty'}" data-dstat="${v}" ${editable?'':'disabled'}>${l}</button>`).join('')}</div>
           ${stv==='營業'?field(b,F[0],true):`<p class="hint dst-hint">這天是「${esc(stv)}」，不用填營業額，直接按${d?'更新':'完成'}結帳就會記錄。</p>`}</section>
         ${stv==='營業'?`<section class="dsec"><div class="ds-h"><span class="ds-n">2</span><h3>交易與報廢</h3><span class="hint">報廢・招待以售價計算，不算進營業額</span></div><div class="dgrid3">${F.filter(f=>f[3]==='count'||f[3]==='loss').map(f=>field(b,f)).join('')}</div></section>
-        ${b==='dp'?`<section class="dsec"><div class="ds-h"><span class="ds-n">3</span><h3>收款方式</h3></div><p class="hint">百貨櫃位的收款都由百貨收銀代收，營業額請填百貨收銀機日結的金額。抽成和撥款到「百貨對帳」記錄。</p></section>`
+        ${isCtr(b)?`<section class="dsec"><div class="ds-h"><span class="ds-n">3</span><h3>收款方式</h3></div><p class="hint">百貨櫃位的收款都由百貨收銀代收，營業額請填百貨收銀機日結的金額。抽成和撥款到「百貨對帳」記錄。</p></section>`
         :`<section class="dsec"><div class="ds-h"><span class="ds-n">3</span><h3>收款方式</h3><span class="hint">各種收款加起來應該等於當日營業額</span></div><div class="dgrid3">${F.filter(f=>f[3]==='pay').map(f=>field(b,f)).join('')}</div></section>`}`:''}
         <section class="dsec"><div class="ds-h"><span class="ds-n">${stv==='營業'?4:2}</span><h3>結帳資訊</h3></div>
-          ${b==='dp'||stv!=='營業'?'':`<label class="dfield dep"><span class="fl">存入銀行<em>從店內現金存入銀行，會從現金結算扣除</em></span><span class="din"><input id="d-${b}-deposit" data-b="${b}" data-k="deposit" type="number" inputmode="numeric" min="0" step="1" value="${esc(val(b,'deposit'))}" placeholder="今天沒有存款就留空" ${editable?'':'disabled'}><small>元</small></span></label>`}
+          ${isCtr(b)||stv!=='營業'?'':`<label class="dfield dep"><span class="fl">存入銀行<em>從店內現金存入銀行，會從現金結算扣除</em></span><span class="din"><input id="d-${b}-deposit" data-b="${b}" data-k="deposit" type="number" inputmode="numeric" min="0" step="1" value="${esc(val(b,'deposit'))}" placeholder="今天沒有存款就留空" ${editable?'':'disabled'}><small>元</small></span></label>`}
           <div class="dgrid2">
           <label class="dfield"><span class="fl">結帳人（登入者）</span><input class="tin" id="d-${b}-staff" value="${esc(W.name||'')}" readonly tabindex="-1"></label>
           <label class="dfield"><span class="fl">備註</span><input class="tin" id="d-${b}-note" data-b="${b}" data-k="note" maxlength="160" value="${esc(val(b,'note'))}" placeholder="例：下雨、企業訂單取貨、零錢不足" ${editable?'':'disabled'}></label></div></section>
@@ -1606,7 +1655,7 @@ function renderSheet(b){
     <div id="dTables">${monthTable(b)}</div>`;
 }
 let PK='daily';
-function openPick(kind){ PK=kind||'daily'; if(!myBR().length){ toast(`你還沒有被指定負責的店，請老闆在人員管理勾選`); return; } if(myBR().length===1){ D.day=todayStr(); subDaily(); choosePick(myBR()[0]); return; } D.day=todayStr(); subDaily(); $('#pickBox').innerHTML=PK==='spend'?spendChooser():renderChooser(); $('#pickModal').hidden=false; document.body.classList.add('noscroll'); setTimeout(()=>{const f=$('#pickBox .pick');f&&f.focus();},30); }
+function openPick(kind){ PK=kind||'daily'; if(!liveBR().length){ toast(`你還沒有被指定負責的店，請老闆在人員管理勾選`); return; } if(liveBR().length===1){ D.day=todayStr(); subDaily(); choosePick(liveBR()[0]); return; } D.day=todayStr(); subDaily(); $('#pickBox').innerHTML=PK==='spend'?spendChooser():renderChooser(); $('#pickModal').hidden=false; document.body.classList.add('noscroll'); setTimeout(()=>{const f=$('#pickBox .pick');f&&f.focus();},30); }
 function closePick(){ $('#pickModal').hidden=true; document.body.classList.remove('noscroll'); }
 function choosePick(b){ closePick(); if(PK==='spend'){ S.mode='spend'; SP.branch=b; SP.day=todayStr(); SP.draft={}; SP.confirmDel=null; SP.editId=null; saveUI(); render(); scrollTo({top:0}); return; } S.mode='daily'; D.edit=false; D.branch=b; D.day=todayStr(); D.dirty={}; saveD(); saveUI(); subDaily(); render(); scrollTo({top:0}); }
 function renderDaily(fromSnap){
@@ -1624,13 +1673,13 @@ async function saveDaily(b){
   for(const [k] of dFields(b)){const el=$(`#d-${b}-${k}`);data[k]=el&&el.value!==''?Math.round(+el.value):0;}
   data.status=val(b,'status')||'營業';
   if(data.status!=='營業') for(const [k] of dFields(b)) data[k]=0;
-  if(b==='dp') data.mall=data.revenue;
+  if(isCtr(b)) data.mall=data.revenue;
   data.staff=W.name||''; data.by=W.uid||''; {const el=$(`#d-${b}-deposit`); data.deposit=el&&el.value!==''?Math.round(+el.value):0;} data.note=(($(`#d-${b}-note`)||{}).value||'').trim(); data.updatedAt=new Date().toISOString();
   data.closed=true;
   { const rv=($(`#d-${b}-revenue`)||{}).value; if(data.status==='營業'&&(rv===undefined||rv==='')){toast('今天沒有營業額的話，請在「當日營業額」填 0 再按完成結帳');const r=$(`#d-${b}-revenue`); r&&r.focus(); return;} }
   const btn=document.querySelector('.big-save'); if(btn) btn.disabled=true;
   try{ await S.db.doc('daily/'+dId(b,D.day)).set(data); D.docs[dId(b,D.day)]=data; S.allDaily={...(S.allDaily||{}),[dId(b,D.day)]:data}; delete D.dirty[b]; D.edit=false;
-    const diff=b==='dp'?0:paidOf(b,data)-data.revenue;
+    const diff=isCtr(b)?0:paidOf(b,data)-data.revenue;
     toast(`${bshort(b)} ${+D.day.slice(5,7)}/${+D.day.slice(8)} ${data.status!=='營業'?`記錄為${data.status}`:'結帳完成'}${diff&&data.status==='營業'?`（收款${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元）`:''}`); renderDaily(); }
   catch(e){ if(btn) btn.disabled=false; if(e&&(e.code==='invalid_argument'||e.code==='permission-denied')){S.canWrite=false;toast('你沒有修改權限');} else toast('儲存失敗，請稍後再試'); }
 }
@@ -1766,7 +1815,7 @@ function drawPay(){
         <div class="pr-save">${PR.dirty?'<span class="pr-dirty">● 尚未儲存</span>':dr.exists?'<span class="hint">✓ 已儲存</span>':''}<button class="btn primary" data-prsave="1" ${PR.dirty?'':'disabled'}>${dr.exists?'儲存修改':'建立薪資表'}</button>${PR.dirty&&dr.exists?'<button class="btn" data-prundo="1">放棄修改</button>':''}${!dr.exists?'<button class="btn" data-prundo="1">取消</button>':''}</div></div>
       <div class="pr-list">${shown.map(id=>prCardHTML(id,dr.rows[id])).join('')||'<p class="hint">這個店點這個月沒有人員。</p>'}</div>
       ${missing.length?`<div class="pr-miss">${missing.map(e=>`<button class="btn" data-pradd="${e.id}">＋ 加入 ${esc(e.name)}</button>`).join('')}</div>`:''}
-      <p class="hint">儲存後，每個人的實發金額會依所屬店點，自動帶到營業分析的「人事」和那間店支出的「人事薪資」（那個月沒有手動填時）。</p>`
+      <p class="hint">儲存後，每個人的實發金額會依所屬店點，自動帶到營業分析的「人事」和那間店支出的「人事支出」（那個月沒有手動填時）。</p>`
     :`<div class="panel emptyb"><p>${m} 月還沒有薪資表。</p>${prCfg().length?`<button class="btn primary" data-prnew="1">建立 ${m} 月薪資表</button><p class="hint">會帶入每個人的底薪、全勤、職務津貼、勞健保，並依業績算好獎金，津貼和其他項目再自己填。</p>`:'<p class="hint">請先在下方「人員與預設薪資」新增人員。</p>'}</div>`}
     ${prRefHTML()}
     ${prCfgHTML()}`;
@@ -1838,100 +1887,121 @@ function bindPay(){
 function autoPayroll(b,y,m){ const d=(S.payroll||{})[`${y}-${pad(m)}`]; if(!d||!d.rows) return [];
   return Object.entries(d.rows).filter(([,r])=>rBr(r)===b).map(([id,r])=>({id:`auto-pay-${y}-${m}-${id}`,cat:r.type==='時薪'?'PT 時薪':'正職',item:r.name,amt:r.net??prNet(r),note:+r.bonus?`含業績獎金 ${fmt(r.bonus)}`:'薪資表',auto:true})); }
 
-/* ---------- 百貨對帳（櫃位業績、抽成、費用、撥款） ---------- */
-const DP={ym:todayStr().slice(0,7),draft:null,dirty:false,cfgOpen:false};
-const dpDoc=ym=>(S.dept||{})[ym]||null;
-function deptCalc(ym,d){
-  d=d||dpDoc(ym)||{};
-  const daily=branchSales('dp',ym), ov=d.sales===''||d.sales==null?null:+d.sales;
-  const sales=ov??daily, rate=d.rate===''||d.rate==null?cfg().rate:+d.rate;
+/* ---------- 百貨對帳（每個櫃位各自：業績、抽成、費用、撥款） ---------- */
+const DP={ym:todayStr().slice(0,7),b:null,draft:null,dirty:false,cfgOpen:false,cfgDraft:null};
+const ctrIds=()=>BR.filter(isCtr);
+const dpKey=(b,ym)=>`${b}-${ym}`;
+const dpDoc=(b,ym)=>(S.dept||{})[dpKey(b,ym)]||null;
+function deptCalc(b,ym,d){
+  d=d||dpDoc(b,ym)||{};
+  const daily=branchSales(b,ym), ov=d.sales===''||d.sales==null?null:+d.sales;
+  const sales=ov??daily, rate=d.rate===''||d.rate==null?(+((ctrOf(b)||{}).rate)||0):+d.rate;
   const comm=Math.round(sales*rate/100), fees=sum((d.fees||[]).map(x=>+x.amt||0)), due=sales-comm-fees;
   const received=d.received===''||d.received==null?null:+d.received;
   return {daily,sales,ov,rate,comm,fees,due,received,diff:received==null?null:received-due,d};
 }
-function autoDept(y,m){
-  const ym=`${y}-${pad(m)}`, c=deptCalc(ym); if(!c.sales&&!dpDoc(ym)) return [];
-  const out=[]; if(c.comm) out.push({id:`auto-dpc-${ym}`,cat:'百貨抽成・費用',item:`百貨抽成 ${c.rate}%`,amt:c.comm,date:'',note:'百貨對帳',auto:true,sysAuto:true});
-  (c.d.fees||[]).forEach((x,i)=>{ if(+x.amt) out.push({id:`auto-dpf-${ym}-${i}`,cat:'百貨抽成・費用',item:x.label||'百貨費用',amt:+x.amt,date:'',note:'百貨對帳',auto:true,sysAuto:true}); });
+const deptCalcAll=(bs,ym)=>{ const xs=bs.map(b=>deptCalc(b,ym)); const k=f=>sum(xs.map(x=>x[f]||0)); return {sales:k('sales'),comm:k('comm'),fees:k('fees'),due:k('due'),received:xs.some(x=>x.received!=null)?k('received'):null}; };
+function autoDept(b,y,m){
+  const ym=`${y}-${pad(m)}`, c=deptCalc(b,ym); if(!c.sales&&!dpDoc(b,ym)) return [];
+  const out=[]; if(c.comm) out.push({id:`auto-dpc-${b}-${ym}`,cat:'百貨抽成・費用',item:`百貨抽成 ${c.rate}%`,amt:c.comm,date:'',note:'百貨對帳',auto:true,sysAuto:true});
+  (c.d.fees||[]).forEach((x,i)=>{ if(+x.amt) out.push({id:`auto-dpf-${b}-${ym}-${i}`,cat:'百貨抽成・費用',item:x.label||'百貨費用',amt:+x.amt,date:'',note:'百貨對帳',auto:true,sysAuto:true}); });
   return out;
 }
-function deptSummaryHTML(ym){
-  const c=deptCalc(ym), [y,m]=ym.split('-').map(Number);
-  if(!c.sales&&!dpDoc(ym)) return `<div class="panel emptyb">${m} 月櫃位還沒有營業紀錄。${isMgr()?'<button class="btn" data-home="dept">打開百貨對帳 →</button>':''}</div>`;
-  return `<div class="panel dp-sum"><div class="ph"><h2>${m} 月百貨對帳</h2>${isMgr()?'<button class="btn" data-home="dept">打開百貨對帳 →</button>':''}</div>
+function deptSummaryHTML(b,ym){
+  const c=deptCalc(b,ym), [y,m]=ym.split('-').map(Number);
+  if(!c.sales&&!dpDoc(b,ym)) return `<div class="panel emptyb">${esc(bfull(b))}：${m} 月沒有營業紀錄。</div>`;
+  return `<div class="panel dp-sum"><div class="ph"><h2><i class="sw" style="background:var(${B[b].color})"></i>${esc(bfull(b))} ・ ${m} 月對帳</h2>${isMgr()?`<button class="btn" data-home="dept" data-dpb="${b}">打開百貨對帳 →</button>`:''}</div>
     <ul class="dp-l num"><li><span>櫃位業績${c.ov!=null?'（依百貨對帳單）':'（每日結帳合計）'}</span><b>${fmt(c.sales)}</b></li>
     <li><span>百貨抽成 ${c.rate}%</span><b>−${fmt(c.comm)}</b></li>
     ${(c.d.fees||[]).filter(x=>+x.amt).map(x=>`<li><span>${esc(x.label||'費用')}</span><b>−${fmt(+x.amt)}</b></li>`).join('')}
     <li class="tot"><span>應撥款</span><b>${fmt(c.due)}</b></li>
     <li><span>實際入帳${c.d.receivedDate?`（${md(c.d.receivedDate)}）`:''}</span><b>${c.received==null?'尚未入帳':fmt(c.received)}</b></li>
-    ${c.diff?`<li class="bad"><span>入帳差額</span><b>${sgn(c.diff)}</b></li>`:''}</ul>
-    <p class="hint">抽成和費用會自動列進百貨櫃位的支出「百貨抽成・費用」（那個月沒有手動填時）。</p></div>`;
+    ${c.diff?`<li class="bad"><span>入帳差額</span><b>${sgn(c.diff)}</b></li>`:''}</ul></div>`;
 }
-function dpEnsure(){ if(DP.draft&&DP.draft.ym===DP.ym) return; const d=dpDoc(DP.ym); DP.dirty=false;
-  DP.draft={ym:DP.ym,exists:!!d,sales:d&&d.sales!=null?d.sales:'',rate:d&&d.rate!=null?d.rate:'',fees:JSON.parse(JSON.stringify((d&&d.fees)||[])),received:d&&d.received!=null?d.received:'',receivedDate:(d&&d.receivedDate)||'',note:(d&&d.note)||''};
-  if(!d){ const p=dpDoc(ymShift(DP.ym,-1)); if(p&&p.fees&&p.fees.length) DP.prevFees=p.fees; else DP.prevFees=null; } else DP.prevFees=null; }
+function dpPick(){ const ids=ctrIds(); if(!ids.includes(DP.b)) DP.b=(ids.filter(b=>ctrOpen(b,DP.ym))[0])||(ids.filter(ctrLive)[0])||ids[0]||null; return DP.b; }
+function dpEnsure(){ const b=DP.b; if(DP.draft&&DP.draft.ym===DP.ym&&DP.draft.b===b) return; const d=dpDoc(b,DP.ym); DP.dirty=false;
+  DP.draft={b,ym:DP.ym,exists:!!d,sales:d&&d.sales!=null?d.sales:'',rate:d&&d.rate!=null?d.rate:'',fees:JSON.parse(JSON.stringify((d&&d.fees)||[])),received:d&&d.received!=null?d.received:'',receivedDate:(d&&d.receivedDate)||'',note:(d&&d.note)||''};
+  if(!d){ const p=dpDoc(b,ymShift(DP.ym,-1)); DP.prevFees=p&&p.fees&&p.fees.length?p.fees:null; } else DP.prevFees=null; }
+function ctrCfgHTML(){
+  const list=DP.cfgDraft||counters(), can=isBoss();
+  return `<details class="panel pr-cfg" id="dpCfg" ${DP.cfgOpen?'open':''}><summary>⚙️ 櫃位設定（名稱、營業期間、抽成率）</summary>
+    <p class="hint">每個外展櫃位一列。結束月份留空代表還在營業；結束後的櫃位不會出現在每日結帳和當日支出的選單，但歷史資料都會保留在營業分析。</p>
+    <div class="ctr-l">${list.map((c,i)=>`<div class="ctr-r"><i class="sw" style="background:var(${(['dp','ep','gl'].includes(c.id)?'--'+c.id:CTR_COLORS[(i+3)%CTR_COLORS.length])})"></i>
+      <label><span>名稱</span><input class="tin" data-ctr="${i}" data-k="name" value="${esc(c.name)}" maxlength="24" ${can?'':'disabled'}></label>
+      <label><span>簡稱</span><input class="tin" data-ctr="${i}" data-k="short" value="${esc(c.short||'')}" maxlength="4" ${can?'':'disabled'}></label>
+      <label><span>開始</span><input class="tin" type="month" data-ctr="${i}" data-k="start" value="${esc(c.start||'')}" ${can?'':'disabled'}></label>
+      <label><span>結束</span><input class="tin" type="month" data-ctr="${i}" data-k="end" value="${esc(c.end||'')}" ${can?'':'disabled'}></label>
+      <label><span>抽成 %</span><input class="tin" type="number" step="0.1" data-ctr="${i}" data-k="rate" value="${esc(c.rate??'')}" ${can?'':'disabled'}></label></div>`).join('')}</div>
+    ${can?`<div class="fx-act"><button class="btn" data-ctradd="1">＋ 新增櫃位</button><span class="sp"></span>${DP.cfgDraft?'<button class="btn" data-ctrcancel="1">取消</button><button class="btn primary" data-ctrsave="1">儲存櫃位設定</button>':''}</div>`:`<p class="hint">只有老闆可以修改。</p>`}</details>`;
+}
 function drawDept(){
   if(!W.name){ renderLogin(); return; }
   if(!isMgr()){ $('#main').innerHTML=`<div class="panel emptyb">這個頁面只有老闆和管理者可以使用。</div>`; return; }
+  const b=dpPick(); if(!b){ $('#main').innerHTML=`<div class="panel emptyb">還沒有設定任何櫃位。</div>${ctrCfgHTML()}`; return; }
   dpEnsure();
-  const dr=DP.draft, c=deptCalc(DP.ym,dr), [y,m]=DP.ym.split('-').map(Number), conf=cfg();
-  const ds=Object.values(S.allDaily||{}).filter(d=>d.branch==='dp'&&d.month===DP.ym&&dStatusOf(d)==='營業'), days=ds.length;
-  const yr=MONTHS.map(mm=>deptCalc(`${y}-${pad(mm)}`)).map((x,i)=>[i+1,x]).filter(([,x])=>x.sales||x.received!=null);
-  $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(--dp)"><div class="st-l"><div><div class="st-name">百貨對帳 <small>${esc(dpName())}</small></div><div class="st-state">櫃位業績、百貨抽成與各項費用、每月撥款</div></div></div></div>
+  const dr=DP.draft, c=deptCalc(b,DP.ym,dr), [y,m]=DP.ym.split('-').map(Number);
+  const ds=Object.values(S.allDaily||{}).filter(d=>d.branch===b&&d.month===DP.ym&&dStatusOf(d)==='營業'), days=ds.length;
+  const yms=[]; for(let k=ymShift(DP.ym,-11);k<=DP.ym;k=ymShift(k,1)) yms.push(k);
+  const yr=yms.map(k=>[k,deptCalc(b,k)]).filter(([,x])=>x.sales||x.received!=null||x.fees);
+  $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(${B[b].color})"><div class="st-l"><div><div class="st-name">百貨對帳 <small>${esc(B[b].name)}・${esc(ctrRange(b))}</small></div><div class="st-state">櫃位業績、百貨抽成與各項費用、每月撥款</div></div></div>
+      <div class="seg cs-seg">${ctrIds().map(x=>`<button data-dpb="${x}" aria-pressed="${x===b}"><i class="sw" style="background:var(${B[x].color})"></i>${esc(B[x].short)}</button>`).join('')}</div></div>
     <div class="cr-month"><button class="btn" data-dpym="-1" aria-label="上個月">‹</button><b>${y} 年 ${m} 月</b><button class="btn" data-dpym="1" aria-label="下個月">›</button></div>
+    ${ctrOpen(b,DP.ym)?'':`<p class="hint" style="text-align:center;margin:-6px 0 0">${esc(B[b].name)}這個月不在營業期間（${esc(ctrRange(b))}）</p>`}
     <div class="dp-grid">
     <div class="panel dp-form">
       <div class="ph"><h2>${m} 月對帳</h2><span class="hint num">每日結帳 ${days} 天・合計 ${fmt(c.daily)} 元</span></div>
       <label class="dfield"><span class="fl">百貨對帳單業績<em>留空就用每日結帳合計 ${fmt(c.daily)}</em></span><span class="din"><input data-dp="sales" type="number" inputmode="numeric" value="${esc(dr.sales)}" placeholder="${c.daily}"><small>元</small></span></label>
-      <label class="dfield"><span class="fl">抽成率<em>留空用合約預設 ${conf.rate}%</em></span><span class="din"><input data-dp="rate" type="number" inputmode="decimal" step="0.1" value="${esc(dr.rate)}" placeholder="${conf.rate}"><small>%</small></span></label>
+      <label class="dfield"><span class="fl">抽成率<em>留空用櫃位設定 ${+((ctrOf(b)||{}).rate)||0}%</em></span><span class="din"><input data-dp="rate" type="number" inputmode="decimal" step="0.1" value="${esc(dr.rate)}" placeholder="${+((ctrOf(b)||{}).rate)||0}"><small>%</small></span></label>
       <div class="pr-x"><div class="pr-xh"><b>其他費用（百貨代扣）</b><span class="num">合計 ${fmt(c.fees)} 元</span></div>
         ${dr.fees.map((x,i)=>`<div class="pr-xr"><input class="tin" data-dpf="${i}" data-k="label" value="${esc(x.label||'')}" placeholder="例：管理費、刷卡手續費、電費、廣告分攤"><span class="din"><input data-dpf="${i}" data-k="amt" type="number" inputmode="numeric" value="${esc(x.amt??'')}" placeholder="0">${PM}<small>元</small></span><button class="ibtn" data-dpfdel="${i}" aria-label="刪除">✕</button></div>`).join('')}
         <div class="fx-act"><button class="btn pr-addx" data-dpfadd="1">＋ 新增費用</button>${DP.prevFees&&!dr.fees.length?`<button class="btn" data-dpfprev="1">沿用上月費用項目（${DP.prevFees.length} 項）</button>`:''}</div></div>
       <div class="dgrid2">
         <label class="dfield"><span class="fl">實際入帳金額</span><span class="din"><input data-dp="received" type="number" inputmode="numeric" value="${esc(dr.received)}" placeholder="還沒入帳就留空"><small>元</small></span></label>
         <label class="dfield"><span class="fl">入帳日期</span><input class="tin" type="date" data-dp="receivedDate" value="${esc(dr.receivedDate)}"></label></div>
-      <label class="dfield"><span class="fl">備註</span><input class="tin" data-dp="note" maxlength="120" value="${esc(dr.note)}" placeholder="例：週年慶加抽 2%、對帳單編號"></label>
+      <label class="dfield"><span class="fl">備註</span><input class="tin" data-dp="note" maxlength="160" value="${esc(dr.note)}" placeholder="例：週年慶加抽 2%、對帳單編號"></label>
       <div class="pr-save">${DP.dirty?'<span class="pr-dirty">● 尚未儲存</span>':dr.exists?'<span class="hint">✓ 已儲存</span>':''}<button class="btn primary" data-dpsave="1" ${DP.dirty?'':'disabled'}>儲存 ${m} 月對帳</button></div>
     </div>
     <aside class="sum-card dp-res" id="dpRes">${dpResHTML(c)}</aside></div>
-    ${yr.length?`<div class="panel scroll"><div class="ph"><h2>${y} 年櫃位對帳</h2><span class="hint">點月份切換</span></div><table class="dtab"><thead><tr><th>月份</th><th>業績</th><th>抽成</th><th>費用</th><th>應撥款</th><th>實際入帳</th><th>差額</th></tr></thead><tbody>${yr.map(([mm,x])=>`<tr class="${mm===m?'cur':''}"><td><button class="ibtn" data-dpgo="${y}-${pad(mm)}">${mm} 月</button></td><td class="num">${fmt(x.sales)}</td><td class="num">${fmt(x.comm)}</td><td class="num">${fmt(x.fees)}</td><td class="num">${fmt(x.due)}</td><td class="num">${x.received==null?'<span class="hint">未入帳</span>':fmt(x.received)}</td><td class="num ${x.diff?'neg':''}">${x.diff==null?'':x.diff?sgn(x.diff):'✓'}</td></tr>`).join('')}</tbody></table></div>`:''}
-    <details class="panel pr-cfg" id="dpCfg" ${DP.cfgOpen?'open':''}><summary>⚙️ 櫃位合約設定</summary>
-      <div class="dgrid2"><label class="dfield"><span class="fl">百貨名稱</span><input class="tin" id="cfgVenue" value="${esc(conf.venue)}" maxlength="20" ${isBoss()?'':'disabled'}></label>
-      <label class="dfield"><span class="fl">預設抽成率</span><span class="din"><input id="cfgRate" type="number" step="0.1" value="${esc(conf.rate)}" ${isBoss()?'':'disabled'}><small>%</small></span></label></div>
-      ${isBoss()?'<button class="btn primary" data-cfgsave="1">儲存設定</button>':`<p class="hint">只有老闆可以修改。</p>`}
-      <p class="hint">換櫃位或換百貨時，改這裡的名稱即可，舊月份的對帳資料都會留著。</p></details>`;
+    ${yr.length?`<div class="panel scroll"><div class="ph"><h2>${esc(B[b].short)}・近 12 個月對帳</h2><span class="hint">點月份切換</span></div><table class="dtab"><thead><tr><th>月份</th><th>業績</th><th>抽成</th><th>費用</th><th>應撥款</th><th>實際入帳</th><th>差額</th></tr></thead><tbody>${yr.map(([k,x])=>`<tr class="${k===DP.ym?'cur':''}"><td><button class="ibtn" data-dpgo="${k}">${k.replace('-','/')}</button></td><td class="num">${fmt(x.sales)}</td><td class="num">${fmt(x.comm)}</td><td class="num">${fmt(x.fees)}</td><td class="num">${fmt(x.due)}</td><td class="num">${x.received==null?'<span class="hint">未入帳</span>':fmt(x.received)}</td><td class="num ${x.diff?'neg':''}">${x.diff==null?'':x.diff?sgn(x.diff):'✓'}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${ctrCfgHTML()}`;
 }
 function dpResHTML(c){
   return `<div class="sc-t">撥款試算</div>
     <div class="sc-big num"><span>應撥款</span><b>${fmt(c.due)}</b></div>
     <div class="sc-row num"><span>業績</span><b>${fmt(c.sales)}</b></div>
-    <div class="sc-row num dep"><span>抽成 ${c.rate}%</span><b>−${fmt(c.comm)}</b></div>
-    <div class="sc-row num dep"><span>其他費用</span><b>−${fmt(c.fees)}</b></div>
+    <div class="sc-row num dep"><span>抽成 ${c.rate}%</span><b>${c.comm?'−'+fmt(c.comm):'0'}</b></div>
+    <div class="sc-row num dep"><span>其他費用</span><b>${c.fees?'−'+fmt(c.fees):'0'}</b></div>
     ${c.received==null?'<div class="recon idle">百貨撥款入帳後，填入實際金額核對</div>':c.diff===0?'<div class="recon ok"><b>✓ 入帳相符</b><span>實際入帳等於應撥款</span></div>':`<div class="recon warn"><b>入帳${c.diff>0?'多':'少'} ${fmt(Math.abs(c.diff))} 元</b><span>請對照百貨對帳單</span></div>`}
     <div class="sc-grid num"><div><span>實拿比例</span><b>${c.sales?(c.due/c.sales*100).toFixed(1)+'%':'—'}</b></div><div><span>抽成＋費用</span><b>${fmt(c.comm+c.fees)}</b></div></div>`;
 }
 async function dpSave(){
   const dr=DP.draft, num=v=>v===''||v==null?null:Math.round(+v*100)/100;
-  const doc={month:DP.ym,sales:num(dr.sales),rate:num(dr.rate),fees:dr.fees.filter(x=>(x.label||'').trim()||+x.amt).map(x=>({label:(x.label||'').trim(),amt:Math.round(+x.amt||0)})),received:num(dr.received),receivedDate:dr.receivedDate||'',note:(dr.note||'').trim(),by:W.name||'',updatedAt:new Date().toISOString()};
-  try{ await S.db.doc('dept/'+DP.ym).set(doc); S.dept={...(S.dept||{}),[DP.ym]:doc}; DP.draft=null; DP.dirty=false; drawDept(); toast('百貨對帳已儲存'); }catch(e){ toast('儲存失敗，請稍後再試'); }
+  const doc={branch:dr.b,month:DP.ym,sales:num(dr.sales),rate:num(dr.rate),fees:dr.fees.filter(x=>(x.label||'').trim()||+x.amt).map(x=>({label:(x.label||'').trim(),amt:Math.round(+x.amt||0)})),received:num(dr.received),receivedDate:dr.receivedDate||'',note:(dr.note||'').trim(),by:W.name||'',updatedAt:new Date().toISOString()};
+  const id=dpKey(dr.b,DP.ym);
+  try{ await S.db.doc('dept/'+id).set(doc); S.dept={...(S.dept||{}),[id]:doc}; DP.draft=null; DP.dirty=false; drawDept(); toast('百貨對帳已儲存'); }catch(e){ toast('儲存失敗，請稍後再試'); }
 }
-function dpDirty(){ if(!DP.dirty){ DP.dirty=true; const sv=$('.dp-form .pr-save'); if(sv){ sv.querySelector('[data-dpsave]').disabled=false; if(!sv.querySelector('.pr-dirty')) sv.insertAdjacentHTML('afterbegin','<span class="pr-dirty">● 尚未儲存</span>'); const ok=sv.querySelector('.hint'); if(ok) ok.remove(); } } const r=$('#dpRes'); if(r) r.innerHTML=dpResHTML(deptCalc(DP.ym,DP.draft)); }
+function dpDirty(){ if(!DP.dirty){ DP.dirty=true; const sv=$('.dp-form .pr-save'); if(sv){ sv.querySelector('[data-dpsave]').disabled=false; if(!sv.querySelector('.pr-dirty')) sv.insertAdjacentHTML('afterbegin','<span class="pr-dirty">● 尚未儲存</span>'); const ok=sv.querySelector('.hint'); if(ok) ok.remove(); } } const r=$('#dpRes'); if(r) r.innerHTML=dpResHTML(deptCalc(DP.b,DP.ym,DP.draft)); }
+function ctrDirty(){ if(!$('[data-ctrsave]')){ const a=$('#dpCfg .fx-act'); if(a) a.insertAdjacentHTML('beforeend','<button class="btn" data-ctrcancel="1">取消</button><button class="btn primary" data-ctrsave="1">儲存櫃位設定</button>'); } }
 function bindDept(){
   const main=$('#main');
   main.addEventListener('input',ev=>{ if(S.mode!=='dept') return; const t=ev.target;
     if(t.dataset.dp){ DP.draft[t.dataset.dp]=t.value; dpDirty(); }
-    else if(t.dataset.dpf!=null){ DP.draft.fees[+t.dataset.dpf][t.dataset.k]=t.value; dpDirty(); } });
+    else if(t.dataset.dpf!=null){ DP.draft.fees[+t.dataset.dpf][t.dataset.k]=t.value; dpDirty(); }
+    else if(t.dataset.ctr!=null){ DP.cfgDraft??=JSON.parse(JSON.stringify(counters())); DP.cfgDraft[+t.dataset.ctr][t.dataset.k]=t.value; ctrDirty(); } });
   main.addEventListener('toggle',ev=>{ if(ev.target.id==='dpCfg') DP.cfgOpen=ev.target.open; },true);
   main.addEventListener('click',async ev=>{ if(S.mode!=='dept') return; const t=ev.target.closest('button'); if(!t) return; const d=t.dataset;
     const leave=()=>!DP.dirty||confirm('這個月的修改還沒儲存，確定要離開嗎？');
-    if(d.dpym){ if(!leave()) return; DP.ym=ymShift(DP.ym,+d.dpym); DP.draft=null; drawDept(); }
+    if(d.dpb){ if(!leave()) return; DP.b=d.dpb; DP.draft=null; drawDept(); }
+    else if(d.dpym){ if(!leave()) return; DP.ym=ymShift(DP.ym,+d.dpym); DP.draft=null; drawDept(); }
     else if(d.dpgo){ if(!leave()) return; DP.ym=d.dpgo; DP.draft=null; drawDept(); }
     else if(d.dpfadd){ DP.draft.fees.push({label:'',amt:''}); DP.dirty=true; drawDept(); }
     else if(d.dpfdel){ DP.draft.fees.splice(+d.dpfdel,1); DP.dirty=true; drawDept(); }
     else if(d.dpfprev){ DP.draft.fees=DP.prevFees.map(x=>({label:x.label,amt:x.amt})); DP.dirty=true; drawDept(); toast('已帶入上月費用項目，金額有變動請修改'); }
     else if(d.dpsave) dpSave();
-    else if(d.cfgsave){ const venue=(($('#cfgVenue')||{}).value||'').trim()||'百貨', rate=+(($('#cfgRate')||{}).value)||0;
-      try{ await saveCfg({venue,rate}); DP.cfgOpen=true; drawDept(); toast('櫃位設定已儲存'); }catch(e){ toast('儲存失敗'); } }
+    else if(d.ctradd){ DP.cfgDraft??=JSON.parse(JSON.stringify(counters())); DP.cfgDraft.push({id:'c'+uid().slice(-5),name:'',short:'',start:ymNow(),end:'',rate:30}); DP.cfgOpen=true; drawDept(); }
+    else if(d.ctrcancel){ DP.cfgDraft=null; drawDept(); }
+    else if(d.ctrsave){ const list=(DP.cfgDraft||[]).filter(c=>(c.name||'').trim()).map(c=>({id:c.id,name:c.name.trim(),short:(c.short||'').trim()||c.name.trim().slice(0,2),start:c.start||'',end:c.end||'',rate:+c.rate||0}));
+      try{ await saveCfg({counters:list}); DP.cfgDraft=null; DP.cfgOpen=true; setupBranches(); drawDept(); toast('櫃位設定已儲存'); }catch(e){ toast('儲存失敗'); } }
   });
 }
 async function saveCfg(patch){ const cur=((S.misc||{}).cfg)||{}, doc={...cur,...patch,updatedAt:new Date().toISOString(),by:W.name||''}; await S.db.doc('misc/cfg').set(doc); S.misc={...(S.misc||{}),cfg:doc}; }
@@ -2122,11 +2192,14 @@ function accountHTML(){
     ${bound?'':`<div class="lg-fm"><input class="tin" type="email" id="bindMail" value="${esc(pend)}" placeholder="你的 Email" autocomplete="email"><button class="btn primary" data-mailbind="1">${pend?'重新寄驗證信':'綁定 Email'}</button></div>`}</div></section>`;
 }
 
+/* 現在還在營業、而且我負責的店點（結束的櫃位不出現在結帳、支出的選單） */
+const liveBR=()=>myBR().filter(ctrLive);
+
 /* ---------- 首頁 & 當日支出 ---------- */
 const SP={branch:null, day:todayStr(), cat:'', pay:'零用金', draft:{}, confirmDel:null};
 const PAYS=['零用金','營收現金','轉帳','刷卡','其他'];
 const STAFF_PAYS=['零用金','營收現金'];
-const paysFor=b=>(isMgr()?PAYS:STAFF_PAYS).filter(p=>b!=='dp'||p!=='營收現金');
+const paysFor=b=>(isMgr()?PAYS:STAFF_PAYS).filter(p=>!isCtr(b)||p!=='營收現金');
 const payOfE=e=>PAYS.find(p=>p!=='其他'&&(e.note||'').split('・').includes(p))||'其他';
 /* 一般夥伴的支出明細只顯示零用金、營收現金付的 */
 const spVisible=e=>isMgr()||STAFF_PAYS.includes(payOfE(e));
@@ -2149,9 +2222,9 @@ function homeStatsHTML(today){
   const ym=today.slice(0,7), m=+ym.slice(5), docs={...(S.allDaily||{}),...D.docs};
   const one=b=>{ const ds=Object.values(docs).filter(d=>d&&d.branch===b&&String(d.date||'').startsWith(ym)&&dStatusOf(d)==='營業'), rev=sum(ds.map(d=>+d.revenue||0)), c=statusCount(b,ym,docs); if(c.未記錄&&!dStatusOf(docs[dId(b,today)])) c.未記錄--; const tx=sum(ds.map(d=>+d.tx||0));
     return {b,rev,c,tx,avg:c.營業?Math.round(rev/c.營業):0}; };
-  const st=myBR().map(one), all=sum(st.map(x=>x.rev));
+  const st=liveBR().map(one), all=sum(st.map(x=>x.rev));
   return `<div class="hstats"><div class="hs-h"><b>${m} 月營業概況</b>${st.length>1?`<span class="num">${isMgr()?ALLNAME:'合計'} <em>${fmt(all)}</em> 元</span>`:''}</div>
-    <div class="hs-g hs${st.length}">${st.map(x=>`<div class="hs-c" style="--bc:var(${B[x.b].color})"><div class="hs-n"><i></i>${esc(B[x.b].short)}<small>${esc(x.b==='dp'?cfg().venue:B[x.b].nick)}</small></div>
+    <div class="hs-g hs${st.length}">${st.map(x=>`<div class="hs-c" style="--bc:var(${B[x.b].color})"><div class="hs-n"><i></i>${esc(B[x.b].short)}<small>${esc(isCtr(x.b)?'櫃位':B[x.b].nick)}</small></div>
       <div class="hs-rev num">${fmt(x.rev)}<small>元</small></div>
       <div class="hs-d num"><span>營業 <b>${x.c.營業}</b> 天</span><span>公休 <b>${x.c.公休}</b> 天</span>${x.c.颱風假?`<span>颱風假 <b>${x.c.颱風假}</b> 天</span>`:''}${x.c.未記錄?`<span class="na">未記錄 <b>${x.c.未記錄}</b> 天</span>`:''}</div>
       <div class="hs-x num">日均 ${fmt(x.avg)} 元・${fmt(x.tx)} 筆${x.tx?`・客單 ${fmt(x.rev/x.tx)}`:''}</div></div>`).join('')}</div></div>`;
@@ -2168,20 +2241,21 @@ function renderHome(){
   const sRow=b=>{const l=spList(b,today); return li(b,`${l.length?`今天 ${l.length} 筆・${fmt(sum(l.map(e=>+e.amt||0)))} 元`:'今天還沒有支出'}<small class="${pettyLeft(b)<0?'neg':''}">零用金剩 ${fmt(pettyLeft(b))}</small>`);};
   const lRow=b=>{const r=sum(listOf(b,m,'rev',y).map(e=>+e.amt||0)), x=sum(listOf(b,m,'exp',y).map(e=>+e.amt||0)); return li(b,`淨利 <b class="${r-x<0?'neg':'pos'}">${sgn(r-x)}</b>`);};
   const card=(k,t,sub,rows,go)=>`<button class="hcard" data-home="${k}"><span class="hc-ic">${ICON[k]}</span><span class="hc-t">${t}</span><span class="hc-s">${sub}</span><ul class="hc-l">${rows}</ul><span class="hc-go">${go} →</span></button>`;
-  const ym=today.slice(0,7), dc=deptCalc(ym), pd=(S.payroll||{})[ym], ppm=ymShift(ym,-1), pdp=(S.payroll||{})[ppm];
+  const ym=today.slice(0,7), liveC=BR.filter(b=>isCtr(b)&&ctrOpen(b,ym)), dc=deptCalcAll(liveC,ym), pdc=deptCalcAll(BR.filter(b=>isCtr(b)&&ctrOpen(b,ymShift(ym,-1))),ymShift(ym,-1)), pd=(S.payroll||{})[ym], ppm=ymShift(ym,-1), pdp=(S.payroll||{})[ppm];
   const payLi=(x,lab)=>x?`<li><i style="background:var(--accent)"></i>${lab}<span>${Object.keys(x.rows||{}).length} 人・${fmt(x.total||0)} 元${Object.values(x.rows||{}).every(r=>r.paid)?'・已發放':''}</span></li>`:`<li><i style="background:var(--rule)"></i>${lab}<span>尚未建立</span></li>`;
   const noBr=!myBR().length?`<div class="panel emptyb">你還沒有被指定負責的店。請老闆到首頁最下面的人員管理，勾選你負責的店。</div>`:'';
   $('#main').innerHTML=`<section class="home">${noBr}
     <div class="home-h"><div class="home-date">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</div><h2>今天也慢慢來，把帳記好</h2></div>
     ${homeStatsHTML(today)}
     <div class="hcards">
-      ${card('daily','每日結帳','營業額、交易筆數、收款方式',myBR().map(dRow).join(''),'選擇店點結帳')}
-      ${card('spend','當日支出','零用金、食材、雜支',myBR().map(sRow).join(''),'選擇店點記支出')}
-      ${isMgr()?card('ledger','營業分析','每月收支・人事・百貨櫃位',BR.map(lRow).join(''),'打開營業分析'):''}
-      ${isMgr()?card('dept','百貨對帳',`${esc(dpName())}・抽成與撥款`,`<li><i style="background:var(--dp)"></i>本月<span>業績 ${fmt(dc.sales)}</span></li><li><i style="background:var(--rule)"></i>上月<span>${(()=>{const p=deptCalc(ppm);return p.received==null?(p.sales?`應撥 ${fmt(p.due)}・未入帳`:'沒有紀錄'):`已入帳 ${fmt(p.received)}`;})()}</span></li>`,'打開對帳'):''}
+      ${card('daily','每日結帳','營業額、交易筆數、收款方式',liveBR().map(dRow).join(''),'選擇店點結帳')}
+      ${card('spend','當日支出','零用金、食材、雜支',liveBR().map(sRow).join(''),'選擇店點記支出')}
+      ${isMgr()?card('ledger','營業分析','每月收支・人事・百貨櫃位',BR.filter(b=>ctrLive(b)||has(b,m)).map(lRow).join(''),'打開營業分析'):''}
+      ${isMgr()?card('dept','百貨對帳',`${liveC.length?liveC.map(b=>esc(B[b].short)).join('、'):'目前沒有營業中的櫃位'}・抽成與撥款`,`<li><i style="background:var(--dp)"></i>本月<span>業績 ${fmt(dc.sales)}</span></li><li><i style="background:var(--rule)"></i>上月<span>${pdc.received==null?(pdc.sales?`應撥 ${fmt(pdc.due)}・未入帳`:'沒有紀錄'):`已入帳 ${fmt(pdc.received)}`}</span></li>`,'打開對帳'):''}
       ${isMgr()?card('payroll','薪資','三點人員薪資、業績獎金、薪資單',payLi(pdp,`${+ppm.slice(5)} 月`)+payLi(pd,`${+ym.slice(5)} 月`),'開始計算'):''}
-      ${card('cash','現金結算',isMgr()?'營收現金・零用金清點':'查看現金與零用金',myBR().filter(b=>b!=='dp'||pettyOf('dp')).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${b==='dp'?'':`現金 ${l?md(l.date):'未結'}・`}零用金 ${p?md(p.date):'未結'}`);}).join(''),isMgr()?'開始結算':'查看結算')}
+      ${card('cash','現金結算',isMgr()?'營收現金・零用金清點':'查看現金與零用金',liveBR().filter(b=>!isCtr(b)||pettyOf(b)).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${isCtr(b)?'':`現金 ${l?md(l.date):'未結'}・`}零用金 ${p?md(p.date):'未結'}`);}).join(''),isMgr()?'開始結算':'查看結算')}
     </div>
+    ${todoHomeHTML()}
     ${accountHTML()}
     ${adminHTML()}
   </section>`;
@@ -2194,7 +2268,7 @@ function spendChooser(){
       <span class="pk-status ${l.length?'done':''}">${l.length?`今天已記 ${l.length} 筆・${fmt(sum(l.map(e=>+e.amt||0)))} 元`:'今天還沒有支出'}</span>
       <span class="pk-month num"><span>零用金餘額</span><b class="${pettyLeft(b)<0?'neg':''}">${fmt(pettyLeft(b))} / ${fmt(pettyOf(b))} 元</b><span>本月支出 ${fmt(mt)} 元・${spMonth(b,today).length} 筆</span></span>
       <span class="pk-go">開始記支出 →</span></button>`;};
-  return `<div class="chooser"><button class="mclose" data-mclose="1" aria-label="關閉">×</button><div class="ch-head sp"><h2 id="pickTitle">今天要記哪一間店的支出？</h2><p class="hint">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</p></div><div class="picks p${myBR().length}">${myBR().map(card).join('')}</div></div>`;
+  return `<div class="chooser"><button class="mclose" data-mclose="1" aria-label="關閉">×</button><div class="ch-head sp"><h2 id="pickTitle">今天要記哪一間店的支出？</h2><p class="hint">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</p></div><div class="picks p${Math.min(3,liveBR().length)}">${liveBR().map(card).join('')}</div></div>`;
 }
 /* ---------- 每月固定支出 ---------- */
 const FX={edit:false,draft:null,amt:{}};
@@ -2213,7 +2287,7 @@ function fixedHTML(b,day){
         <select class="tin" data-fxe="${i}" data-k="pay">${PAYS.map(p=>`<option ${p===(x.pay||'轉帳')?'selected':''}>${p}</option>`).join('')}</select>
         <button class="ibtn" data-fxdel="${i}" aria-label="刪除">✕</button></div>`).join('')||'<p class="hint">還沒有固定支出，按下方新增。</p>'}</div>
       <div class="fx-act"><button class="btn" data-fxadd="1">＋ 新增一項</button><span class="sp"></span><button class="btn" data-fxcancel="1">取消</button><button class="btn primary" data-fxsave="1">儲存設定</button></div>
-      <p class="hint">金額不固定的（例如水電瓦斯）可以先填大約金額，記入時再改。</p></div>`; }
+      <p class="hint">金額不固定的（例如水電）可以先填大約金額，記入時再改。</p></div>`; }
   const done=list.filter(x=>fxDone(b,day,x.id)), todo=list.filter(x=>!fxDone(b,day,x.id));
   const totAll=sum(list.map(x=>+x.amt||0));
   return `<div class="panel fx" id="fxPanel"><div class="ph"><h2>${m} 月固定支出</h2><span class="hint num">${list.length?`已記 ${done.length}／${list.length} 項・每月約 ${fmt(totAll)} 元`:'尚未設定'}</span>${can?`<button class="btn fx-set" data-fxedit="1">${list.length?'設定':'＋ 設定固定支出'}</button>`:''}</div>
@@ -2221,7 +2295,7 @@ function fixedHTML(b,day){
       return `<li class="${d?'ok':''}"><span class="fx-d num">${m}/${dd}</span><span class="spl-c">${esc(x.cat)}</span><span class="fx-i">${esc(x.item)}<small>${esc(x.pay||'')}</small></span>
         ${d?`<span class="fx-st">✓ 已記 <b class="num">${fmt(+d.amt||0)}</b></span>`:can?`<span class="din fx-amt"><input data-fxamt="${x.id}" type="number" inputmode="numeric" value="${esc(FX.amt[x.id]??x.amt??'')}"><small>元</small></span><button class="btn primary" data-fxrec="${x.id}">記入</button>`:`<span class="fx-st todo num">未記・約 ${fmt(+x.amt||0)}</span>`}</li>`; }).join('')}</ul>
       ${can&&todo.length>1?`<div class="fx-act"><span class="sp"></span><button class="btn primary" data-fxall="1">全部記入 ${m} 月（${todo.length} 項）</button></div>`:''}`
-    :'<p class="hint">把房租、水電瓦斯、網路、POS 月費等每月都會有的支出設定好，每個月按一下就能記入。</p>'}</div>`;
+    :'<p class="hint">把房租、水電、網路、POS 月費等每月都會有的支出設定好，每個月按一下就能記入。</p>'}</div>`;
 }
 async function fxSaveList(b,list){ const cur=((S.misc||{}).fixedexp)||{}, doc={...cur,[b]:list};
   await S.db.doc('misc/fixedexp').set(doc); S.misc={...(S.misc||{}),fixedexp:doc}; }
@@ -2257,7 +2331,7 @@ function spMonthHTML(b,day){
 function renderSpend(b){
   const editable=S.canWrite!==false&&S.db, day=SP.day, list=spList(b,day), tt=sum(list.map(e=>+e.amt||0));
   if(!paysFor(b).includes(SP.pay)) SP.pay=paysFor(b)[0];
-  const cats=CATS[b].exp; if(!cats.includes(SP.cat)) SP.cat=cats.includes('食材原料')?'食材原料':cats[0];
+  const cats=CATS[b].exp; if(!cats.includes(SP.cat)) SP.cat=cats.includes('食材')?'食材':cats[0];
   const byCat={}; list.forEach(e=>byCat[e.cat]=(byCat[e.cat]||0)+(+e.amt||0));
   const mList=spMonth(b,day), mTot=sum(mList.map(e=>+e.amt||0));
   const freq={}; spMonth(b,day).concat(spMonth(b,addDays(day.slice(0,8)+'01',-1))).forEach(e=>{if(e.item)freq[e.item]=(freq[e.item]||0)+1;});
@@ -2411,7 +2485,7 @@ function subCash(){
 function csUntilHTML(type,b){ const u=csUntil(type,b), t=todayStr(), y=addDays(t,-1);
   return `<div class="cs-until"><span class="fl">結算到</span><input type="date" class="tin" data-csu="${type}" data-b="${b}" value="${u}" max="${t}"><span class="chips"><button type="button" class="chip ${u===t?'on':''}" data-csq="${type}|${b}|${t}">今天</button><button type="button" class="chip ${u===y?'on':''}" data-csq="${type}|${b}|${y}">昨天</button></span>${u<t?`<span class="hint">${md(u)} 之後的${type==='cash'?'現金營收':'支出'}留到下次結算</span>`:''}</div>`; }
 function cashCard(b){
-  if(b==='dp') return `<section class="cs-card"><div class="cs-h"><span class="cs-ic">${ICON.dept}</span><div><h3>營收現金</h3><p class="hint">百貨櫃位的營業額都由百貨代收，月底撥款，所以櫃上不用結現金。撥款請到「百貨對帳」核對。</p></div></div>${isMgr()?'<button class="btn" data-home="dept">打開百貨對帳 →</button>':''}</section>`;
+  if(isCtr(b)) return `<section class="cs-card"><div class="cs-h"><span class="cs-ic">${ICON.dept}</span><div><h3>營收現金</h3><p class="hint">百貨櫃位的營業額都由百貨代收，月底撥款，所以櫃上不用結現金。撥款請到「百貨對帳」核對。</p></div></div>${isMgr()?'<button class="btn" data-home="dept">打開百貨對帳 →</button>':''}</section>`;
   const l=lastSettle(b,'cash'), list=cashPending(b), xl=cashExpPending(b), exp=sum(list.map(r=>(+r.cash||0)-(+r.deposit||0)))-sum(xl.map(e=>+e.amt||0)), first=list[0];
   const dr=C.draft.cash[b]||{}, counted=dr.counted===undefined||dr.counted===''?null:+dr.counted;
   const diff=counted==null?null:counted-exp, can=isMgr();
@@ -2465,11 +2539,11 @@ function drawCash(){
   if(S.mode!=='cash') return;
   subCash();
   if(!myBR().length){ $('#main').innerHTML=`<div class="panel emptyb">你還沒有被指定負責的店，請老闆在人員管理勾選。</div>`; return; }
-  if(!canBr(C.branch)) C.branch=myBR()[0];
+  if(!liveBR().includes(C.branch)) C.branch=liveBR()[0]||myBR()[0];
   const b=C.branch;
   $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(${B[b].color})">
       <div class="st-l"><div><div class="st-name">現金結算 <small>${isMgr()?'你可以完成清點結算':`只有老闆和管理者可以完成清點結算`}</small></div><div class="st-state">${md(todayStr())}（${wk(todayStr())}）</div></div></div>
-      <div class="seg cs-seg"${myBR().length>1?'':' hidden'}>${myBR().map(x=>`<button data-cb="${x}" aria-pressed="${x===b}"><i class="sw" style="background:var(${B[x].color})"></i>${esc(B[x].short)}</button>`).join('')}</div>
+      <div class="seg cs-seg"${liveBR().length>1?'':' hidden'}>${liveBR().map(x=>`<button data-cb="${x}" aria-pressed="${x===b}"><i class="sw" style="background:var(${B[x].color})"></i>${esc(B[x].short)}</button>`).join('')}</div>
     </div>
     <div class="cs-grid">${cashCard(b)}${pettyOf(b)?pettyCard(b):`<section class="cs-card"><div class="cs-h"><span class="cs-ic g">${ICON.spend}</span><div><h3>零用金</h3><p class="hint">這個店點沒有設定零用金。</p></div></div></section>`}</div>
     ${historyHTML(b)}
@@ -2511,6 +2585,51 @@ function bindCash(){
       try{ await S.db.doc('settle/'+id).delete(); const o={...S.settle}; delete o[id]; S.settle=o; drawCash(); toast('已撤銷這次結帳'); }catch(e){ toast('撤銷失敗'); } }
   });
 }
+
+/* ---------- 待補紀錄：哪個店、哪幾個月、少了什麼、誰要補 ---------- */
+const TD={adding:false,draft:null,confirm:null};
+const todos=()=>(((S.misc||{}).todo||{}).list)||[];
+const ymLabel=ym=>`${ym.slice(0,4)}/${+ym.slice(5)}`;
+const todoRange=t=>t.from===t.to?ymLabel(t.from):`${ymLabel(t.from)} – ${ymLabel(t.to)}`;
+const todoFor=(b,ym)=>todos().filter(t=>!t.done&&t.branch===b&&t.from<=ym&&t.to>=ym);
+const myTodos=()=>todos().filter(t=>!t.done&&(isBoss()||t.who===W.name));
+async function saveTodos(list){ const doc={list,updatedAt:new Date().toISOString(),by:W.name||''}; await S.db.doc('misc/todo').set(doc); S.misc={...(S.misc||{}),todo:doc}; }
+function todoHomeHTML(){
+  if(!W.name) return ''; const list=todos().filter(t=>isBoss()||t.who===W.name); const open=list.filter(t=>!t.done);
+  if(!list.length&&!isBoss()) return '';
+  const can=isMgr();
+  return `<section class="panel todo" id="todoPanel"><div class="ph"><h2>待補紀錄</h2><span class="hint">${open.length?`${open.length} 項還沒補齊`:'目前都補齊了'}</span>${can&&!TD.adding?'<button class="btn" data-tdadd="1">＋ 新增待補</button>':''}</div>
+    ${open.map(t=>`<div class="td-r"><i class="sw" style="background:var(${(B[t.branch]||{}).color||'--ink-3'})"></i>
+      <div class="td-m"><b>${esc(bfull(t.branch)||t.branch)}・${esc(todoRange(t))}</b><span>${esc(t.text)}</span><small>請 ${esc(t.who||'—')} 補齊${t.by?`・${esc(t.by)} 建立`:''}</small></div>
+      <div class="td-a"><button class="btn" data-tdgo="${t.branch}|${t.from}">看那個月</button>${(t.who===W.name||isBoss())?`<button class="btn primary" data-tddone="${t.id}">${TD.confirm===t.id?'確定已補齊？':'已補齊'}</button>`:''}</div></div>`).join('')}
+    ${TD.adding?`<div class="td-f">
+      <label class="dfield"><span class="fl">店點</span><select class="tin" id="td-b">${BR.map(b=>`<option value="${b}">${esc(bfull(b))}</option>`).join('')}</select></label>
+      <label class="dfield"><span class="fl">從</span><input class="tin" type="month" id="td-from" value="${ymNow()}"></label>
+      <label class="dfield"><span class="fl">到</span><input class="tin" type="month" id="td-to" value="${ymNow()}"></label>
+      <label class="dfield"><span class="fl">誰要補</span><select class="tin" id="td-who">${staffList().map(n=>`<option ${n==='菜菜'?'selected':''}>${esc(n)}</option>`).join('')}</select></label>
+      <label class="dfield wide"><span class="fl">少了什麼</span><input class="tin" id="td-text" maxlength="120" placeholder="例：公司帳戶付的房租、薪資、勞健保"></label>
+      <div class="fx-act"><span class="sp"></span><button class="btn" data-tdcancel="1">取消</button><button class="btn primary" data-tdsave="1">新增</button></div></div>`:''}
+    ${list.some(t=>t.done)?`<details class="td-done"><summary>已補齊（${list.filter(t=>t.done).length}）</summary>${list.filter(t=>t.done).map(t=>`<div class="td-r done"><div class="td-m"><b>${esc(bfull(t.branch)||t.branch)}・${esc(todoRange(t))}</b><span>${esc(t.text)}</span><small>${esc(t.doneBy||'')} ${t.doneAt?md(t.doneAt.slice(0,10))+' 補齊':''}</small></div></div>`).join('')}</details>`:''}
+  </section>`;
+}
+function todoBannerHTML(m){
+  const ym=`${YEAR}-${pad(m)}`, bs=branches(), ts=bs.flatMap(b=>todoFor(b,ym));
+  const notes=bs.map(b=>[b,(doc(b,m)||{}).monthNote]).filter(x=>x[1]);
+  if(!ts.length&&!notes.length) return '';
+  return `<div class="td-banner">${notes.map(([b,n])=>`<div class="td-note"><b>${esc(bshort(b))}</b> ${esc(n)}</div>`).join('')}${ts.map(t=>`<div class="td-warn"><b>待補・${esc(bshort(t.branch))}</b> ${esc(t.text)}<small>請 ${esc(t.who)} 補齊（${esc(todoRange(t))}）</small></div>`).join('')}</div>`;
+}
+document.addEventListener('click',async ev=>{ const t=ev.target.closest('[data-tdadd],[data-tdcancel],[data-tdsave],[data-tddone],[data-tdgo]'); if(!t) return; const d=t.dataset;
+  const redraw=()=>{ const el=$('#todoPanel'); if(el) el.outerHTML=todoHomeHTML(); };
+  if(d.tdadd){ TD.adding=true; redraw(); }
+  else if(d.tdcancel){ TD.adding=false; redraw(); }
+  else if(d.tdsave){ let from=$('#td-from').value, to=$('#td-to').value; const text=$('#td-text').value.trim(); if(!from||!to||!text){ toast('請填月份和少了什麼'); return; } if(to<from) [from,to]=[to,from];
+    const list=todos().concat([{id:'t'+uid(),branch:$('#td-b').value,from,to,who:$('#td-who').value,text,by:W.name||'',at:new Date().toISOString()}]);
+    try{ await saveTodos(list); TD.adding=false; redraw(); toast('已新增待補紀錄'); }catch(e){ toast('儲存失敗'); } }
+  else if(d.tddone){ if(TD.confirm!==d.tddone){ TD.confirm=d.tddone; redraw(); return; } TD.confirm=null;
+    const list=todos().map(x=>x.id===d.tddone?{...x,done:true,doneBy:W.name||'',doneAt:new Date().toISOString()}:x);
+    try{ await saveTodos(list); redraw(); toast('已標記補齊'); }catch(e){ toast('儲存失敗'); } }
+  else if(d.tdgo){ if(!isMgr()){ toast('營業分析只有老闆和管理者看得到'); return; } const [b,ym]=d.tdgo.split('|'); S.mode='ledger'; S.branch=b; YEAR=+ym.slice(0,4); S.month=+ym.slice(5); S.sec='money'; saveUI(); render(); scrollTo({top:0}); }
+});
 
 /* ---------- render & events ---------- */
 const MGR_MODES=['ledger','dept','payroll'];
@@ -2657,7 +2776,7 @@ function startData(){
     setStatus('ro',c==='permission-denied'?'沒有權限':'連線中斷'); S.loaded=true; S.loadErr=c; showLoadErr(); render(); }));
   FB.unsubs.push(watchBr('daily',null,o=>{ S.allDaily=o; redrawFor(['home','ledger']); if(S.mode==='dept'&&!DP.dirty) drawDept(); }));
   FB.unsubs.push(watchBr('settle',null,o=>{ S.settle=o; redrawFor(['home','spend','cash']); }));
-  FB.unsubs.push(db.collection('misc').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{m[d.id]=fsDec(d.data());}); S.misc=m; redrawFor(['home','spend','cash','ledger']); if(S.mode==='dept'&&!DP.dirty) drawDept(); },()=>{}));
+  FB.unsubs.push(db.collection('misc').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{m[d.id]=fsDec(d.data());}); S.misc=m; setupBranches(); renderWho(); redrawFor(['home','spend','cash','ledger']); if(S.mode==='dept'&&!DP.dirty) drawDept(); },()=>{}));
   startMgrData();
 }
 /* 薪資、百貨對帳只有老闆和管理者讀得到 */
