@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="color-scheme" content="light only">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>伯虎在二樓 帳本</title>
+<title>伯虎在二樓 收支總覽</title>
 <meta name="theme-color" content="#24414a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="伯虎帳本">
+<meta name="apple-mobile-web-app-title" content="伯虎收支">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -1026,6 +1026,10 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 .picks.p2,.hs-g.hs2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .hs-g.hs1{grid-template-columns:1fr}
 @media (max-width:640px){.picks.p2,.hs-g.hs2{grid-template-columns:1fr}}
+
+/* 虎字印章：字置中（標題的字距不套用到印章上） */
+.masthead h1::before{text-shadow:none!important;letter-spacing:0!important;text-indent:0;line-height:1!important;display:grid!important;place-items:center;padding:0 0 .06em!important;box-sizing:border-box;font-family:var(--f-display)}
+.lg-seal{letter-spacing:0;line-height:1;place-items:center;padding-bottom:.06em;box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -1034,7 +1038,7 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
   <header>
     <div class="brand">
       <div class="eyebrow">恆春・台南・百貨櫃位</div>
-      <h1>伯虎在二樓 帳本</h1>
+      <h1>伯虎在二樓 收支總覽</h1>
     </div>
     <div class="hright"><div class="seg mode" role="group" aria-label="頁面" id="modeSeg"><button data-mode="home">首頁</button><button data-mode="daily">每日結帳</button><button data-mode="spend">當日支出</button><button data-mode="ledger" class="mgr-only" hidden>營業分析</button><button data-mode="dept" class="mgr-only" hidden>百貨對帳</button><button data-mode="payroll" class="mgr-only" hidden>薪資</button><button data-mode="cash">現金結算</button></div><span class="who" id="who" hidden></span><button class="reload-btn" id="reloadBtn" type="button" aria-label="重新整理" title="重新整理（載入最新版本）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button><span class="status" id="status"><i></i><span>連線中…</span></span></div>
   </header>
@@ -1064,7 +1068,7 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 <div class="modal" id="pickModal" hidden role="dialog" aria-modal="true" aria-labelledby="pickTitle"><div class="modal-box" id="pickBox"></div></div>
 
 <script>
-/* 伯虎在二樓 帳本：恆春本店、台南小伯虎、百貨櫃位 一起管理 */
+/* 伯虎在二樓 收支總覽：恆春本店、台南小伯虎、百貨櫃位 一起管理 */
 const BR = ['hc','tn','dp'];
 const B = {
   hc:{name:'恆春本店', short:'恆春', nick:'本店', color:'--hc'},
@@ -1602,7 +1606,7 @@ function renderSheet(b){
     <div id="dTables">${monthTable(b)}</div>`;
 }
 let PK='daily';
-function openPick(kind){ PK=kind||'daily'; if(!myBR().length){ toast(`你還沒有被指定負責的店，請${BOSS}在人員管理勾選`); return; } if(myBR().length===1){ D.day=todayStr(); subDaily(); choosePick(myBR()[0]); return; } D.day=todayStr(); subDaily(); $('#pickBox').innerHTML=PK==='spend'?spendChooser():renderChooser(); $('#pickModal').hidden=false; document.body.classList.add('noscroll'); setTimeout(()=>{const f=$('#pickBox .pick');f&&f.focus();},30); }
+function openPick(kind){ PK=kind||'daily'; if(!myBR().length){ toast(`你還沒有被指定負責的店，請老闆在人員管理勾選`); return; } if(myBR().length===1){ D.day=todayStr(); subDaily(); choosePick(myBR()[0]); return; } D.day=todayStr(); subDaily(); $('#pickBox').innerHTML=PK==='spend'?spendChooser():renderChooser(); $('#pickModal').hidden=false; document.body.classList.add('noscroll'); setTimeout(()=>{const f=$('#pickBox .pick');f&&f.focus();},30); }
 function closePick(){ $('#pickModal').hidden=true; document.body.classList.remove('noscroll'); }
 function choosePick(b){ closePick(); if(PK==='spend'){ S.mode='spend'; SP.branch=b; SP.day=todayStr(); SP.draft={}; SP.confirmDel=null; SP.editId=null; saveUI(); render(); scrollTo({top:0}); return; } S.mode='daily'; D.edit=false; D.branch=b; D.day=todayStr(); D.dirty={}; saveD(); saveUI(); subDaily(); render(); scrollTo({top:0}); }
 function renderDaily(fromSnap){
@@ -1747,7 +1751,7 @@ function prRefHTML(){
 }
 function drawPay(){
   if(!W.name){ renderLogin(); return; }
-  if(!isMgr()){ $('#main').innerHTML=`<div class="panel emptyb">這個頁面只有${esc(BOSS)}和管理者可以使用。</div>`; return; }
+  if(!isMgr()){ $('#main').innerHTML=`<div class="panel emptyb">這個頁面只有老闆和管理者可以使用。</div>`; return; }
   prEnsureDraft();
   const ym=PR.ym, [y,m]=ym.split('-').map(Number), dr=PR.draft;
   const ids=dr?dr.order.filter(id=>dr.rows[id]):[], tot=dr?sum(ids.map(id=>prNet(dr.rows[id]))):0, paidN=dr?ids.filter(id=>dr.rows[id].paid).length:0;
@@ -1868,7 +1872,7 @@ function dpEnsure(){ if(DP.draft&&DP.draft.ym===DP.ym) return; const d=dpDoc(DP.
   if(!d){ const p=dpDoc(ymShift(DP.ym,-1)); if(p&&p.fees&&p.fees.length) DP.prevFees=p.fees; else DP.prevFees=null; } else DP.prevFees=null; }
 function drawDept(){
   if(!W.name){ renderLogin(); return; }
-  if(!isMgr()){ $('#main').innerHTML=`<div class="panel emptyb">這個頁面只有${esc(BOSS)}和管理者可以使用。</div>`; return; }
+  if(!isMgr()){ $('#main').innerHTML=`<div class="panel emptyb">這個頁面只有老闆和管理者可以使用。</div>`; return; }
   dpEnsure();
   const dr=DP.draft, c=deptCalc(DP.ym,dr), [y,m]=DP.ym.split('-').map(Number), conf=cfg();
   const ds=Object.values(S.allDaily||{}).filter(d=>d.branch==='dp'&&d.month===DP.ym&&dStatusOf(d)==='營業'), days=ds.length;
@@ -1894,7 +1898,7 @@ function drawDept(){
     <details class="panel pr-cfg" id="dpCfg" ${DP.cfgOpen?'open':''}><summary>⚙️ 櫃位合約設定</summary>
       <div class="dgrid2"><label class="dfield"><span class="fl">百貨名稱</span><input class="tin" id="cfgVenue" value="${esc(conf.venue)}" maxlength="20" ${isBoss()?'':'disabled'}></label>
       <label class="dfield"><span class="fl">預設抽成率</span><span class="din"><input id="cfgRate" type="number" step="0.1" value="${esc(conf.rate)}" ${isBoss()?'':'disabled'}><small>%</small></span></label></div>
-      ${isBoss()?'<button class="btn primary" data-cfgsave="1">儲存設定</button>':`<p class="hint">只有${esc(BOSS)}可以修改。</p>`}
+      ${isBoss()?'<button class="btn primary" data-cfgsave="1">儲存設定</button>':`<p class="hint">只有老闆可以修改。</p>`}
       <p class="hint">換櫃位或換百貨時，改這裡的名稱即可，舊月份的對帳資料都會留著。</p></details>`;
 }
 function dpResHTML(c){
@@ -1947,7 +1951,9 @@ const maskMail=m=>{const [u,d]=String(m||'').split('@'); return u?`${u.slice(0,2
 const pwDone=n=>{ const p=personOf(n); return !!(p&&P.pwset&&P.pwset[n]===(p.v||1)); };
 const myMailOf=n=>{ try{ return localStorage.getItem('mail:'+n)||''; }catch(e){ return ''; } };
 const okMail=m=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(m||'').trim());
-const isBoss=()=>!!W.name&&W.name===BOSS&&W.admin===true;
+/* 老闆可以有好幾位：創立帳號的妃妃，以及在人員管理被設為老闆的人 */
+const isBossName=n=>n===BOSS||!!(personOf(n)||{}).boss;
+const isBoss=()=>!!W.name&&isBossName(W.name)&&W.admin===true;
 const isMgr=()=>isBoss()||(!!W.name&&!!(personOf(W.name)||{}).mgr);
 /* 一般夥伴只能看、只能填自己負責的店；老闆和管理者看全部 */
 const myBR=()=>isMgr()?BR:BR.filter(b=>((personOf(W.name)||{}).branches||[]).includes(b));
@@ -1963,7 +1969,7 @@ const authMsg=e=>{const c=(e&&e.code)||'';
   if(c==='auth/too-many-requests') return '嘗試太多次，請過幾分鐘再試';
   if(c==='auth/network-request-failed') return '網路連線失敗，請檢查網路';
   if(c==='auth/weak-password') return '密碼至少要 6 個字';
-  if(c==='auth/email-already-in-use') return `這個名字已經設定過密碼了，請直接登入；忘記密碼請找${BOSS}重設`;
+  if(c==='auth/email-already-in-use') return `這個名字已經設定過密碼了，請直接登入；忘記密碼請找老闆重設`;
   if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)) return (A.name&&pwDone(A.name))?'密碼不對，忘記密碼請按下方「忘記密碼？」':'密碼不對。第一次使用的話，請按下方「第一次登入，設定密碼」';
   if(c==='auth/operation-not-allowed') return 'Firebase 尚未開啟「電子郵件/密碼」登入，請依設定說明開啟';
   return '登入失敗（'+(c||'未知錯誤')+'）';};
@@ -2006,12 +2012,14 @@ function renderLogin(){
   const f=$('#pw1'); if(f) f.focus();
 }
 async function savePeople(list){
-  if(!isBoss()){toast(`只有${BOSS}可以修改人員名單`);return false;}
+  if(!isBoss()){toast('只有老闆可以修改人員名單');return false;}
   const bp=list.find(p=>p.name===BOSS)||{};
-  const mgrs=list.filter(p=>p.mgr||p.name===BOSS);
+  const bosses=list.filter(p=>p.boss||p.name===BOSS);
+  const mgrs=list.filter(p=>p.mgr||p.boss||p.name===BOSS);
   const data={...P.staff,people:list,emails:list.map(p=>emailOf(p.name,p.v)),mails:list.filter(p=>p.mail).map(p=>lc(p.mail)),
     mgrEmails:mgrs.map(p=>emailOf(p.name,p.v)).concat(mgrs.filter(p=>p.mail).map(p=>lc(p.mail))),
-    access:Object.fromEntries(list.flatMap(p=>{const br=(p.branches||[]).filter(b=>BR.includes(b)); return [[emailOf(p.name,p.v),br]].concat(p.mail?[[lc(p.mail),br]]:[]);})),bossMail:bp.mail?lc(bp.mail):'',updatedAt:new Date().toISOString()};
+    access:Object.fromEntries(list.flatMap(p=>{const br=(p.branches||[]).filter(b=>BR.includes(b)); return [[emailOf(p.name,p.v),br]].concat(p.mail?[[lc(p.mail),br]]:[]);})),bossMail:bp.mail?lc(bp.mail):'',
+    bossEmails:bosses.map(p=>emailOf(p.name,p.v)).concat(bosses.filter(p=>p.mail).map(p=>lc(p.mail))),updatedAt:new Date().toISOString()};
   try{ await FB.fs.doc('public/staff').set(data); return true; }
   catch(e){ toast('人員名單儲存失敗'); return false; }
 }
@@ -2056,8 +2064,9 @@ function bindLogin(){
       t.disabled=false; }
     else if(t.dataset.lgback){ A.name=null; A.err=''; A.forgot=false; renderLogin(); }
     else if(t.dataset.lgmode){ A.mode=t.dataset.lgmode; A.err=''; renderLogin(); }
-    else if(t.dataset.staffdel){ const n=t.dataset.staffdel; if(n===BOSS) return; if(A.confirmDel!==n){ A.confirmDel=n; renderHome(); return; } A.confirmDel=null; if(await savePeople(people().filter(p=>p.name!==n))) toast(`已移除 ${n}`); }
-    else if(t.dataset.staffmgr){ const n=t.dataset.staffmgr; if(n===BOSS) return; const on=!(personOf(n)||{}).mgr; if(await savePeople(people().map(p=>p.name===n?{...p,mgr:on}:p))) toast(on?`${n} 已設為管理者，可以看薪資、百貨對帳和營業分析`:`${n} 已取消管理者`); }
+    else if(t.dataset.staffboss){ const n=t.dataset.staffboss; if(n===BOSS||n===W.name) return; if(A.confirmBoss!==n){ A.confirmBoss=n; renderHome(); return; } A.confirmBoss=null; const on=!(personOf(n)||{}).boss; if(await savePeople(people().map(p=>p.name===n?{...p,boss:on,mgr:on?true:p.mgr}:p))) toast(on?`${n} 已設為老闆，權限和你一樣`:`${n} 已取消老闆，改為管理者`); }
+    else if(t.dataset.staffdel){ const n=t.dataset.staffdel; if(n===BOSS||n===W.name) return; if(A.confirmDel!==n){ A.confirmDel=n; renderHome(); return; } A.confirmDel=null; if(await savePeople(people().filter(p=>p.name!==n))) toast(`已移除 ${n}`); }
+    else if(t.dataset.staffmgr){ const n=t.dataset.staffmgr; if(isBossName(n)) return; const on=!(personOf(n)||{}).mgr; if(await savePeople(people().map(p=>p.name===n?{...p,mgr:on}:p))) toast(on?`${n} 已設為管理者，可以看薪資、百貨對帳和營業分析`:`${n} 已取消管理者`); }
     else if(t.dataset.staffbr){ const [n,b]=t.dataset.staffbr.split('|'); const p=personOf(n); if(!p) return; const cur=p.branches||[]; const nb=cur.includes(b)?cur.filter(x=>x!==b):BR.filter(x=>cur.includes(x)||x===b); if(await savePeople(people().map(x=>x.name===n?{...x,branches:nb}:x))) toast(`${n} 負責：${nb.length?nb.map(x=>B[x].short).join('、'):'（沒有指定店）'}`); }
     else if(t.dataset.pwreset){ const n=t.dataset.pwreset; if(n===BOSS) return; if(await savePeople(people().map(p=>p.name===n?{...p,v:(p.v||1)+1,mail:''}:p))) toast(`${n} 的密碼已重設，下次登入請按「第一次登入」重新設定`); }
   });
@@ -2072,9 +2081,9 @@ function bindLogin(){
 /* 人員與資料管理（只有老闆） */
 function adminHTML(){
   if(!isBoss()) return '';
-  return `<section class="panel adm"><div class="ph"><h2>人員管理</h2><span class="hint">只有${esc(BOSS)}看得到</span></div>
+  return `<section class="panel adm"><div class="ph"><h2>人員管理</h2><span class="hint">只有老闆看得到</span></div>
     <p class="hint adm-note">勾選每位夥伴負責的店：一般夥伴只看得到、只能填自己負責的店，付款只能選零用金或營收現金。管理者可以看全部店點、營業分析、薪資、百貨對帳，也能完成現金結算。</p>
-    <div class="adm-people">${people().map(p=>`<div class="adm-p"><i>${esc(p.name.slice(0,1))}</i><b>${esc(p.name)}</b>${p.name===BOSS?'<small>老闆</small>':`<span class="adm-br">${p.mgr?'<small>全部店點</small>':BR.map(b=>{const on=(p.branches||[]).includes(b);return `<button class="chip br-chip ${on?'on':''}" style="--bc:var(${B[b].color})" data-staffbr="${esc(p.name)}|${b}">${on?'✓ ':''}${esc(B[b].short)}</button>`;}).join('')}${!p.mgr&&!(p.branches||[]).length?'<em class="adm-warn">還沒指定店</em>':''}</span><button class="chip ${p.mgr?'on':''}" data-staffmgr="${esc(p.name)}">${p.mgr?'✓ 管理者':'設為管理者'}</button><button class="chip" data-pwreset="${esc(p.name)}">重設密碼</button><button class="chip danger" data-staffdel="${esc(p.name)}">${A.confirmDel===p.name?'確定移除？':'移除'}</button>`}</div>`).join('')}</div>
+    <div class="adm-people">${people().map(p=>`<div class="adm-p"><i>${esc(p.name.slice(0,1))}</i><b>${esc(p.name)}</b>${p.name===BOSS?'<small>老闆</small>':p.boss?`<small>老闆</small>${p.name===W.name?'':`<button class="chip" data-staffboss="${esc(p.name)}">${A.confirmBoss===p.name?'確定取消老闆？':'取消老闆'}</button>`}`:`<button class="chip" data-staffboss="${esc(p.name)}">${A.confirmBoss===p.name?'確定設為老闆？':'設為老闆'}</button><span class="adm-br">${p.mgr?'<small>全部店點</small>':BR.map(b=>{const on=(p.branches||[]).includes(b);return `<button class="chip br-chip ${on?'on':''}" style="--bc:var(${B[b].color})" data-staffbr="${esc(p.name)}|${b}">${on?'✓ ':''}${esc(B[b].short)}</button>`;}).join('')}${!p.mgr&&!(p.branches||[]).length?'<em class="adm-warn">還沒指定店</em>':''}</span><button class="chip ${p.mgr?'on':''}" data-staffmgr="${esc(p.name)}">${p.mgr?'✓ 管理者':'設為管理者'}</button><button class="chip" data-pwreset="${esc(p.name)}">重設密碼</button><button class="chip danger" data-staffdel="${esc(p.name)}">${A.confirmDel===p.name?'確定移除？':'移除'}</button>`}</div>`).join('')}</div>
     <form class="lg-add" id="staffForm"><input id="staffNew" maxlength="12" placeholder="新增夥伴名字" autocomplete="off"><button class="btn primary" type="submit">新增夥伴</button></form>
     <div class="adm-data"><label class="btn">匯入備份資料<input type="file" accept="application/json,.json" id="impFile" hidden></label><button class="btn" data-export="1">下載備份</button><span class="hint" id="impMsg">${esc(IMP.msg||'建議每個月下載一次備份')}</span></div>
   </section>`;
@@ -2098,7 +2107,7 @@ async function importData(file){
 async function exportData(){
   const out={_meta:{exportedAt:new Date().toISOString(),by:W.name}};
   for(const c of COLS){ const s=await FB.fs.collection(c).get(); out[c]={}; s.docs.forEach(d=>out[c][d.id]=fsDec(d.data())); }
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(out)],{type:'application/json'})); a.download=`伯虎帳本-備份-${todayStr()}.json`; document.body.appendChild(a); a.click(); a.remove();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(out)],{type:'application/json'})); a.download=`伯虎收支-備份-${todayStr()}.json`; document.body.appendChild(a); a.click(); a.remove();
 }
 document.addEventListener('change',ev=>{ if(ev.target.id==='impFile'&&ev.target.files[0]) importData(ev.target.files[0]); });
 document.addEventListener('click',ev=>{ const t=ev.target.closest('[data-export]'); if(t) exportData().catch(()=>toast('備份失敗')); });
@@ -2161,7 +2170,7 @@ function renderHome(){
   const card=(k,t,sub,rows,go)=>`<button class="hcard" data-home="${k}"><span class="hc-ic">${ICON[k]}</span><span class="hc-t">${t}</span><span class="hc-s">${sub}</span><ul class="hc-l">${rows}</ul><span class="hc-go">${go} →</span></button>`;
   const ym=today.slice(0,7), dc=deptCalc(ym), pd=(S.payroll||{})[ym], ppm=ymShift(ym,-1), pdp=(S.payroll||{})[ppm];
   const payLi=(x,lab)=>x?`<li><i style="background:var(--accent)"></i>${lab}<span>${Object.keys(x.rows||{}).length} 人・${fmt(x.total||0)} 元${Object.values(x.rows||{}).every(r=>r.paid)?'・已發放':''}</span></li>`:`<li><i style="background:var(--rule)"></i>${lab}<span>尚未建立</span></li>`;
-  const noBr=!myBR().length?`<div class="panel emptyb">你還沒有被指定負責的店。請${esc(BOSS)}到首頁最下面的人員管理，勾選你負責的店。</div>`:'';
+  const noBr=!myBR().length?`<div class="panel emptyb">你還沒有被指定負責的店。請老闆到首頁最下面的人員管理，勾選你負責的店。</div>`:'';
   $('#main').innerHTML=`<section class="home">${noBr}
     <div class="home-h"><div class="home-date">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</div><h2>今天也慢慢來，把帳記好</h2></div>
     ${homeStatsHTML(today)}
@@ -2419,7 +2428,7 @@ function cashCard(b){
       <label class="dfield wide"><span class="fl">備註</span><input class="tin" id="cs-${b}-cash-note" data-cs="cash" data-b="${b}" data-k="note" maxlength="60" value="${esc(dr.note??'')}" placeholder="可不填"></label>
     </div>
     <div class="cs-res num" id="csr-${b}-cash"${can?'':' hidden'}>${counted==null?'<span class="hint">填入實點現金後會自動對帳</span>':`<span class="${diff===0?'ok':'bad'}">${diff===0?'✓ 現金相符':`現金${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元`}</span><span>結算後營業現金歸 0</span>`}</div>
-    ${can?`<button class="btn primary cs-go" data-csave="cash" data-b="${b}">完成營收現金結帳</button>`:`<p class="cs-lock">🔒 只有${BOSS}和管理者可以完成清點結算</p>`}
+    ${can?`<button class="btn primary cs-go" data-csave="cash" data-b="${b}">完成營收現金結帳</button>`:`<p class="cs-lock">🔒 只有老闆和管理者可以完成清點結算</p>`}
   </section>`;
 }
 function pettyCard(b){
@@ -2437,7 +2446,7 @@ function pettyCard(b){
       <label class="dfield wide"><span class="fl">備註</span><input class="tin" data-cs="petty" data-b="${b}" data-k="note" id="cs-${b}-petty-note" maxlength="60" value="${esc(dr.note??'')}" placeholder="可不填"></label>
     </div>
     <div class="cs-res num" id="csr-${b}-petty"${can?'':' hidden'}>${counted==null?'<span class="hint">填入實點零用金後會自動對帳</span>':`<span class="${diff===0?'ok':'bad'}">${diff===0?'✓ 零用金相符':`零用金${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元`}</span><span>補回 ${fmt(refill)} 元到 ${fmt(q)}</span>`}</div>
-    ${can?`<button class="btn primary cs-go" data-csave="petty" data-b="${b}">完成零用金結帳並補滿</button>`:`<p class="cs-lock">🔒 只有${BOSS}和管理者可以完成清點結算</p>`}
+    ${can?`<button class="btn primary cs-go" data-csave="petty" data-b="${b}">完成零用金結帳並補滿</button>`:`<p class="cs-lock">🔒 只有老闆和管理者可以完成清點結算</p>`}
   </section>`;
 }
 function historyHTML(b){
@@ -2455,11 +2464,11 @@ function drawCash(){
   if(!W.name){ renderLogin(); return; }
   if(S.mode!=='cash') return;
   subCash();
-  if(!myBR().length){ $('#main').innerHTML=`<div class="panel emptyb">你還沒有被指定負責的店，請${esc(BOSS)}在人員管理勾選。</div>`; return; }
+  if(!myBR().length){ $('#main').innerHTML=`<div class="panel emptyb">你還沒有被指定負責的店，請老闆在人員管理勾選。</div>`; return; }
   if(!canBr(C.branch)) C.branch=myBR()[0];
   const b=C.branch;
   $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(${B[b].color})">
-      <div class="st-l"><div><div class="st-name">現金結算 <small>${isMgr()?'你可以完成清點結算':`只有${BOSS}和管理者可以完成清點結算`}</small></div><div class="st-state">${md(todayStr())}（${wk(todayStr())}）</div></div></div>
+      <div class="st-l"><div><div class="st-name">現金結算 <small>${isMgr()?'你可以完成清點結算':`只有老闆和管理者可以完成清點結算`}</small></div><div class="st-state">${md(todayStr())}（${wk(todayStr())}）</div></div></div>
       <div class="seg cs-seg"${myBR().length>1?'':' hidden'}>${myBR().map(x=>`<button data-cb="${x}" aria-pressed="${x===b}"><i class="sw" style="background:var(${B[x].color})"></i>${esc(B[x].short)}</button>`).join('')}</div>
     </div>
     <div class="cs-grid">${cashCard(b)}${pettyOf(b)?pettyCard(b):`<section class="cs-card"><div class="cs-h"><span class="cs-ic g">${ICON.spend}</span><div><h3>零用金</h3><p class="hint">這個店點沒有設定零用金。</p></div></div></section>`}</div>
@@ -2467,7 +2476,7 @@ function drawCash(){
     ${pettyCfgHTML()}`;
 }
 async function saveSettle(type,b){
-  if(!isMgr()){toast(`只有${BOSS}和管理者可以結帳`);return;}
+  if(!isMgr()){toast(`只有老闆和管理者可以結帳`);return;}
   if(!S.db){toast('資料庫沒有連線');return;}
   const dr=(C.draft[type][b])||{}; if(dr.counted===undefined||dr.counted===''){toast('請先填入實點金額');$(`#cs-${b}-${type}-counted`)?.focus();return;}
   const counted=Math.round(+dr.counted), at=new Date().toISOString(), date=csUntil(type,b);
@@ -2621,7 +2630,7 @@ document.addEventListener('click',ev=>{
 
 /* ---------- start ---------- */
 function showLoadErr(){ let el=$('#loadErr'); if(!el){ el=document.createElement('div'); el.id='loadErr'; el.className='load-err'; document.querySelector('.wrap')?.insertBefore(el,$('#main')); }
-  el.innerHTML=S.loadErr?`⚠️ 讀取資料失敗（${esc(S.loadErr)}）。${S.loadErr==='permission-denied'?`這個帳號目前沒有讀取權限，請找${BOSS}確認人員名單，或登出後重新登入。`:'請檢查網路後重新整理頁面。'} <button class="btn" onclick="location.reload()">重新整理</button>`:''; el.hidden=!S.loadErr; }
+  el.innerHTML=S.loadErr?`⚠️ 讀取資料失敗（${esc(S.loadErr)}）。${S.loadErr==='permission-denied'?`這個帳號目前沒有讀取權限，請找老闆確認人員名單，或登出後重新登入。`:'請檢查網路後重新整理頁面。'} <button class="btn" onclick="location.reload()">重新整理</button>`:''; el.hidden=!S.loadErr; }
 function stopData(){ FB.unsubs.forEach(u=>{try{u()}catch(e){}}); FB.unsubs=[]; if(D.unsub){try{D.unsub()}catch(e){}} D.unsub=null; D.subMonth=null; if(C.unsub){try{C.unsub()}catch(e){}} C.unsub=null; C.subB=null;
   S.db=null; S.docs={}; S.allDaily={}; S.loadErr=null; showLoadErr(); S.misc={}; S.settle={}; S.payroll={}; S.dept={}; D.docs={}; C.daily={}; S.loaded=false; FB.dataOn=false; FB.mgrOn=false; }
 function redrawFor(kinds){ if(kinds.includes(S.mode)){ if(S.mode==='home') renderHome(); else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='ledger'&&!S.editing&&!S.adding) render(); } }
@@ -2671,7 +2680,7 @@ function applyAuth(){
     if(mm&&(P.staff.emails||[]).includes(mm.oldEmail)){ n=nameOfEmail(mm.oldEmail); viaOld=mm.oldEmail; }
   }
   if(!n){ W.name=null; stopData(); renderWho(); FB.auth.signOut(); A.err='這個帳號已被移除或重設密碼，請重新選擇名字登入'; render(); return; }
-  const was=W.name; W.name=n; W.email=u.email; W.uid=u.uid; W.admin=!!(P.staff&&(P.staff.bossEmail===u.email||(viaOld&&P.staff.bossEmail===viaOld)||(P.staff.bossMail&&P.staff.bossMail===em)));
+  const was=W.name; W.name=n; W.email=u.email; W.uid=u.uid; W.admin=!!(P.staff&&(P.staff.bossEmail===u.email||(viaOld&&P.staff.bossEmail===viaOld)||(P.staff.bossMail&&P.staff.bossMail===em)||(P.staff.bossEmails||[]).some(x=>x===em||(viaOld&&x===viaOld))));
   if(FB.dataOn&&FB.dataKey!==dataKey()){ stopData(); }
   renderWho(); startData(); startMgrData();
   { const pp=personOf(n); if(pp&&P.pwset&&P.pwset[n]!==(pp.v||1)) FB.fs.doc('public/pwset').set({[n]:pp.v||1},{merge:true}).catch(()=>{}); }

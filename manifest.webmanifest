@@ -1,6 +1,6 @@
 {
-  "name": "伯虎在二樓 帳本",
-  "short_name": "伯虎帳本",
+  "name": "伯虎在二樓 收支總覽",
+  "short_name": "伯虎收支",
   "lang": "zh-Hant",
   "start_url": "./",
   "scope": "./",

@@ -8,8 +8,13 @@ service cloud.firestore {
     function myEmail() { return request.auth.token.email.lower(); }
     function isStaff() { return signedIn() && exists(/databases/$(database)/documents/public/staff)
       && (myEmail() in staffDoc().emails || myEmail() in staffDoc().get('mails', [])); }
-    function isBoss() { return signedIn() && (myEmail() == staffDoc().bossEmail || myEmail() == staffDoc().get('bossMail', '')); }
+    function isBoss() { return signedIn() && (myEmail() == staffDoc().bossEmail || myEmail() == staffDoc().get('bossMail', '')
+      || myEmail() in staffDoc().get('bossEmails', [])); }
     function isMgr() { return isBoss() || (signedIn() && myEmail() in staffDoc().get('mgrEmails', [])); }
+    // 一般夥伴只能讀寫自己負責的店（public/staff 的 access 對照表）
+    function myBr() { return staffDoc().get('access', {}).get(myEmail(), []); }
+    function canBr(b) { return isMgr() || (isStaff() && b in myBr()); }
+    function idOk(id, b) { return id.matches(b + '-.*'); }
 
     match /public/staff {
       allow read: if true;
@@ -20,11 +25,21 @@ service cloud.firestore {
     match /public/pwset { allow read: if true; allow write: if signedIn(); }
     match /mailmap/{m} { allow read: if signedIn(); allow create, update: if isStaff(); }
 
-    match /months/{id}   { allow read, write: if isStaff(); }
-    match /daily/{id}    { allow read, write: if isStaff(); }
-    match /misc/{id}     { allow read: if isStaff(); allow write: if isMgr() || (isStaff() && id == 'fixedexp'); }
+    match /months/{id} {
+      allow read: if canBr(resource.data.branch);
+      allow create: if canBr(request.resource.data.branch) && idOk(id, request.resource.data.branch);
+      allow update: if canBr(resource.data.branch) && canBr(request.resource.data.branch) && idOk(id, request.resource.data.branch);
+      allow delete: if isMgr();
+    }
+    match /daily/{id} {
+      allow read: if canBr(resource.data.branch);
+      allow create: if canBr(request.resource.data.branch) && idOk(id, request.resource.data.branch);
+      allow update: if canBr(resource.data.branch) && canBr(request.resource.data.branch) && idOk(id, request.resource.data.branch);
+      allow delete: if isMgr();
+    }
+    match /settle/{id}   { allow read: if canBr(resource.data.branch); allow write: if isMgr(); }
+    match /misc/{id}     { allow read: if isStaff(); allow write: if isMgr(); }
     match /receipts/{id} { allow read, create: if isStaff(); allow update, delete: if isMgr(); }
-    match /settle/{id}   { allow read: if isStaff(); allow write: if isMgr(); }
     match /payroll/{id}  { allow read, write: if isMgr(); }
     match /dept/{id}     { allow read, write: if isMgr(); }
   }
