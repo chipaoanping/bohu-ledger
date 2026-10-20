@@ -1015,6 +1015,17 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 
 .dtab td.st-offc{text-align:left}
 .hc-l b.pos{color:var(--pos)}.hc-l b.neg{color:var(--neg)}
+
+.adm-p{flex-wrap:wrap}
+.adm-br{display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex-basis:100%;order:5}
+.adm-br small{color:var(--ink-3)}
+.br-chip.on{background:color-mix(in srgb,var(--bc) 16%,var(--paper));border-color:var(--bc);color:var(--ink)}
+.adm-warn{font-style:normal;font-size:12px;color:var(--neg)}
+.adm-note{margin:-4px 0 4px}
+.picks.p1{grid-template-columns:minmax(0,420px);justify-content:center}
+.picks.p2,.hs-g.hs2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.hs-g.hs1{grid-template-columns:1fr}
+@media (max-width:640px){.picks.p2,.hs-g.hs2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1450,9 +1461,7 @@ function subDaily(){
   if(D.subMonth===key) return;
   if(D.unsub) D.unsub();
   D.subMonth=key;
-  D.unsub=S.db.collection('daily').where('month','in',want).onSnapshot(snap=>{
-    const o={}; snap.docs.forEach(d=>{o[d.id]=d.data();}); D.docs=o; if(S.mode==='daily') renderDaily(true); else if(S.mode==='home') renderHome();
-  },()=>{});
+  D.unsub=watchBr('daily',q=>q.where('month','in',want),o=>{ D.docs=o; if(S.mode==='daily') renderDaily(true); else if(S.mode==='home') renderHome(); });
 }
 const val=(b,k)=>{const dirty=D.dirty[b]||{};if(dirty[k]!==undefined) return dirty[k];const d=dDoc(b)||{};return d[k]??'';};
 const nval=(b,k)=>+val(b,k)||0;
@@ -1479,7 +1488,7 @@ function renderChooser(){
       <span class="pk-month num"><span>${+today.slice(5,7)} 月累計</span><b>${fmt(mrev)} 元</b><span>${fmt(mtx)} 筆交易・${mrows.length} 天</span></span>
       <span class="pk-go">開始結帳 →</span>
     </button>`;};
-  return `<div class="chooser"><button class="mclose" data-mclose="1" aria-label="關閉">×</button><div class="ch-head"><h2 id="pickTitle">今天要幫哪一間店結帳？</h2><p class="hint">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</p></div><div class="picks p3">${BR.map(card).join('')}</div></div>`;
+  return `<div class="chooser"><button class="mclose" data-mclose="1" aria-label="關閉">×</button><div class="ch-head"><h2 id="pickTitle">今天要幫哪一間店結帳？</h2><p class="hint">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</p></div><div class="picks p${myBR().length}">${myBR().map(card).join('')}</div></div>`;
 }
 
 /* step 2: closing sheet */
@@ -1533,7 +1542,7 @@ function monthTable(b){
   const td=sum(rows.map(diffOf));
   h+=`<tr class="net"><td>合計 ${rows.filter(r=>dStatusOf(r)==='營業').length} 天</td>${cols.map(k=>`<td class="num">${fmt(tt(k))}</td>`).join('')}${b==='dp'?'':`<td class="num ${td?'neg':'pos'}">${td?sgn(td):'✓'}</td>`}<td class="num">${fmt(tt('deposit'))}</td><td></td></tr></tbody></table></div>`;
   const [y,m]=dMonth().split('-').map(Number), led=sum(listOfRaw(b,m,'rev',y).map(e=>+e.amt||0));
-  if(led) h+=`<p class="hint" style="margin:-8px 4px 0">營業分析裡 ${y} 年 ${m} 月${esc(bshort(b))}手動填的營收是 ${fmt(led)} 元，每日結帳合計 ${fmt(tt('revenue'))} 元。</p>`;
+  if(led&&isMgr()) h+=`<p class="hint" style="margin:-8px 4px 0">營業分析裡 ${y} 年 ${m} 月${esc(bshort(b))}手動填的營收是 ${fmt(led)} 元，每日結帳合計 ${fmt(tt('revenue'))} 元。</p>`;
   return h;
 }
 function sheetTop(b,state,extra=''){
@@ -1593,7 +1602,7 @@ function renderSheet(b){
     <div id="dTables">${monthTable(b)}</div>`;
 }
 let PK='daily';
-function openPick(kind){ PK=kind||'daily'; D.day=todayStr(); subDaily(); $('#pickBox').innerHTML=PK==='spend'?spendChooser():renderChooser(); $('#pickModal').hidden=false; document.body.classList.add('noscroll'); setTimeout(()=>{const f=$('#pickBox .pick');f&&f.focus();},30); }
+function openPick(kind){ PK=kind||'daily'; if(!myBR().length){ toast(`你還沒有被指定負責的店，請${BOSS}在人員管理勾選`); return; } if(myBR().length===1){ D.day=todayStr(); subDaily(); choosePick(myBR()[0]); return; } D.day=todayStr(); subDaily(); $('#pickBox').innerHTML=PK==='spend'?spendChooser():renderChooser(); $('#pickModal').hidden=false; document.body.classList.add('noscroll'); setTimeout(()=>{const f=$('#pickBox .pick');f&&f.focus();},30); }
 function closePick(){ $('#pickModal').hidden=true; document.body.classList.remove('noscroll'); }
 function choosePick(b){ closePick(); if(PK==='spend'){ S.mode='spend'; SP.branch=b; SP.day=todayStr(); SP.draft={}; SP.confirmDel=null; SP.editId=null; saveUI(); render(); scrollTo({top:0}); return; } S.mode='daily'; D.edit=false; D.branch=b; D.day=todayStr(); D.dirty={}; saveD(); saveUI(); subDaily(); render(); scrollTo({top:0}); }
 function renderDaily(fromSnap){
@@ -1940,6 +1949,9 @@ const myMailOf=n=>{ try{ return localStorage.getItem('mail:'+n)||''; }catch(e){ 
 const okMail=m=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(m||'').trim());
 const isBoss=()=>!!W.name&&W.name===BOSS&&W.admin===true;
 const isMgr=()=>isBoss()||(!!W.name&&!!(personOf(W.name)||{}).mgr);
+/* 一般夥伴只能看、只能填自己負責的店；老闆和管理者看全部 */
+const myBR=()=>isMgr()?BR:BR.filter(b=>((personOf(W.name)||{}).branches||[]).includes(b));
+const canBr=b=>myBR().includes(b);
 const A={name:null,mode:'login',err:'',busy:false};
 function renderWho(){
   document.body.classList.toggle('boss',isBoss());
@@ -1998,7 +2010,8 @@ async function savePeople(list){
   const bp=list.find(p=>p.name===BOSS)||{};
   const mgrs=list.filter(p=>p.mgr||p.name===BOSS);
   const data={...P.staff,people:list,emails:list.map(p=>emailOf(p.name,p.v)),mails:list.filter(p=>p.mail).map(p=>lc(p.mail)),
-    mgrEmails:mgrs.map(p=>emailOf(p.name,p.v)).concat(mgrs.filter(p=>p.mail).map(p=>lc(p.mail))),bossMail:bp.mail?lc(bp.mail):'',updatedAt:new Date().toISOString()};
+    mgrEmails:mgrs.map(p=>emailOf(p.name,p.v)).concat(mgrs.filter(p=>p.mail).map(p=>lc(p.mail))),
+    access:Object.fromEntries(list.flatMap(p=>{const br=(p.branches||[]).filter(b=>BR.includes(b)); return [[emailOf(p.name,p.v),br]].concat(p.mail?[[lc(p.mail),br]]:[]);})),bossMail:bp.mail?lc(bp.mail):'',updatedAt:new Date().toISOString()};
   try{ await FB.fs.doc('public/staff').set(data); return true; }
   catch(e){ toast('人員名單儲存失敗'); return false; }
 }
@@ -2045,6 +2058,7 @@ function bindLogin(){
     else if(t.dataset.lgmode){ A.mode=t.dataset.lgmode; A.err=''; renderLogin(); }
     else if(t.dataset.staffdel){ const n=t.dataset.staffdel; if(n===BOSS) return; if(A.confirmDel!==n){ A.confirmDel=n; renderHome(); return; } A.confirmDel=null; if(await savePeople(people().filter(p=>p.name!==n))) toast(`已移除 ${n}`); }
     else if(t.dataset.staffmgr){ const n=t.dataset.staffmgr; if(n===BOSS) return; const on=!(personOf(n)||{}).mgr; if(await savePeople(people().map(p=>p.name===n?{...p,mgr:on}:p))) toast(on?`${n} 已設為管理者，可以看薪資、百貨對帳和營業分析`:`${n} 已取消管理者`); }
+    else if(t.dataset.staffbr){ const [n,b]=t.dataset.staffbr.split('|'); const p=personOf(n); if(!p) return; const cur=p.branches||[]; const nb=cur.includes(b)?cur.filter(x=>x!==b):BR.filter(x=>cur.includes(x)||x===b); if(await savePeople(people().map(x=>x.name===n?{...x,branches:nb}:x))) toast(`${n} 負責：${nb.length?nb.map(x=>B[x].short).join('、'):'（沒有指定店）'}`); }
     else if(t.dataset.pwreset){ const n=t.dataset.pwreset; if(n===BOSS) return; if(await savePeople(people().map(p=>p.name===n?{...p,v:(p.v||1)+1,mail:''}:p))) toast(`${n} 的密碼已重設，下次登入請按「第一次登入」重新設定`); }
   });
   document.addEventListener('submit',async ev=>{
@@ -2052,14 +2066,15 @@ function bindLogin(){
     if(id==='pwForm'||id==='setupForm'){ ev.preventDefault(); ev.stopImmediatePropagation(); submitPw(id==='setupForm'); return; }
     if(id==='staffForm'){ ev.preventDefault(); ev.stopImmediatePropagation();
       const n=$('#staffNew').value.trim(); if(!n) return; if(staffList().includes(n)){toast('名單裡已經有這個名字');return;}
-      if(await savePeople(people().concat([{name:n,v:1}]))){ toast(`已新增 ${n}，請他第一次登入時設定密碼`); } }
+      if(await savePeople(people().concat([{name:n,v:1,branches:[]}]))){ toast(`已新增 ${n}，請勾選他負責的店，再請他第一次登入時設定密碼`); } }
   },true);
 }
 /* 人員與資料管理（只有老闆） */
 function adminHTML(){
   if(!isBoss()) return '';
-  return `<section class="panel adm"><div class="ph"><h2>人員管理</h2><span class="hint">只有${esc(BOSS)}看得到・管理者可以看薪資、百貨對帳、營業分析、完成現金結算</span></div>
-    <div class="adm-people">${people().map(p=>`<div class="adm-p"><i>${esc(p.name.slice(0,1))}</i><b>${esc(p.name)}</b>${p.name===BOSS?'<small>老闆</small>':`<button class="chip ${p.mgr?'on':''}" data-staffmgr="${esc(p.name)}">${p.mgr?'✓ 管理者':'設為管理者'}</button><button class="chip" data-pwreset="${esc(p.name)}">重設密碼</button><button class="chip danger" data-staffdel="${esc(p.name)}">${A.confirmDel===p.name?'確定移除？':'移除'}</button>`}</div>`).join('')}</div>
+  return `<section class="panel adm"><div class="ph"><h2>人員管理</h2><span class="hint">只有${esc(BOSS)}看得到</span></div>
+    <p class="hint adm-note">勾選每位夥伴負責的店：一般夥伴只看得到、只能填自己負責的店，付款只能選零用金或營收現金。管理者可以看全部店點、營業分析、薪資、百貨對帳，也能完成現金結算。</p>
+    <div class="adm-people">${people().map(p=>`<div class="adm-p"><i>${esc(p.name.slice(0,1))}</i><b>${esc(p.name)}</b>${p.name===BOSS?'<small>老闆</small>':`<span class="adm-br">${p.mgr?'<small>全部店點</small>':BR.map(b=>{const on=(p.branches||[]).includes(b);return `<button class="chip br-chip ${on?'on':''}" style="--bc:var(${B[b].color})" data-staffbr="${esc(p.name)}|${b}">${on?'✓ ':''}${esc(B[b].short)}</button>`;}).join('')}${!p.mgr&&!(p.branches||[]).length?'<em class="adm-warn">還沒指定店</em>':''}</span><button class="chip ${p.mgr?'on':''}" data-staffmgr="${esc(p.name)}">${p.mgr?'✓ 管理者':'設為管理者'}</button><button class="chip" data-pwreset="${esc(p.name)}">重設密碼</button><button class="chip danger" data-staffdel="${esc(p.name)}">${A.confirmDel===p.name?'確定移除？':'移除'}</button>`}</div>`).join('')}</div>
     <form class="lg-add" id="staffForm"><input id="staffNew" maxlength="12" placeholder="新增夥伴名字" autocomplete="off"><button class="btn primary" type="submit">新增夥伴</button></form>
     <div class="adm-data"><label class="btn">匯入備份資料<input type="file" accept="application/json,.json" id="impFile" hidden></label><button class="btn" data-export="1">下載備份</button><span class="hint" id="impMsg">${esc(IMP.msg||'建議每個月下載一次備份')}</span></div>
   </section>`;
@@ -2101,12 +2116,18 @@ function accountHTML(){
 /* ---------- 首頁 & 當日支出 ---------- */
 const SP={branch:null, day:todayStr(), cat:'', pay:'零用金', draft:{}, confirmDel:null};
 const PAYS=['零用金','營收現金','轉帳','刷卡','其他'];
+const STAFF_PAYS=['零用金','營收現金'];
+const paysFor=b=>(isMgr()?PAYS:STAFF_PAYS).filter(p=>b!=='dp'||p!=='營收現金');
+const payOfE=e=>PAYS.find(p=>p!=='其他'&&(e.note||'').split('・').includes(p))||'其他';
+/* 一般夥伴的支出明細只顯示零用金、營收現金付的 */
+const spVisible=e=>isMgr()||STAFF_PAYS.includes(payOfE(e));
 const pettyOf=b=>+cfg().petty[b]||0;
 const pettyUsed=(b)=>sum(pettyPending(b).map(e=>+e.amt||0));
 const pettyLeft=(b)=>pettyOf(b)-pettyUsed(b);
 const spYM=day=>[+day.slice(0,4),+day.slice(5,7)];
-const spList=(b,day)=>{const [y,m]=spYM(day);return listOfRaw(b,m,'exp',y).filter(e=>e.date===day);};
-const spMonth=(b,day)=>{const [y,m]=spYM(day);return listOfRaw(b,m,'exp',y);};
+const spAll=(b,day)=>{const [y,m]=spYM(day);return listOfRaw(b,m,'exp',y);};
+const spList=(b,day)=>spAll(b,day).filter(e=>e.date===day&&spVisible(e));
+const spMonth=(b,day)=>spAll(b,day).filter(spVisible);
 const ICON={
   daily:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 14h3M8 17h6M15.5 14h.01"/></svg>',
   spend:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
@@ -2119,9 +2140,9 @@ function homeStatsHTML(today){
   const ym=today.slice(0,7), m=+ym.slice(5), docs={...(S.allDaily||{}),...D.docs};
   const one=b=>{ const ds=Object.values(docs).filter(d=>d&&d.branch===b&&String(d.date||'').startsWith(ym)&&dStatusOf(d)==='營業'), rev=sum(ds.map(d=>+d.revenue||0)), c=statusCount(b,ym,docs); if(c.未記錄&&!dStatusOf(docs[dId(b,today)])) c.未記錄--; const tx=sum(ds.map(d=>+d.tx||0));
     return {b,rev,c,tx,avg:c.營業?Math.round(rev/c.營業):0}; };
-  const st=BR.map(one), all=sum(st.map(x=>x.rev));
-  return `<div class="hstats"><div class="hs-h"><b>${m} 月營業概況</b><span class="num">${ALLNAME} <em>${fmt(all)}</em> 元</span></div>
-    <div class="hs-g hs3">${st.map(x=>`<div class="hs-c" style="--bc:var(${B[x.b].color})"><div class="hs-n"><i></i>${esc(B[x.b].short)}<small>${esc(x.b==='dp'?cfg().venue:B[x.b].nick)}</small></div>
+  const st=myBR().map(one), all=sum(st.map(x=>x.rev));
+  return `<div class="hstats"><div class="hs-h"><b>${m} 月營業概況</b>${st.length>1?`<span class="num">${isMgr()?ALLNAME:'合計'} <em>${fmt(all)}</em> 元</span>`:''}</div>
+    <div class="hs-g hs${st.length}">${st.map(x=>`<div class="hs-c" style="--bc:var(${B[x.b].color})"><div class="hs-n"><i></i>${esc(B[x.b].short)}<small>${esc(x.b==='dp'?cfg().venue:B[x.b].nick)}</small></div>
       <div class="hs-rev num">${fmt(x.rev)}<small>元</small></div>
       <div class="hs-d num"><span>營業 <b>${x.c.營業}</b> 天</span><span>公休 <b>${x.c.公休}</b> 天</span>${x.c.颱風假?`<span>颱風假 <b>${x.c.颱風假}</b> 天</span>`:''}${x.c.未記錄?`<span class="na">未記錄 <b>${x.c.未記錄}</b> 天</span>`:''}</div>
       <div class="hs-x num">日均 ${fmt(x.avg)} 元・${fmt(x.tx)} 筆${x.tx?`・客單 ${fmt(x.rev/x.tx)}`:''}</div></div>`).join('')}</div></div>`;
@@ -2140,16 +2161,17 @@ function renderHome(){
   const card=(k,t,sub,rows,go)=>`<button class="hcard" data-home="${k}"><span class="hc-ic">${ICON[k]}</span><span class="hc-t">${t}</span><span class="hc-s">${sub}</span><ul class="hc-l">${rows}</ul><span class="hc-go">${go} →</span></button>`;
   const ym=today.slice(0,7), dc=deptCalc(ym), pd=(S.payroll||{})[ym], ppm=ymShift(ym,-1), pdp=(S.payroll||{})[ppm];
   const payLi=(x,lab)=>x?`<li><i style="background:var(--accent)"></i>${lab}<span>${Object.keys(x.rows||{}).length} 人・${fmt(x.total||0)} 元${Object.values(x.rows||{}).every(r=>r.paid)?'・已發放':''}</span></li>`:`<li><i style="background:var(--rule)"></i>${lab}<span>尚未建立</span></li>`;
-  $('#main').innerHTML=`<section class="home">
+  const noBr=!myBR().length?`<div class="panel emptyb">你還沒有被指定負責的店。請${esc(BOSS)}到首頁最下面的人員管理，勾選你負責的店。</div>`:'';
+  $('#main').innerHTML=`<section class="home">${noBr}
     <div class="home-h"><div class="home-date">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</div><h2>今天也慢慢來，把帳記好</h2></div>
     ${homeStatsHTML(today)}
     <div class="hcards">
-      ${card('daily','每日結帳','營業額、交易筆數、收款方式',BR.map(dRow).join(''),'選擇店點結帳')}
-      ${card('spend','當日支出','零用金、食材、雜支',BR.map(sRow).join(''),'選擇店點記支出')}
+      ${card('daily','每日結帳','營業額、交易筆數、收款方式',myBR().map(dRow).join(''),'選擇店點結帳')}
+      ${card('spend','當日支出','零用金、食材、雜支',myBR().map(sRow).join(''),'選擇店點記支出')}
       ${isMgr()?card('ledger','營業分析','每月收支・人事・百貨櫃位',BR.map(lRow).join(''),'打開營業分析'):''}
       ${isMgr()?card('dept','百貨對帳',`${esc(dpName())}・抽成與撥款`,`<li><i style="background:var(--dp)"></i>本月<span>業績 ${fmt(dc.sales)}</span></li><li><i style="background:var(--rule)"></i>上月<span>${(()=>{const p=deptCalc(ppm);return p.received==null?(p.sales?`應撥 ${fmt(p.due)}・未入帳`:'沒有紀錄'):`已入帳 ${fmt(p.received)}`;})()}</span></li>`,'打開對帳'):''}
       ${isMgr()?card('payroll','薪資','三點人員薪資、業績獎金、薪資單',payLi(pdp,`${+ppm.slice(5)} 月`)+payLi(pd,`${+ym.slice(5)} 月`),'開始計算'):''}
-      ${card('cash','現金結算',isMgr()?'營收現金・零用金清點':'查看現金與零用金',BR.filter(b=>b!=='dp'||pettyOf('dp')).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${b==='dp'?'':`現金 ${l?md(l.date):'未結'}・`}零用金 ${p?md(p.date):'未結'}`);}).join(''),isMgr()?'開始結算':'查看結算')}
+      ${card('cash','現金結算',isMgr()?'營收現金・零用金清點':'查看現金與零用金',myBR().filter(b=>b!=='dp'||pettyOf('dp')).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${b==='dp'?'':`現金 ${l?md(l.date):'未結'}・`}零用金 ${p?md(p.date):'未結'}`);}).join(''),isMgr()?'開始結算':'查看結算')}
     </div>
     ${accountHTML()}
     ${adminHTML()}
@@ -2163,12 +2185,12 @@ function spendChooser(){
       <span class="pk-status ${l.length?'done':''}">${l.length?`今天已記 ${l.length} 筆・${fmt(sum(l.map(e=>+e.amt||0)))} 元`:'今天還沒有支出'}</span>
       <span class="pk-month num"><span>零用金餘額</span><b class="${pettyLeft(b)<0?'neg':''}">${fmt(pettyLeft(b))} / ${fmt(pettyOf(b))} 元</b><span>本月支出 ${fmt(mt)} 元・${spMonth(b,today).length} 筆</span></span>
       <span class="pk-go">開始記支出 →</span></button>`;};
-  return `<div class="chooser"><button class="mclose" data-mclose="1" aria-label="關閉">×</button><div class="ch-head sp"><h2 id="pickTitle">今天要記哪一間店的支出？</h2><p class="hint">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</p></div><div class="picks p3">${BR.map(card).join('')}</div></div>`;
+  return `<div class="chooser"><button class="mclose" data-mclose="1" aria-label="關閉">×</button><div class="ch-head sp"><h2 id="pickTitle">今天要記哪一間店的支出？</h2><p class="hint">${+today.slice(5,7)} 月 ${+today.slice(8)} 日・星期${wk(today)}</p></div><div class="picks p${myBR().length}">${myBR().map(card).join('')}</div></div>`;
 }
 /* ---------- 每月固定支出 ---------- */
 const FX={edit:false,draft:null,amt:{}};
 const fxList=b=>((((S.misc||{}).fixedexp)||{})[b])||[];
-function fxDone(b,day,id){ return spMonth(b,day).find(e=>e.fixed===id); }
+function fxDone(b,day,id){ return spAll(b,day).find(e=>e.fixed===id); }
 function fixedHTML(b,day){
   const can=isMgr(), [y,m]=spYM(day), list=fxList(b), last=new Date(y,m,0).getDate();
   if(!list.length&&!can) return '';
@@ -2225,6 +2247,7 @@ function spMonthHTML(b,day){
 }
 function renderSpend(b){
   const editable=S.canWrite!==false&&S.db, day=SP.day, list=spList(b,day), tt=sum(list.map(e=>+e.amt||0));
+  if(!paysFor(b).includes(SP.pay)) SP.pay=paysFor(b)[0];
   const cats=CATS[b].exp; if(!cats.includes(SP.cat)) SP.cat=cats.includes('食材原料')?'食材原料':cats[0];
   const byCat={}; list.forEach(e=>byCat[e.cat]=(byCat[e.cat]||0)+(+e.amt||0));
   const mList=spMonth(b,day), mTot=sum(mList.map(e=>+e.amt||0));
@@ -2247,7 +2270,7 @@ function renderSpend(b){
             <label class="dfield big"><span class="fl">金額</span><span class="din"><input id="s-amt" type="number" inputmode="numeric" min="0" step="1" value="${esc(dr.amt||'')}" placeholder="0" ${editable?'':'disabled'}><small>元</small></span></label>
           </div></section>
         <section class="dsec"><div class="ds-h"><span class="ds-n">3</span><h3>付款方式</h3></div>
-          <div class="chips">${PAYS.filter(p=>b!=='dp'||p!=='營收現金').map(p=>`<button type="button" class="chip ${p===SP.pay?'on':''}" data-spay="${p}">${p}</button>`).join('')}</div>
+          <div class="chips">${paysFor(b).map(p=>`<button type="button" class="chip ${p===SP.pay?'on':''}" data-spay="${p}">${p}</button>`).join('')}</div>
           <label class="dfield"><span class="fl">備註</span><input class="tin" id="s-note" maxlength="80" value="${esc(dr.note||'')}" placeholder="可不填" ${editable?'':'disabled'}></label></section>
         <section class="dsec"><div class="ds-h"><span class="ds-n">4</span><h3>收據照片</h3><span class="hint">有收據請拍照，會跟這筆支出存在一起</span></div>
           <div class="rc-row">${SP.photoURL?`<span class="rc-prev"><img src="${SP.photoURL}" alt="收據預覽"><button type="button" class="rc-x" data-sphotox="1" aria-label="移除照片">×</button></span>`:''}
@@ -2265,7 +2288,7 @@ function renderSpend(b){
         ${editable?`${SP.editId?`<div class="sp-editing">正在修改這筆支出<button class="btn" data-seditx="1">取消修改</button></div>`:''}<button class="btn primary big-save" data-ssave="${b}">${SP.editId?'儲存修改':'新增支出'}</button>`:'<p class="hint">你目前只能檢視。</p>'}
       </aside>
     </div>
-    <div class="panel"><div class="ph"><h2>${+day.slice(5,7)} 月 ${+day.slice(8)} 日支出明細</h2><span class="hint">會同步到營業分析的支出</span></div>
+    <div class="panel"><div class="ph"><h2>${+day.slice(5,7)} 月 ${+day.slice(8)} 日支出明細</h2><span class="hint">${isMgr()?'會同步到營業分析的支出':'零用金與營收現金支出'}</span></div>
       ${list.length?`<ul class="sp-list">${list.map(e=>spRow(e,editable,false)).join('')}<li class="tot"><span></span><span>合計 ${list.length} 筆</span><span></span><b class="num">${fmt(tt)}</b>${editable?'<span></span>':''}</li></ul>`:'<p class="emptyb">這天還沒有支出紀錄。</p>'}
     </div>
     ${fixedHTML(b,day)}
@@ -2293,6 +2316,7 @@ async function spendAdd(b){
   if(!item){err.textContent='請填項目';$('#s-item').focus();return;}
   if(raw===''||!Number.isFinite(amt)||amt<=0){err.textContent='請填金額';$('#s-amt').focus();return;}
   const extra=$('#s-note').value.trim(), note=[SP.pay==='其他'?'':SP.pay,extra].filter(Boolean).join('・');
+  if(!paysFor(b).includes(SP.pay)){ err.textContent='請選付款方式'; return; }
   if(SP.editId){ const id=SP.editId, old=spMonth(b,SP.day).find(x=>x.id===id)||{}; const keep=(old.note||'').split('・').filter(x=>x==='固定支出');
     const upd={cat:SP.cat,item,amt,note:[SP.pay==='其他'?'':SP.pay,...keep,extra].filter(Boolean).join('・'),editedBy:W.name||'',editedAt:new Date().toISOString()};
     const btn=document.querySelector('.big-save'); if(btn){btn.disabled=true;btn.textContent='儲存中…';}
@@ -2372,7 +2396,8 @@ function cashPending(b){const l=lastSettle(b,'cash'), base=l?l.date:'0000-00-00'
   return Object.entries(C.daily).filter(([id,d])=>d.branch===b&&d.date>=base&&d.date<=t&&((+d.cash||0)>0||(+d.deposit||0)>0)&&!cv.has(id)).map(([id,d])=>({id,...d})).sort((a,c)=>a.date<c.date?-1:1);}
 function subCash(){
   if(!S.db||C.subB==='all') return; C.subB='all';
-  C.unsub=S.db.collection('daily').where('month','in',(()=>{const a=[];const d=new Date();for(let i=0;i<3;i++){const x=new Date(d.getFullYear(),d.getMonth()-i,1);a.push(`${x.getFullYear()}-${pad(x.getMonth()+1)}`);}return a;})()).onSnapshot(snap=>{const o={};snap.docs.forEach(d=>{o[d.id]=d.data();});C.daily=o;if(S.mode==='cash')drawCash();else if(S.mode==='home')renderHome();},()=>{});
+  const ms=(()=>{const a=[];const d=new Date();for(let i=0;i<3;i++){const x=new Date(d.getFullYear(),d.getMonth()-i,1);a.push(`${x.getFullYear()}-${pad(x.getMonth()+1)}`);}return a;})();
+  C.unsub=watchBr('daily',q=>q.where('month','in',ms),o=>{C.daily=o;if(S.mode==='cash')drawCash();else if(S.mode==='home')renderHome();});
 }
 function csUntilHTML(type,b){ const u=csUntil(type,b), t=todayStr(), y=addDays(t,-1);
   return `<div class="cs-until"><span class="fl">結算到</span><input type="date" class="tin" data-csu="${type}" data-b="${b}" value="${u}" max="${t}"><span class="chips"><button type="button" class="chip ${u===t?'on':''}" data-csq="${type}|${b}|${t}">今天</button><button type="button" class="chip ${u===y?'on':''}" data-csq="${type}|${b}|${y}">昨天</button></span>${u<t?`<span class="hint">${md(u)} 之後的${type==='cash'?'現金營收':'支出'}留到下次結算</span>`:''}</div>`; }
@@ -2430,10 +2455,12 @@ function drawCash(){
   if(!W.name){ renderLogin(); return; }
   if(S.mode!=='cash') return;
   subCash();
+  if(!myBR().length){ $('#main').innerHTML=`<div class="panel emptyb">你還沒有被指定負責的店，請${esc(BOSS)}在人員管理勾選。</div>`; return; }
+  if(!canBr(C.branch)) C.branch=myBR()[0];
   const b=C.branch;
   $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(${B[b].color})">
       <div class="st-l"><div><div class="st-name">現金結算 <small>${isMgr()?'你可以完成清點結算':`只有${BOSS}和管理者可以完成清點結算`}</small></div><div class="st-state">${md(todayStr())}（${wk(todayStr())}）</div></div></div>
-      <div class="seg cs-seg">${BR.map(x=>`<button data-cb="${x}" aria-pressed="${x===b}"><i class="sw" style="background:var(${B[x].color})"></i>${esc(B[x].short)}</button>`).join('')}</div>
+      <div class="seg cs-seg"${myBR().length>1?'':' hidden'}>${myBR().map(x=>`<button data-cb="${x}" aria-pressed="${x===b}"><i class="sw" style="background:var(${B[x].color})"></i>${esc(B[x].short)}</button>`).join('')}</div>
     </div>
     <div class="cs-grid">${cashCard(b)}${pettyOf(b)?pettyCard(b):`<section class="cs-card"><div class="cs-h"><span class="cs-ic g">${ICON.spend}</span><div><h3>零用金</h3><p class="hint">這個店點沒有設定零用金。</p></div></div></section>`}</div>
     ${historyHTML(b)}
@@ -2598,18 +2625,29 @@ function showLoadErr(){ let el=$('#loadErr'); if(!el){ el=document.createElement
 function stopData(){ FB.unsubs.forEach(u=>{try{u()}catch(e){}}); FB.unsubs=[]; if(D.unsub){try{D.unsub()}catch(e){}} D.unsub=null; D.subMonth=null; if(C.unsub){try{C.unsub()}catch(e){}} C.unsub=null; C.subB=null;
   S.db=null; S.docs={}; S.allDaily={}; S.loadErr=null; showLoadErr(); S.misc={}; S.settle={}; S.payroll={}; S.dept={}; D.docs={}; C.daily={}; S.loaded=false; FB.dataOn=false; FB.mgrOn=false; }
 function redrawFor(kinds){ if(kinds.includes(S.mode)){ if(S.mode==='home') renderHome(); else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='ledger'&&!S.editing&&!S.adding) render(); } }
+/* 管理者看全部；一般夥伴每間店各開一個查詢（branch == 那間店），資料庫規則才會放行 */
+function watchBr(col,refine,cb,onErr){
+  const db=FB.fs, f=refine||(q=>q);
+  if(isMgr()){ return f(db.collection(col)).onSnapshot(snap=>{ const o={}; snap.docs.forEach(d=>{o[d.id]=d.data();}); cb(o); },onErr||(()=>{})); }
+  const parts={}, bs=myBR(); if(!bs.length){ queueMicrotask(()=>cb({})); return ()=>{}; }
+  const us=bs.map(b=>f(db.collection(col).where('branch','==',b)).onSnapshot(snap=>{ const o={}; snap.docs.forEach(d=>{o[d.id]=d.data();}); parts[b]=o; if(bs.every(x=>parts[x])) cb(Object.assign({},...bs.map(x=>parts[x]))); },onErr||(()=>{})));
+  return ()=>us.forEach(u=>u());
+}
+const dataKey=()=>isMgr()?'all':'br:'+myBR().join(',');
 function startData(){
-  if(FB.dataOn) return; FB.dataOn=true; const db=FB.fs; S.db=db; S.canWrite=true;
+  if(FB.dataOn) return; FB.dataOn=true; FB.dataKey=dataKey(); const db=FB.fs; S.db=db; S.canWrite=true;
   setTimeout(()=>{ if(FB.dataOn&&!S.loaded){ S.loadErr='讀取超過 15 秒'; showLoadErr(); } },15000);
-  FB.unsubs.push(db.collection('months').onSnapshot(snap=>{
-    const docs={}; snap.docs.forEach(d=>{docs[d.id]=d.data();}); S.docs=docs;
+  FB.unsubs.push(watchBr('months',null,docs=>{
+    S.docs=docs;
     const first=!S.loaded; S.loaded=true; if(S.loadErr){ S.loadErr=null; showLoadErr(); }
     if(first&&S.month!==0&&S.month!==null&&!anyData(S.month)&&S.month!==latestMonth()) S.month=latestMonth();
     setStatus('ok','已同步');
     if(S.mode==='daily'){ if(first) render(); } else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='home') renderHome(); else if(S.mode==='ledger'){ if(!S.editing&&!S.adding) render(); else renderRibbon(); }
-  },e=>{ const c=(e&&e.code)||'unknown'; setStatus('ro',c==='permission-denied'?'沒有權限':'連線中斷'); S.loaded=true; S.loadErr=c; showLoadErr(); render(); }));
-  FB.unsubs.push(db.collection('daily').onSnapshot(snap=>{ const o={}; snap.docs.forEach(d=>{o[d.id]=d.data();}); S.allDaily=o; redrawFor(['home','ledger']); if(S.mode==='dept'&&!DP.dirty) drawDept(); },()=>{}));
-  FB.unsubs.push(db.collection('settle').onSnapshot(snap=>{ const o={}; snap.docs.forEach(d=>{o[d.id]=d.data();}); S.settle=o; redrawFor(['home','spend','cash']); },()=>{}));
+  },e=>{ const c=(e&&e.code)||'unknown';
+    if(c==='permission-denied'&&!FB.retried){ FB.retried=true; setTimeout(()=>{ if(FB.auth.currentUser){ stopData(); applyAuth(); } },2500); return; }
+    setStatus('ro',c==='permission-denied'?'沒有權限':'連線中斷'); S.loaded=true; S.loadErr=c; showLoadErr(); render(); }));
+  FB.unsubs.push(watchBr('daily',null,o=>{ S.allDaily=o; redrawFor(['home','ledger']); if(S.mode==='dept'&&!DP.dirty) drawDept(); }));
+  FB.unsubs.push(watchBr('settle',null,o=>{ S.settle=o; redrawFor(['home','spend','cash']); }));
   FB.unsubs.push(db.collection('misc').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{m[d.id]=fsDec(d.data());}); S.misc=m; redrawFor(['home','spend','cash','ledger']); if(S.mode==='dept'&&!DP.dirty) drawDept(); },()=>{}));
   startMgrData();
 }
@@ -2634,6 +2672,7 @@ function applyAuth(){
   }
   if(!n){ W.name=null; stopData(); renderWho(); FB.auth.signOut(); A.err='這個帳號已被移除或重設密碼，請重新選擇名字登入'; render(); return; }
   const was=W.name; W.name=n; W.email=u.email; W.uid=u.uid; W.admin=!!(P.staff&&(P.staff.bossEmail===u.email||(viaOld&&P.staff.bossEmail===viaOld)||(P.staff.bossMail&&P.staff.bossMail===em)));
+  if(FB.dataOn&&FB.dataKey!==dataKey()){ stopData(); }
   renderWho(); startData(); startMgrData();
   { const pp=personOf(n); if(pp&&P.pwset&&P.pwset[n]!==(pp.v||1)) FB.fs.doc('public/pwset').set({[n]:pp.v||1},{merge:true}).catch(()=>{}); }
   if(!was){ S.mode='home'; const go=new URLSearchParams(location.search).get('go'); if(go) history.replaceState(null,'',location.pathname); saveUI(); render(); if(go==='daily') setTimeout(()=>openPick('daily'),300); toast(`${n}，歡迎回來`); }
@@ -2646,7 +2685,7 @@ render();
   FB.app=firebase.initializeApp(cfg0); FB.auth=firebase.auth(); FB.fs=firebase.firestore();
   try{ FB.fs.enablePersistence({synchronizeTabs:true}).catch(()=>{}); }catch(e){}
   FB.fs.doc('public/pwset').onSnapshot(d=>{ P.pwset=d.exists?d.data():{}; if(!FB.auth.currentUser&&A.name) renderLogin(); },()=>{ P.pwset={}; });
-  FB.fs.doc('public/staff').onSnapshot(d=>{ P.staff=d.exists?d.data():null; P.loaded=true; if(FB.auth.currentUser) applyAuth(); else render(); },e=>{ P.loaded=true; A.err='讀不到人員名單：'+(e&&e.code||''); render(); });
+  FB.fs.doc('public/staff').onSnapshot({includeMetadataChanges:true},d=>{ if(d.metadata&&d.metadata.hasPendingWrites) return; P.staff=d.exists?d.data():null; P.loaded=true; if(FB.auth.currentUser) applyAuth(); else render(); },e=>{ P.loaded=true; A.err='讀不到人員名單：'+(e&&e.code||''); render(); });
   FB.auth.onAuthStateChanged(()=>applyAuth());
 })();
 </script>
