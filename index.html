@@ -1054,6 +1054,33 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 .td-warn{background:color-mix(in srgb,var(--mustard) 22%,var(--paper));border:1px solid color-mix(in srgb,var(--mustard) 60%,transparent)}
 .td-note{background:var(--soft);border:1px solid var(--rule)}
 .td-warn small{color:var(--ink-2);font-size:12px}
+
+/* 代墊請款 */
+.claim{display:grid;gap:16px}
+.cl-who{margin:4px 0 10px}
+.cl-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:6px 0 8px}
+.cl-sum div{background:var(--soft);border-radius:12px;padding:10px 12px;display:grid;gap:2px}
+.cl-sum span{font-size:12px;color:var(--ink-3)}.cl-sum b{font-size:20px}.cl-sum small{font-size:12px;color:var(--ink-3)}
+.cl-f{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.cl-f label{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink-2)}
+.cl-f .sp{flex:1}
+.cl-m{margin-top:8px}
+.cl-mh{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid var(--rule);font-size:14px}
+.cl-l{list-style:none;margin:0;padding:0}
+.cl-r{display:grid;grid-template-columns:70px 80px auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 2px;border-bottom:1px dashed var(--rule);font-size:14px}
+.cl-r label{display:flex;gap:6px;align-items:center}
+.cl-r.off{opacity:.45}
+.cl-b{display:flex;gap:5px;align-items:center;color:var(--ink-2)}.cl-b i{width:8px;height:8px;border-radius:50%}
+.cl-i{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-c{border:1px solid var(--rule);border-radius:12px;padding:10px 12px;margin-top:8px}
+.cl-c.paid{background:var(--soft)}
+.cl-ch{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.cl-t{display:flex;gap:12px;align-items:baseline;background:none;border:0;padding:0;cursor:pointer;font:inherit;color:var(--ink)}
+.cl-st{font-size:13px;color:var(--accent)}.cl-c.paid .cl-st{color:var(--pos)}
+.cl-a{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.cl-pd{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink-2)}
+@media (max-width:640px){.cl-sum{grid-template-columns:1fr 1fr}.cl-r{grid-template-columns:62px 1fr auto;}.cl-r .spl-c,.cl-r .cl-b{display:none}}
+.cl-f label{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1064,7 +1091,7 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
       <div class="eyebrow">恆春・台南・百貨櫃位</div>
       <h1>伯虎在二樓 收支總覽</h1>
     </div>
-    <div class="hright"><div class="seg mode" role="group" aria-label="頁面" id="modeSeg"><button data-mode="home">首頁</button><button data-mode="daily">每日結帳</button><button data-mode="spend">當日支出</button><button data-mode="ledger" class="mgr-only" hidden>營業分析</button><button data-mode="dept" class="mgr-only" hidden>百貨對帳</button><button data-mode="payroll" class="mgr-only" hidden>薪資</button><button data-mode="cash">現金結算</button></div><span class="who" id="who" hidden></span><button class="reload-btn" id="reloadBtn" type="button" aria-label="重新整理" title="重新整理（載入最新版本）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button><span class="status" id="status"><i></i><span>連線中…</span></span></div>
+    <div class="hright"><div class="seg mode" role="group" aria-label="頁面" id="modeSeg"><button data-mode="home">首頁</button><button data-mode="daily">每日結帳</button><button data-mode="spend">當日支出</button><button data-mode="ledger" class="mgr-only" hidden>營業分析</button><button data-mode="dept" class="mgr-only" hidden>百貨對帳</button><button data-mode="payroll" class="mgr-only" hidden>薪資</button><button data-mode="claim" class="mgr-only" hidden>代墊請款</button><button data-mode="cash">現金結算</button></div><span class="who" id="who" hidden></span><button class="reload-btn" id="reloadBtn" type="button" aria-label="重新整理" title="重新整理（載入最新版本）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button><span class="status" id="status"><i></i><span>連線中…</span></span></div>
   </header>
 
   <div class="controls">
@@ -2197,7 +2224,7 @@ const liveBR=()=>myBR().filter(ctrLive);
 
 /* ---------- 首頁 & 當日支出 ---------- */
 const SP={branch:null, day:todayStr(), cat:'', pay:'零用金', draft:{}, confirmDel:null};
-const PAYS=['零用金','營收現金','轉帳','刷卡','其他'];
+const PAYS=['零用金','營收現金','轉帳','刷卡','代墊','其他'];
 const STAFF_PAYS=['零用金','營收現金'];
 const paysFor=b=>(isMgr()?PAYS:STAFF_PAYS).filter(p=>!isCtr(b)||p!=='營收現金');
 const payOfE=e=>PAYS.find(p=>p!=='其他'&&(e.note||'').split('・').includes(p))||'其他';
@@ -2216,6 +2243,7 @@ const ICON={
   ledger:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13"/><path d="M8 13l3-3 2 2 3-4"/></svg>',
   payroll:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.5 16.5c.6-1.7 2-2.6 3.5-2.6s2.9.9 3.5 2.6M14.5 10h4M14.5 13.5h3"/></svg>',
   dept:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5M9 11h.01M15 11h.01"/></svg>',
+  claim:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l3 3v15H4V3z"/><path d="M8 9h8M8 13h8M8 17h4M15 17l1.5 1.5L19 16"/></svg>',
   cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>'
 };
 function homeStatsHTML(today){
@@ -2253,6 +2281,7 @@ function renderHome(){
       ${isMgr()?card('ledger','營業分析','每月收支・人事・百貨櫃位',BR.filter(b=>ctrLive(b)||has(b,m)).map(lRow).join(''),'打開營業分析'):''}
       ${isMgr()?card('dept','百貨對帳',`${liveC.length?liveC.map(b=>esc(B[b].short)).join('、'):'目前沒有營業中的櫃位'}・抽成與撥款`,`<li><i style="background:var(--dp)"></i>本月<span>業績 ${fmt(dc.sales)}</span></li><li><i style="background:var(--rule)"></i>上月<span>${pdc.received==null?(pdc.sales?`應撥 ${fmt(pdc.due)}・未入帳`:'沒有紀錄'):`已入帳 ${fmt(pdc.received)}`}</span></li>`,'打開對帳'):''}
       ${isMgr()?card('payroll','薪資','三點人員薪資、業績獎金、薪資單',payLi(pdp,`${+ppm.slice(5)} 月`)+payLi(pd,`${+ym.slice(5)} 月`),'開始計算'):''}
+      ${isMgr()?(()=>{ const used=claimedSet(), mine=advAll().filter(x=>x.e.adv===W.name&&!used.has(advKey(x.k,x.e.id))), un=claimsList().filter(c=>c.who===W.name&&!c.paidDate); return card('claim','代墊請款','先幫公司付的錢・彙整請款',`<li><i style="background:var(--accent)"></i>還沒請款<span>${mine.length} 筆・${fmt(sum(mine.map(x=>+x.e.amt||0)))} 元</span></li><li><i style="background:var(--rule)"></i>等公司撥款<span>${un.length} 張・${fmt(sum(un.map(c=>c.total)))} 元</span></li>`,'打開請款'); })():''}
       ${card('cash','現金結算',isMgr()?'營收現金・零用金清點':'查看現金與零用金',liveBR().filter(b=>!isCtr(b)||pettyOf(b)).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${isCtr(b)?'':`現金 ${l?md(l.date):'未結'}・`}零用金 ${p?md(p.date):'未結'}`);}).join(''),isMgr()?'開始結算':'查看結算')}
     </div>
     ${todoHomeHTML()}
@@ -2401,12 +2430,12 @@ async function spendAdd(b){
   const extra=$('#s-note').value.trim(), note=[SP.pay==='其他'?'':SP.pay,extra].filter(Boolean).join('・');
   if(!paysFor(b).includes(SP.pay)){ err.textContent='請選付款方式'; return; }
   if(SP.editId){ const id=SP.editId, old=spMonth(b,SP.day).find(x=>x.id===id)||{}; const keep=(old.note||'').split('・').filter(x=>x==='固定支出');
-    const upd={cat:SP.cat,item,amt,note:[SP.pay==='其他'?'':SP.pay,...keep,extra].filter(Boolean).join('・'),editedBy:W.name||'',editedAt:new Date().toISOString()};
+    const upd={cat:SP.cat,item,amt,note:[SP.pay==='其他'?'':SP.pay,...keep,extra].filter(Boolean).join('・'),editedBy:W.name||'',editedAt:new Date().toISOString(),adv:SP.pay==='代墊'?(old.adv||W.name||''):null};
     const btn=document.querySelector('.big-save'); if(btn){btn.disabled=true;btn.textContent='儲存中…';}
     if(SP.photo){ const rid=await uploadReceipt(SP.photo); if(rid) upd.receipt=rid; }
     SP.editId=null; SP.draft={}; clearPhoto();
     await spendWrite(b,SP.day,l=>l.map(x=>x.id===id?{...x,...upd}:x),`已修改 ${item} ${fmt(amt)} 元`); return; }
-  const e={id:uid(),cat:SP.cat,item,amt,date:SP.day,note,by:W.name||'',uid:W.uid||''};
+  const e={id:uid(),cat:SP.cat,item,amt,date:SP.day,note,by:W.name||'',uid:W.uid||''}; if(SP.pay==='代墊') e.adv=W.name||'';
   const btn=document.querySelector('.big-save'); if(btn){btn.disabled=true;btn.textContent=SP.photo?'上傳收據中…':'儲存中…';}
   if(SP.photo){ const rid=await uploadReceipt(SP.photo); if(!rid){ if(btn){btn.disabled=false;btn.textContent='新增支出';} return; } e.receipt=rid; }
   SP.draft={}; clearPhoto();
@@ -2433,7 +2462,7 @@ function bindSpend(){
   main.addEventListener('submit',ev=>{ if(S.mode==='spend'){ev.preventDefault();ev.stopImmediatePropagation();} },true);
   main.addEventListener('click',ev=>{
     const t=ev.target.closest('button'); if(!t) return;
-    if((S.mode==='home'||S.mode==='ledger')&&t.dataset.home){ const k=t.dataset.home; if(['ledger','cash','payroll','dept'].includes(k)){S.mode=k;saveUI();render();scrollTo({top:0});} else openPick(k); return; }
+    if((S.mode==='home'||S.mode==='ledger')&&t.dataset.home){ const k=t.dataset.home; if(['ledger','cash','payroll','dept','claim'].includes(k)){S.mode=k;saveUI();render();scrollTo({top:0});} else openPick(k); return; }
     if(S.mode!=='spend') return;
     if(t.dataset.sback) openPick('spend');
     else if(t.dataset.sshift) setSpendDay(addDays(SP.day,+t.dataset.sshift));
@@ -2631,8 +2660,92 @@ document.addEventListener('click',async ev=>{ const t=ev.target.closest('[data-t
   else if(d.tdgo){ if(!isMgr()){ toast('營業分析只有老闆和管理者看得到'); return; } const [b,ym]=d.tdgo.split('|'); S.mode='ledger'; S.branch=b; YEAR=+ym.slice(0,4); S.month=+ym.slice(5); S.sec='money'; saveUI(); render(); scrollTo({top:0}); }
 });
 
+/* ---------- 代墊請款：老闆先付的公司支出，彙整向公司請款，記錄請款日與撥款日 ---------- */
+const CL={who:null, upto:null, date:null, off:{}, open:{}, payDate:{}, confirm:null};
+const claimsList=()=>((((S.misc||{}).claims)||{}).list)||[];
+const advKey=(k,id)=>k+'|'+id;
+function advAll(){ const out=[];
+  for(const [k,d] of Object.entries(S.docs||{})) (d.exp||[]).forEach(e=>{ if(e&&e.adv) out.push({k,b:d.branch||k.slice(0,k.indexOf('-')),e}); });
+  return out.sort((a,c)=>((a.e.date||a.k.slice(-7)+'-99')<(c.e.date||c.k.slice(-7)+'-99')?-1:1)); }
+function claimedSet(){ const s=new Map(); claimsList().forEach(c=>(c.items||[]).forEach(i=>s.set(advKey(i.k,i.id),c))); return s; }
+const advDate=x=>x.e.date||(x.k.slice(-7)+'-月結');
+function claimText(c){
+  const rows=(c.items||[]).map(i=>`${i.date?i.date.replace(/-/g,'/'):i.k.slice(-7).replace('-','/')}　${B[i.b]?B[i.b].short:i.b}　${i.cat}　${i.item}　${fmt(i.amt)}`);
+  return `伯虎在二樓 代墊請款單\n請款人：${c.who}　請款日：${c.date.replace(/-/g,'/')}\n\n${rows.join('\n')}\n\n合計 ${(c.items||[]).length} 筆　NT$ ${fmt(c.total)}`;
+}
+function claimPrint(c){
+  const w=open('','_blank'); if(!w){ toast('請允許彈出視窗後再列印'); return; }
+  const rows=(c.items||[]).map(i=>`<tr><td>${esc(i.date||i.k.slice(-7))}</td><td>${esc(B[i.b]?B[i.b].short:i.b)}</td><td>${esc(i.cat)}</td><td>${esc(i.item)}</td><td style="text-align:right">${fmt(i.amt)}</td></tr>`).join('');
+  w.document.write(`<!doctype html><meta charset="utf-8"><title>代墊請款單 ${esc(c.date)}</title><style>body{font-family:"Noto Sans TC",sans-serif;margin:32px;color:#222}h1{font-size:20px;margin:0 0 4px}p{margin:0 0 16px;color:#555}table{border-collapse:collapse;width:100%;font-size:13px}td,th{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left}th{background:#f3efe8}tfoot td{font-weight:700;border-top:2px solid #333}.sig{margin-top:40px;display:flex;gap:80px}</style>
+  <h1>伯虎在二樓　代墊請款單</h1><p>請款人：${esc(c.who)}　請款日：${esc(c.date)}　共 ${(c.items||[]).length} 筆</p>
+  <table><thead><tr><th>日期</th><th>店點</th><th>類別</th><th>項目</th><th style="text-align:right">金額</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="4">合計</td><td style="text-align:right">NT$ ${fmt(c.total)}</td></tr></tfoot></table>
+  <div class="sig"><span>請款人：</span><span>核准：</span><span>撥款日：${esc(c.paidDate||'')}</span></div><script>onload=()=>print()<\/script>`);
+  w.document.close();
+}
+async function claimsSave(list,msg){
+  try{ await S.db.doc('misc/claims').set({list}); S.misc={...(S.misc||{}),claims:{list}}; toast(msg); drawClaim(); return true; }
+  catch(e){ toast('儲存失敗，請稍後再試'); return false; }
+}
+function drawClaim(){
+  if(!W.name){ renderLogin(); return; }
+  if(S.mode!=='claim') return;
+  if(!S.loaded){ $('#main').innerHTML=`<div class="panel emptyb">正在讀取…</div>`; return; }
+  const all=advAll(), used=claimedSet(), whos=[...new Set(all.map(x=>x.e.adv).concat(claimsList().map(c=>c.who)))];
+  if(!CL.who||!whos.includes(CL.who)) CL.who=whos.includes(W.name)?W.name:(whos[0]||W.name);
+  const today=todayStr(); CL.upto=CL.upto||today; CL.date=CL.date||today;
+  const pend=all.filter(x=>x.e.adv===CL.who&&!used.has(advKey(x.k,x.e.id))&&advDate(x)<=CL.upto+'~');
+  const pick=pend.filter(x=>!CL.off[advKey(x.k,x.e.id)]), pTot=sum(pick.map(x=>+x.e.amt||0));
+  const cl=claimsList().filter(c=>c.who===CL.who).slice().sort((a,c)=>a.date<c.date?1:-1);
+  const unpaid=cl.filter(c=>!c.paidDate), unTot=sum(unpaid.map(c=>c.total)), paidTot=sum(cl.filter(c=>c.paidDate&&c.paidDate.slice(0,4)===today.slice(0,4)).map(c=>c.total));
+  const allPendTot=sum(all.filter(x=>x.e.adv===CL.who&&!used.has(advKey(x.k,x.e.id))).map(x=>+x.e.amt||0));
+  const byM={}; pend.forEach(x=>(byM[advDate(x).slice(0,7)]??=[]).push(x));
+  const row=x=>{ const key=advKey(x.k,x.e.id), on=!CL.off[key];
+    return `<li class="cl-r ${on?'':'off'}"><label><input type="checkbox" data-cltog="${esc(key)}" ${on?'checked':''}><span class="num">${x.e.date?md(x.e.date):'月結'}</span></label><span class="cl-b"><i style="background:var(${B[x.b]?B[x.b].color:'--ink-3'})"></i>${esc(B[x.b]?B[x.b].short:x.b)}</span><span class="spl-c">${esc(x.e.cat)}</span><span class="cl-i">${esc(x.e.item)}</span><b class="num">${fmt(+x.e.amt||0)}</b></li>`; };
+  const claimRow=c=>{ const op=CL.open[c.id];
+    return `<div class="cl-c ${c.paidDate?'paid':''}"><div class="cl-ch"><button type="button" class="cl-t" data-clopen="${c.id}"><b>${c.date.replace(/-/g,'/')} 請款</b><span class="num">${(c.items||[]).length} 筆・NT$ ${fmt(c.total)}</span></button>
+      <span class="cl-st">${c.paidDate?`✓ ${c.paidDate.replace(/-/g,'/')} 已撥款`:'等待公司撥款'}</span></div>
+      <div class="cl-a">${c.paidDate?`<button class="btn" data-clunpay="${c.id}">改回未撥款</button>`:`<label class="cl-pd">撥款日 <input type="date" class="tin" data-clpd="${c.id}" value="${esc(CL.payDate[c.id]||today)}"></label><button class="btn primary" data-clpay="${c.id}">標記已撥款</button>`}
+        <button class="btn" data-clcopy="${c.id}">複製明細</button><button class="btn" data-clprint="${c.id}">列印請款單</button>
+        ${c.paidDate?'':`<button class="btn ${CL.confirm===c.id?'danger':''}" data-cldel="${c.id}">${CL.confirm===c.id?'確定撤銷？':'撤銷請款單'}</button>`}</div>
+      ${op?`<ul class="cl-l">${(c.items||[]).map(i=>`<li class="cl-r"><span class="num">${i.date?md(i.date):'月結'}</span><span class="cl-b">${esc(B[i.b]?B[i.b].short:i.b)}</span><span class="spl-c">${esc(i.cat)}</span><span class="cl-i">${esc(i.item)}</span><b class="num">${fmt(i.amt)}</b></li>`).join('')}</ul>`:''}</div>`; };
+  $('#main').innerHTML=`<section class="claim">
+    <div class="panel"><div class="ph"><h2>代墊請款</h2><span class="hint">先幫公司付的錢，彙整後向公司請款</span></div>
+      ${whos.length>1?`<div class="seg cl-who">${whos.map(w=>`<button data-clwho="${esc(w)}" aria-pressed="${w===CL.who}">${esc(w)}</button>`).join('')}</div>`:''}
+      <div class="cl-sum num"><div><span>還沒請款</span><b>${fmt(allPendTot)}</b></div><div><span>已請款、等撥款</span><b>${fmt(unTot)}</b><small>${unpaid.length} 張</small></div><div><span>${today.slice(0,4)} 年已撥款</span><b>${fmt(paidTot)}</b></div></div>
+      <p class="hint">在「當日支出」記帳時付款方式選「代墊」，就會出現在這裡。</p></div>
+    <div class="panel"><div class="ph"><h2>建立請款單</h2><span class="hint num">勾選 ${pick.length}／${pend.length} 筆・NT$ ${fmt(pTot)}</span></div>
+      <div class="cl-f"><label>算到哪一天 <input type="date" class="tin" id="clUpto" value="${esc(CL.upto)}"></label><label>請款日 <input type="date" class="tin" id="clDate" value="${esc(CL.date)}"></label>
+        <span class="sp"></span>${pend.length?`<button class="btn" data-clall="1">${pick.length===pend.length?'全部取消':'全部勾選'}</button>`:''}<button class="btn primary" data-clmake="1" ${pick.length?'':'disabled'}>建立請款單（${pick.length} 筆・${fmt(pTot)} 元）</button></div>
+      ${pend.length?Object.entries(byM).map(([m,l])=>`<div class="cl-m"><div class="cl-mh"><b>${+m.slice(0,4)} 年 ${+m.slice(5)} 月</b><span class="num">${l.length} 筆・${fmt(sum(l.map(x=>+x.e.amt||0)))} 元</span></div><ul class="cl-l">${l.map(row).join('')}</ul></div>`).join(''):'<p class="emptyb">目前沒有還沒請款的代墊支出。</p>'}</div>
+    <div class="panel"><div class="ph"><h2>請款紀錄</h2><span class="hint">${cl.length} 張</span></div>${cl.length?cl.map(claimRow).join(''):'<p class="hint">還沒有請款紀錄。</p>'}</div>
+  </section>`;
+}
+function bindClaim(){
+  const main=$('#main');
+  main.addEventListener('change',ev=>{ if(S.mode!=='claim') return; const t=ev.target;
+    if(t.dataset.cltog){ if(t.checked) delete CL.off[t.dataset.cltog]; else CL.off[t.dataset.cltog]=1; drawClaim(); }
+    else if(t.id==='clUpto'){ CL.upto=t.value||todayStr(); drawClaim(); }
+    else if(t.id==='clDate'){ CL.date=t.value||todayStr(); }
+    else if(t.dataset.clpd){ CL.payDate[t.dataset.clpd]=t.value; } });
+  main.addEventListener('click',async ev=>{ if(S.mode!=='claim') return; const t=ev.target.closest('button'); if(!t) return;
+    const find=id=>claimsList().find(c=>c.id===id);
+    if(t.dataset.clwho){ CL.who=t.dataset.clwho; CL.off={}; drawClaim(); }
+    else if(t.dataset.clopen){ CL.open[t.dataset.clopen]=!CL.open[t.dataset.clopen]; drawClaim(); }
+    else if(t.dataset.clall){ const used=claimedSet(); const pend=advAll().filter(x=>x.e.adv===CL.who&&!used.has(advKey(x.k,x.e.id))&&advDate(x)<=CL.upto+'~'); const allOn=pend.every(x=>!CL.off[advKey(x.k,x.e.id)]); CL.off={}; if(allOn) pend.forEach(x=>CL.off[advKey(x.k,x.e.id)]=1); drawClaim(); }
+    else if(t.dataset.clmake){ const used=claimedSet(); const pick=advAll().filter(x=>x.e.adv===CL.who&&!used.has(advKey(x.k,x.e.id))&&advDate(x)<=CL.upto+'~'&&!CL.off[advKey(x.k,x.e.id)]); if(!pick.length) return;
+      const items=pick.map(x=>({k:x.k,id:x.e.id,b:x.b,date:x.e.date||'',cat:x.e.cat,item:x.e.item,amt:+x.e.amt||0}));
+      const c={id:'cl'+uid(),who:CL.who,date:CL.date||todayStr(),items,total:sum(items.map(i=>i.amt)),paidDate:'',by:W.name||'',at:new Date().toISOString()};
+      t.disabled=true; if(await claimsSave(claimsList().concat([c]),`已建立請款單 ${items.length} 筆・${fmt(c.total)} 元`)){ CL.off={}; CL.open[c.id]=true; } }
+    else if(t.dataset.clpay){ const id=t.dataset.clpay, d=CL.payDate[id]||todayStr(); await claimsSave(claimsList().map(c=>c.id===id?{...c,paidDate:d,paidBy:W.name||''}:c),`已記錄 ${d.replace(/-/g,'/')} 撥款`); }
+    else if(t.dataset.clunpay){ const id=t.dataset.clunpay; await claimsSave(claimsList().map(c=>c.id===id?{...c,paidDate:''}:c),'已改回未撥款'); }
+    else if(t.dataset.cldel){ const id=t.dataset.cldel; if(CL.confirm!==id){ CL.confirm=id; drawClaim(); return; } CL.confirm=null; await claimsSave(claimsList().filter(c=>c.id!==id),'已撤銷請款單，項目回到未請款'); }
+    else if(t.dataset.clcopy){ const c=find(t.dataset.clcopy); try{ await navigator.clipboard.writeText(claimText(c)); toast('已複製，可以貼到 LINE 或 email'); }catch(e){ toast('無法複製，請改用列印'); } }
+    else if(t.dataset.clprint){ claimPrint(find(t.dataset.clprint)); }
+  });
+}
+
 /* ---------- render & events ---------- */
-const MGR_MODES=['ledger','dept','payroll'];
+const MGR_MODES=['ledger','dept','payroll','claim'];
 function render(){
   document.querySelectorAll('#modeSeg button,#bnav button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
   document.querySelectorAll('#modeSeg button.mgr-only,#bnav button.mgr-only').forEach(b=>b.hidden=!(W.name&&isMgr()));
@@ -2644,6 +2757,7 @@ function render(){
   if(S.mode==='home'){ renderHome(); return; }
   if(S.mode==='payroll'){ drawPay(); return; }
   if(S.mode==='dept'){ drawDept(); return; }
+  if(S.mode==='claim'){ drawClaim(); return; }
   if(S.mode==='cash'){ if(!S.loaded){ $('#main').innerHTML=`<div class="panel emptyb">正在讀取…</div>`; return; } drawCash(); return; }
   if(S.mode==='spend'){ if(!SP.branch){ S.mode='home'; return render(); } if(!S.loaded){ $('#main').innerHTML=`<div class="panel emptyb">正在讀取…</div>`; return; } drawSpend(); return; }
   if(daily&&!D.branch){ S.mode='home'; return render(); }
@@ -2672,7 +2786,7 @@ document.getElementById('reloadBtn')?.addEventListener('click',async()=>{
   try{ const r=await navigator.serviceWorker?.getRegistration(); await r?.update(); }catch(e){}
   location.reload();
 });
-bindDaily(); bindPay(); bindDept(); bindSpend(); bindLogin(); bindCash(); renderWho();
+bindDaily(); bindPay(); bindDept(); bindSpend(); bindClaim(); bindLogin(); bindCash(); renderWho();
 
 $('#main').addEventListener('click',async ev=>{
   if(S.mode!=='ledger') return;
@@ -2752,7 +2866,7 @@ function showLoadErr(){ let el=$('#loadErr'); if(!el){ el=document.createElement
   el.innerHTML=S.loadErr?`⚠️ 讀取資料失敗（${esc(S.loadErr)}）。${S.loadErr==='permission-denied'?`這個帳號目前沒有讀取權限，請找老闆確認人員名單，或登出後重新登入。`:'請檢查網路後重新整理頁面。'} <button class="btn" onclick="location.reload()">重新整理</button>`:''; el.hidden=!S.loadErr; }
 function stopData(){ FB.unsubs.forEach(u=>{try{u()}catch(e){}}); FB.unsubs=[]; if(D.unsub){try{D.unsub()}catch(e){}} D.unsub=null; D.subMonth=null; if(C.unsub){try{C.unsub()}catch(e){}} C.unsub=null; C.subB=null;
   S.db=null; S.docs={}; S.allDaily={}; S.loadErr=null; showLoadErr(); S.misc={}; S.settle={}; S.payroll={}; S.dept={}; D.docs={}; C.daily={}; S.loaded=false; FB.dataOn=false; FB.mgrOn=false; }
-function redrawFor(kinds){ if(kinds.includes(S.mode)){ if(S.mode==='home') renderHome(); else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='ledger'&&!S.editing&&!S.adding) render(); } }
+function redrawFor(kinds){ if(kinds.includes(S.mode)){ if(S.mode==='home') renderHome(); else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='claim') drawClaim(); else if(S.mode==='ledger'&&!S.editing&&!S.adding) render(); } }
 /* 管理者看全部；一般夥伴每間店各開一個查詢（branch == 那間店），資料庫規則才會放行 */
 function watchBr(col,refine,cb,onErr){
   const db=FB.fs, f=refine||(q=>q);
@@ -2770,13 +2884,13 @@ function startData(){
     const first=!S.loaded; S.loaded=true; if(S.loadErr){ S.loadErr=null; showLoadErr(); }
     if(first&&S.month!==0&&S.month!==null&&!anyData(S.month)&&S.month!==latestMonth()) S.month=latestMonth();
     setStatus('ok','已同步');
-    if(S.mode==='daily'){ if(first) render(); } else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='home') renderHome(); else if(S.mode==='ledger'){ if(!S.editing&&!S.adding) render(); else renderRibbon(); }
+    if(S.mode==='daily'){ if(first) render(); } else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='claim') drawClaim(); else if(S.mode==='home') renderHome(); else if(S.mode==='ledger'){ if(!S.editing&&!S.adding) render(); else renderRibbon(); }
   },e=>{ const c=(e&&e.code)||'unknown';
     if(c==='permission-denied'&&!FB.retried){ FB.retried=true; setTimeout(()=>{ if(FB.auth.currentUser){ stopData(); applyAuth(); } },2500); return; }
     setStatus('ro',c==='permission-denied'?'沒有權限':'連線中斷'); S.loaded=true; S.loadErr=c; showLoadErr(); render(); }));
   FB.unsubs.push(watchBr('daily',null,o=>{ S.allDaily=o; redrawFor(['home','ledger']); if(S.mode==='dept'&&!DP.dirty) drawDept(); }));
   FB.unsubs.push(watchBr('settle',null,o=>{ S.settle=o; redrawFor(['home','spend','cash']); }));
-  FB.unsubs.push(db.collection('misc').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{m[d.id]=fsDec(d.data());}); S.misc=m; setupBranches(); renderWho(); redrawFor(['home','spend','cash','ledger']); if(S.mode==='dept'&&!DP.dirty) drawDept(); },()=>{}));
+  FB.unsubs.push(db.collection('misc').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{m[d.id]=fsDec(d.data());}); S.misc=m; setupBranches(); renderWho(); redrawFor(['home','spend','cash','ledger','claim']); if(S.mode==='dept'&&!DP.dirty) drawDept(); },()=>{}));
   startMgrData();
 }
 /* 薪資、百貨對帳只有老闆和管理者讀得到 */
