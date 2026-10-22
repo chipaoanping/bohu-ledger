@@ -1168,6 +1168,14 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 .bq-sl{list-style:none;margin:0;padding:0;display:block}.bq-sl li{display:flex;justify-content:space-between;align-items:baseline;padding:9px 2px;border-bottom:1px dashed var(--rule);font-size:16px}
 .bq-sl li small{margin-left:6px;font-size:12px;color:var(--ink-3)}.bq-sl li b{font-size:20px}.bq-sl li b.neg{color:var(--neg)}
 .mstrip.wk{grid-template-columns:repeat(6,1fr)!important}.mstrip.wk .ms[disabled]{opacity:.35}
+.st-pt{min-width:0;font-size:14px}.st-pt td,.st-pt th{vertical-align:top}.st-pt tr.st-z td{color:var(--ink-3)}.st-pt td.pos b{color:var(--pos)}.st-pt td.neg b{color:var(--neg)}
+.st-pr{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}.st-pr .chip{font-size:12px;padding:2px 8px}.st-pr .chip.warn{color:var(--neg);border-color:var(--neg)}
+.st-rate{width:80px}
+.st-pg{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:8px;align-items:start;padding:10px 2px;border-bottom:1px dashed var(--rule);font-size:15px}
+.st-pg>span{text-align:right}.st-ph{font-size:12px;color:var(--ink-3);border-bottom:1px solid var(--rule);padding-top:4px}.st-ph>span:first-child{text-align:left}
+.st-pg.st-z{color:var(--ink-3)}.st-pg .pos b{color:var(--pos)}.st-pg .neg b{color:var(--neg)}
+.st-pt2{border-bottom:0;font-weight:700}.st-pt2 small{display:block;font-weight:400;font-size:11px;color:var(--ink-3)}
+@media (max-width:640px){.st-pg{font-size:13.5px;gap:6px}}
 </style>
 </head>
 <body>
@@ -1208,7 +1216,7 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 </nav>
 <div class="modal" id="pickModal" hidden role="dialog" aria-modal="true" aria-labelledby="pickTitle"><div class="modal-box" id="pickBox"></div></div>
 
-<script>const BUILD='20261022210229';
+<script>const BUILD='20261022211504';
 
 /* 伯虎在二樓 收支總覽：恆春本店、台南小伯虎、百貨櫃位 一起管理 */
 /* 店點：恆春本店、台南小伯虎是固定的；百貨外展櫃位可以有好幾個（設定在 misc/cfg.counters），各有開始和結束月份 */
@@ -2402,7 +2410,7 @@ function renderHome(){
       ${card('daily','每日結帳','營業額、交易筆數、收款方式',liveBR().map(dRow).join(''),'選擇店點結帳')}
       ${card('spend','當日支出','零用金、食材、雜支',liveBR().map(sRow).join(''),'選擇店點記支出')}
       ${canBake()?(bkFull()?card('bake','庫存盤點','可麗露・法國麵包・原物料',bakeHomeRows(),'開始盤點'):card('bake','分店庫存','各口味目前庫存',bakeHomeRows(),'查看庫存')):''}
-      ${canStock()?card('stock','選品盤點','品牌・商品・入庫售出・盤點',stockHomeRows(),'開始盤點'):''}
+      ${canStock()?(stOwner()?card('stock','選品獲利','各品牌銷售−支付品牌方',stBrs().map(b=>{ const r=stProfitRows(b,today.slice(0,7)).filter(x=>x.n); return `<li><i style="background:var(${B[b].color})"></i>${esc(B[b].short)}<span>本月銷售 ${fmt(sum(r.map(x=>x.amt)))}・獲利 <b>${fmt(sum(r.map(x=>x.profit)))}</b></span></li>`; }).join(''),'查看獲利'):card('stock','選品盤點','品牌・商品・入庫售出・盤點',stockHomeRows(),'開始盤點')):''}
       ${card('cash',isMgr()?'現金結算':'零用金結算',isMgr()?'營收現金・零用金清點':'查看零用金餘額',liveBR().filter(b=>!isCtr(b)||pettyOf(b)).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${isCtr(b)||!isMgr()?'':`現金 ${l?md(l.date):'未結'}・`}${isMgr()?`零用金 ${p?md(p.date):'未結'}`:`零用金剩 ${fmt(pettyLeft(b))}`}`);}).join(''),isMgr()?'開始結算':'查看結算')}
       ${isMgr()?card('ledger','營業分析','每月收支・人事・百貨櫃位',BR.filter(b=>ctrLive(b)||has(b,m)).map(lRow).join(''),'打開營業分析'):''}
       ${isMgr()?card('dept','百貨對帳',`${liveC.length?liveC.map(b=>esc(B[b].short)).join('、'):'目前沒有營業中的櫃位'}・抽成與撥款`,`<li><i style="background:var(--dp)"></i>本月<span>業績 ${fmt(dc.sales)}</span></li><li><i style="background:var(--rule)"></i>上月<span>${pdc.received==null?(pdc.sales?`應撥 ${fmt(pdc.due)}・未入帳`:'沒有紀錄'):`已入帳 ${fmt(pdc.received)}`}</span></li>`,'打開對帳'):''}
@@ -3048,7 +3056,7 @@ async function stMove(b,itemId,type,n,note){
   const d=stDoc(b), it=(d.items||[]).find(x=>x.id===itemId); if(!it) return;
   n=Math.round(+n||0); if(n<=0){ toast('請填數量'); return; }
   const delta=type==='in'?n:-n; if(it.qty+delta<0){ toast(`庫存只剩 ${it.qty}，不能${MVN[type]} ${n}`); return; }
-  try{ await stAddMoves(b,[{id:uid(),date:todayStr(),at:new Date().toISOString(),by:W.name||'',itemId,name:it.name,brandId:it.brandId,type,n,price:+it.price||0,note:note||''}]); }
+  try{ await stAddMoves(b,[{id:uid(),date:todayStr(),at:new Date().toISOString(),by:W.name||'',itemId,name:it.name,brandId:it.brandId,type,n,price:+it.price||0,cost:+it.cost||0,note:note||''}]); }
   catch(e){ toast('沒有存到，請再試一次'); return; }
   const items=d.items.map(x=>x.id===itemId?{...x,qty:x.qty+delta}:x);
   ST.act=null; ST.actN=''; await stSave(b,{items},`${it.name} ${MVN[type]} ${n}，剩 ${it.qty+delta}`);
@@ -3112,12 +3120,44 @@ function stSettleHTML(b){
   return `<div class="panel"><div class="ph"><h2>${+ym.slice(5)} 月選品結算</h2><span class="hint">只有老闆看得到</span></div>
     ${rows.length?`<table class="dtab"><thead><tr><th>品牌</th><th>售出</th><th>銷售額</th><th>付給店家</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.x.name)}<small class="hint"> ${esc(r.x.type||'寄售')}${r.x.rate?` ${r.x.rate}%`:''}</small></td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.amt)}</td><td class="num">${(r.x.type||'寄售')==='寄售'?fmt(r.pay):'買斷'}</td></tr>`).join('')}<tr class="net"><td>合計</td><td class="num">${fmt(sum(rows.map(r=>r.n)))}</td><td class="num">${fmt(sum(rows.map(r=>r.amt)))}</td><td class="num">${fmt(sum(rows.map(r=>r.pay)))}</td></tr></tbody></table>`:'<p class="hint">這個月還沒有售出。</p>'}</div>`;
 }
+/* 老闆（妃妃）的選品頁：只看各品牌 銷售金額−支付給品牌方＝獲利 */
+const stOwner=()=>W.name===BOSS;
+/* 銷售來源：有匯入肚肚 POS 的月份用 POS 實收金額（依分類＝品牌），沒有才用系統裡按的「售出」 */
+const stPos=(b,ym)=>stAll()[`${b}-stocksales-${ym}`]||null;
+function stProfitRows(b,ym){
+  const d=stDoc(b), pos=stPos(b,ym), l=stMoves(b,ym).filter(m=>m.type==='sell'&&!m.void);
+  return (d.brands||[]).map(x=>{ const buy=(x.type||'寄售')==='買斷'; let amt, pay, miss=0, n;
+    if(pos){ const s=(pos.list||[]).filter(r=>r.brand===x.name); amt=sum(s.map(r=>+r.amt||0)); n=s.length?1:0;
+      pay=buy?Math.round(amt*(+x.cost||0)/100):Math.round(amt*(1-(+x.rate||0)/100)); if(buy&&!(+x.cost)&&amt) miss=1; }
+    else { const s=l.filter(m=>m.brandId===x.id); amt=sum(s.map(m=>m.n*m.price)); n=sum(s.map(m=>m.n));
+      if(buy){ pay=sum(s.map(m=>{ const c=+m.cost||+(((d.items||[]).find(i=>i.id===m.itemId)||{}).cost)||0; if(!c) miss++; return m.n*c; })); }
+      else pay=Math.round(amt*(1-(+x.rate||0)/100)); }
+    return {x,buy,amt,pay,profit:amt-pay,miss,n}; });
+}
+function stProfitHTML(b){
+  const ym=ST.ym||todayStr().slice(0,7), m=+ym.slice(5), d=stDoc(b), rows=stProfitRows(b,ym), sold=rows.filter(r=>r.n), noRate=rows.filter(r=>!r.buy&&!(+r.x.rate)).length;
+  const T=k=>sum(sold.map(r=>r[k]));
+  const pos=stPos(b,ym);
+  const rateCell=r=>r.buy?(pos?(ST.rateEdit===r.x.id?`<span class="din st-rate"><input type="number" inputmode="numeric" id="stRateIn" value="${esc(r.x.cost||'')}" placeholder="成本"><small>%</small></span><button class="btn primary" data-strsave="${r.x.id}">存</button>`:`<button class="chip ${+r.x.cost?'':'warn'}" data-strate="${r.x.id}">${+r.x.cost?`買斷・成本 ${r.x.cost}%`:'買斷・成本未設定'}</button>`):`<small class="hint">買斷${r.miss?`・<b class="neg">${r.miss} 筆缺進價</b>`:''}</small>`):ST.rateEdit===r.x.id?`<span class="din st-rate"><input type="number" inputmode="numeric" id="stRateIn" value="${esc(r.x.rate||'')}" placeholder="抽成"><small>%</small></span><button class="btn primary" data-strsave="${r.x.id}">存</button>`
+    :`<button class="chip ${+r.x.rate?'':'warn'}" data-strate="${r.x.id}">${+r.x.rate?`抽成 ${r.x.rate}%`:'抽成未設定'}</button>`;
+  const costList=ST.costEdit?`<div class="st-form"><h3>${esc(stBrand(b,ST.costEdit).name)}・進價（買斷成本）</h3>${(d.items||[]).filter(i=>i.brandId===ST.costEdit&&!i.off).map(i=>`<label>${esc(i.name)}<small>售價 ${fmt(i.price)}</small><span class="din"><input type="number" inputmode="numeric" data-stcost="${i.id}" value="${esc(i.cost??'')}"><small>元</small></span></label>`).join('')||'<p class="hint">這個品牌沒有商品。</p>'}<div class="st-fa"><span class="sp"></span><button class="btn" data-stcx="1">取消</button><button class="btn primary" data-stcsave="1">儲存進價</button></div></div>`:'';
+  return `<div class="panel"><div class="ph"><h2>${m} 月選品獲利</h2><span class="dnav pl-wn"><button class="btn" data-stym="-1" aria-label="上個月">‹</button><span class="num">${m} 月</span><button class="btn" data-stym="1" aria-label="下個月" ${ym>=todayStr().slice(0,7)?'disabled':''}>›</button></span></div>
+    <p class="hint">${pos?`銷售金額來自肚肚 POS（${esc(String(pos.at||'').slice(0,10))} 匯入，依商品分類＝品牌）。`:'銷售金額來自系統裡的「售出」紀錄。'}獲利＝銷售金額−支付給品牌方；寄售依抽成計算，買斷依${pos?'成本 %':'商品進價'}計算。${noRate?`<b class="neg">有 ${noRate} 個寄售品牌還沒設定抽成，獲利會算成 0。</b>`:''}</p>
+    ${costList}
+    <div class="st-pg st-ph"><span>品牌</span><span>銷售金額</span><span>支付品牌方</span><span>獲利</span></div>
+      ${rows.map(r=>`<div class="st-pg ${r.n?'':'st-z'}"><div><b>${esc(r.x.name)}</b><div class="st-pr">${rateCell(r)}${r.buy&&!pos?`<button class="chip" data-stcost0="${r.x.id}">填進價</button>`:''}</div></div><span class="num">${r.n?fmt(r.amt):'—'}</span><span class="num">${r.n?fmt(r.pay):'—'}</span><span class="num ${r.profit<0?'neg':r.profit>0?'pos':''}"><b>${r.n?fmt(r.profit):'—'}</b></span></div>`).join('')}
+      ${pos?(()=>{ const names=new Set((d.brands||[]).map(x=>x.name)), ex=(pos.list||[]).filter(r=>!names.has(r.brand)); return ex.length?`<p class="hint neg">肚肚有 ${ex.length} 筆的分類不在品牌清單：${esc([...new Set(ex.map(r=>r.brand))].join('、'))}</p>`:''; })():''}
+      <div class="st-pg st-pt2"><b>合計<small>${sold.length} 個品牌有銷售</small></b><span class="num">${fmt(T('amt'))}</span><span class="num">${fmt(T('pay'))}</span><span class="num"><b>${fmt(T('profit'))}</b></span></div></div>`;
+}
 function drawStock(){
   if(!W.name){ renderLogin(); return; }
   if(S.mode!=='stock') return;
   if(!canStock()){ S.mode='home'; renderHome(); return; }
   const bs=stBrs(); if(!bs.length){ $('#main').innerHTML=`<div class="panel emptyb">你還沒有被指定負責的店。</div>`; return; }
   if(!bs.includes(ST.b)) ST.b=bs[0]; const b=ST.b;
+  if(stOwner()){ $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(${B[b].color})"><div class="st-l"><div><div class="st-name">選品獲利 <small>${esc(bfull(b))}</small></div><div class="st-state">各品牌銷售・支付品牌方・獲利</div></div></div>
+      <div class="seg cs-seg"${bs.length>1?'':' hidden'}>${bs.map(x=>`<button data-stb2="${x}" aria-pressed="${x===b}"><i class="sw" style="background:var(${B[x].color})"></i>${esc(B[x].short)}</button>`).join('')}</div></div>${stProfitHTML(b)}`;
+    const ri=$('#stRateIn'); if(ri) ri.focus(); return; }
   const tabs=[['items','商品'],['take','盤點'],['log','紀錄'],['brands','品牌']].concat(isMgr()?[['settle','結算']]:[]);
   const a=document.activeElement, fid=a&&a.id&&$('#main').contains(a)?a.id:null;
   $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(${B[b].color})"><div class="st-l"><div><div class="st-name">選品盤點 <small>${esc(bfull(b))}</small></div><div class="st-state">寄售・買斷選品庫存</div></div></div>
@@ -3133,13 +3173,14 @@ function bindStock(){
     else if(t.id==='stActN') ST.actN=t.value;
     else if(t.dataset.stf&&ST.form) ST.form[t.dataset.stf]=t.value;
     else if(t.dataset.stb&&ST.bForm){ ST.bForm[t.dataset.stb]=t.value; }
-    else if(t.dataset.sttk&&ST.take){ ST.take.act[t.dataset.sttk]=t.value; } });
+    else if(t.dataset.sttk&&ST.take){ ST.take.act[t.dataset.sttk]=t.value; }
+    else if(t.dataset.stcost){ ST.costDraft={...(ST.costDraft||{}),[t.dataset.stcost]:t.value}; } });
   main.addEventListener('change',ev=>{ if(S.mode!=='stock') return; const t=ev.target;
     if(t.dataset.stb==='type'&&ST.bForm){ ST.bForm.type=t.value; drawStock(); }
     else if(t.dataset.stf==='brandId'&&ST.form) ST.form.brandId=t.value;
     else if(t.id==='stTB') ST.takeBrand=t.value;
     else if(t.dataset.sttk&&ST.take){ const it=(stDoc(ST.b).items||[]).find(x=>x.id===t.dataset.sttk), li=t.closest('.st-r'); if(it&&li){ const v=t.value, df=v===''?0:+v-it.qty; li.classList.toggle('diff',!!df); let em=li.querySelector('.st-a em'); if(!em){ em=document.createElement('em'); li.querySelector('.st-a').appendChild(em); } em.className='num '+(df<0?'neg':'pos'); em.textContent=df?(df>0?'+':'')+df:''; } } });
-  main.addEventListener('keydown',ev=>{ if(S.mode!=='stock'||ev.key!=='Enter') return; if(ev.target.id==='stActN'){ ev.preventDefault(); const g=main.querySelector('[data-stgo]'); g&&g.click(); } });
+  main.addEventListener('keydown',ev=>{ if(S.mode!=='stock'||ev.key!=='Enter') return; if(ev.target.id==='stRateIn'){ ev.preventDefault(); const g=main.querySelector('[data-strsave]'); g&&g.click(); return; } if(ev.target.id==='stActN'){ ev.preventDefault(); const g=main.querySelector('[data-stgo]'); g&&g.click(); } });
   main.addEventListener('click',async ev=>{ if(S.mode!=='stock') return; const t=ev.target.closest('button'); if(!t) return; const b=ST.b, d=stDoc(b);
     if(t.dataset.stb2){ ST.b=t.dataset.stb2; ST.form=ST.bForm=ST.take=ST.act=null; drawStock(); }
     else if(t.dataset.sttab){ ST.tab=t.dataset.sttab; ST.confirm=null; drawStock(); }
@@ -3175,6 +3216,11 @@ function bindStock(){
       const items2=d.items.map(x=>{ const df=diffs.find(y=>y.id===x.id); return df?{...x,qty:df.act}:x; });
       const take={id:uid(),date:todayStr(),by:W.name||'',brandId:tk.brandId||'',brandName:tk.brandId?stBrand(b,tk.brandId).name:'',count:items.length,diffs};
       if(await stSave(b,{items:items2,takes:(d.takes||[]).concat([take]).slice(-60)},diffs.length?`盤點完成，調整了 ${diffs.length} 項`:'盤點完成，全部相符')){ ST.take=null; drawStock(); } }
+    else if(t.dataset.strate){ ST.rateEdit=t.dataset.strate; drawStock(); }
+    else if(t.dataset.strsave){ const id=t.dataset.strsave, v=Math.max(0,Math.min(100,Math.round(+($('#stRateIn')||{}).value||0))), br=d.brands.find(x=>x.id===id), buy=(br.type||'寄售')==='買斷'; ST.rateEdit=null; await stSave(b,{brands:d.brands.map(x=>x.id===id?(buy?{...x,cost:v}:{...x,rate:v}):x)},`${br.name} ${buy?'成本':'抽成'} ${v}%`); }
+    else if(t.dataset.stcost0){ ST.costEdit=t.dataset.stcost0; ST.costDraft={}; drawStock(); }
+    else if(t.dataset.stcx){ ST.costEdit=null; drawStock(); }
+    else if(t.dataset.stcsave){ const cd=ST.costDraft||{}; ST.costEdit=null; await stSave(b,{items:d.items.map(x=>cd[x.id]!==undefined?{...x,cost:Math.max(0,Math.round(+cd[x.id]||0))}:x)},'進價已儲存'); }
     else if(t.dataset.stym){ const cur=ST.ym||todayStr().slice(0,7); ST.ym=ymShift(cur,+t.dataset.stym); drawStock(); }
     else if(t.dataset.stvoid){ const id=t.dataset.stvoid; if(ST.confirm!=='v'+id){ ST.confirm='v'+id; drawStock(); return; } ST.confirm=null;
       const ym=todayStr().slice(0,7), docId=mvId(b,ym), cur=stAll()[docId]; const m=(cur.list||[]).find(x=>x.id===id); if(!m) return;
