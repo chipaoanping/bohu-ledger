@@ -1216,7 +1216,7 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 </nav>
 <div class="modal" id="pickModal" hidden role="dialog" aria-modal="true" aria-labelledby="pickTitle"><div class="modal-box" id="pickBox"></div></div>
 
-<script>const BUILD='20261022211504';
+<script>const BUILD='20261022212306';
 
 /* 伯虎在二樓 收支總覽：恆春本店、台南小伯虎、百貨櫃位 一起管理 */
 /* 店點：恆春本店、台南小伯虎是固定的；百貨外展櫃位可以有好幾個（設定在 misc/cfg.counters），各有開始和結束月份 */
@@ -3038,6 +3038,8 @@ const stId=b=>`${b}-stock`, mvId=(b,ym)=>`${b}-stockmv-${ym}`;
 const stAll=()=>({...(S.allDaily||{}),...(D.docs||{})});
 const stDoc=b=>stAll()[stId(b)]||{branch:b,kind:'stock',brands:[],items:[],takes:[]};
 const stMoves=(b,ym)=>((stAll()[mvId(b,ym)]||{}).list)||[];
+/* 結束合作的品牌標 off：一般畫面不顯示，舊銷售紀錄仍算得到 */
+const stBrs2=b=>(stDoc(b).brands||[]).filter(x=>!x.off);
 const stBrand=(b,id)=>(stDoc(b).brands||[]).find(x=>x.id===id)||{name:'（未填品牌）'};
 const stBrs=()=>liveBR().filter(b=>!isCtr(b));
 async function stSave(b,patch,msg){
@@ -3062,7 +3064,7 @@ async function stMove(b,itemId,type,n,note){
   ST.act=null; ST.actN=''; await stSave(b,{items},`${it.name} ${MVN[type]} ${n}，剩 ${it.qty+delta}`);
 }
 function stItemsHTML(b){
-  const d=stDoc(b), brs=d.brands||[], q=ST.q.trim();
+  const d=stDoc(b), brs=stBrs2(b), q=ST.q.trim();
   let items=(d.items||[]).filter(x=>!x.off&&(!ST.brand||x.brandId===ST.brand)&&(!q||(x.name+(x.code||'')+stBrand(b,x.brandId).name).includes(q)));
   items=items.sort((a,c)=>stBrand(b,a.brandId).name.localeCompare(stBrand(b,c.brandId).name)||a.name.localeCompare(c.name));
   const tot=sum(items.map(x=>x.qty)), low=items.filter(x=>+x.safe&&x.qty<=+x.safe).length;
@@ -3086,7 +3088,7 @@ function stItemsHTML(b){
           :`<button class="btn" data-stact="${x.id}|sell">售出</button><button class="btn" data-stact="${x.id}|in">入庫</button><button class="btn" data-stact="${x.id}|ret">退回</button><button class="ibtn" data-stedit="${x.id}">編輯</button>`}</div></li>`; }).join('')}</ul>`:(brs.length?'<p class="hint">沒有符合的商品。</p>':'')}</div>`;
 }
 function stBrandsHTML(b){
-  const d=stDoc(b), brs=d.brands||[], f=ST.bForm;
+  const d=stDoc(b), brs=stBrs2(b), f=ST.bForm;
   return `<div class="panel"><div class="ph"><h2>品牌</h2><span class="hint">${brs.length} 個品牌</span><button class="btn primary" data-stbnew="1">＋ 新增品牌</button></div>
     ${f?`<div class="st-form"><h3>${f.id?'編輯品牌':'新增品牌'}</h3>
       <label>品牌名稱<input class="tin" data-stb="name" value="${esc(f.name||'')}" maxlength="30" placeholder="例：二五八茶莊"></label>
@@ -3097,7 +3099,7 @@ function stBrandsHTML(b){
     ${brs.length?`<ul class="st-l">${brs.map(x=>{ const n=(d.items||[]).filter(i=>i.brandId===x.id&&!i.off); return `<li class="st-r"><div class="st-m"><b>${esc(x.name)}</b><small>${esc(x.type||'寄售')}${(x.type||'寄售')==='寄售'&&x.rate?`・抽成 ${x.rate}%`:''}${x.note?`・${esc(x.note)}`:''}</small></div><div class="st-q2 num"><b>${n.length}</b><small>項商品</small></div><div class="st-a"><button class="ibtn" data-stbedit="${x.id}">編輯</button></div></li>`; }).join('')}</ul>`:'<p class="hint">還沒有品牌，按「＋ 新增品牌」開始。</p>'}</div>`;
 }
 function stTakeHTML(b){
-  const d=stDoc(b), brs=d.brands||[], tk=ST.take;
+  const d=stDoc(b), brs=stBrs2(b), tk=ST.take;
   if(tk){ const items=(d.items||[]).filter(x=>!x.off&&(!tk.brandId||x.brandId===tk.brandId));
     const diffs=items.filter(x=>tk.act[x.id]!==undefined&&tk.act[x.id]!==''&&+tk.act[x.id]!==x.qty);
     return `<div class="panel"><div class="ph"><h2>盤點：${esc(tk.brandId?stBrand(b,tk.brandId).name:'全部品牌')}</h2><span class="hint">數量跟系統一樣可以留空，不一樣才填實際數量</span></div>
@@ -3135,7 +3137,7 @@ function stProfitRows(b,ym){
     return {x,buy,amt,pay,profit:amt-pay,miss,n}; });
 }
 function stProfitHTML(b){
-  const ym=ST.ym||todayStr().slice(0,7), m=+ym.slice(5), d=stDoc(b), rows=stProfitRows(b,ym), sold=rows.filter(r=>r.n), noRate=rows.filter(r=>!r.buy&&!(+r.x.rate)).length;
+  const ym=ST.ym||todayStr().slice(0,7), m=+ym.slice(5), d=stDoc(b), rows=stProfitRows(b,ym), sold=rows.filter(r=>r.n), noRate=rows.filter(r=>!r.buy&&!(+r.x.rate)&&(!r.x.off||r.n)).length;
   const T=k=>sum(sold.map(r=>r[k]));
   const pos=stPos(b,ym);
   const rateCell=r=>r.buy?(pos?(ST.rateEdit===r.x.id?`<span class="din st-rate"><input type="number" inputmode="numeric" id="stRateIn" value="${esc(r.x.cost||'')}" placeholder="成本"><small>%</small></span><button class="btn primary" data-strsave="${r.x.id}">存</button>`:`<button class="chip ${+r.x.cost?'':'warn'}" data-strate="${r.x.id}">${+r.x.cost?`買斷・成本 ${r.x.cost}%`:'買斷・成本未設定'}</button>`):`<small class="hint">買斷${r.miss?`・<b class="neg">${r.miss} 筆缺進價</b>`:''}</small>`):ST.rateEdit===r.x.id?`<span class="din st-rate"><input type="number" inputmode="numeric" id="stRateIn" value="${esc(r.x.rate||'')}" placeholder="抽成"><small>%</small></span><button class="btn primary" data-strsave="${r.x.id}">存</button>`
@@ -3145,7 +3147,7 @@ function stProfitHTML(b){
     <p class="hint">${pos?`銷售金額來自肚肚 POS（${esc(String(pos.at||'').slice(0,10))} 匯入，依商品分類＝品牌）。`:'銷售金額來自系統裡的「售出」紀錄。'}獲利＝銷售金額−支付給品牌方；寄售依抽成計算，買斷依${pos?'成本 %':'商品進價'}計算。${noRate?`<b class="neg">有 ${noRate} 個寄售品牌還沒設定抽成，獲利會算成 0。</b>`:''}</p>
     ${costList}
     <div class="st-pg st-ph"><span>品牌</span><span>銷售金額</span><span>支付品牌方</span><span>獲利</span></div>
-      ${rows.map(r=>`<div class="st-pg ${r.n?'':'st-z'}"><div><b>${esc(r.x.name)}</b><div class="st-pr">${rateCell(r)}${r.buy&&!pos?`<button class="chip" data-stcost0="${r.x.id}">填進價</button>`:''}</div></div><span class="num">${r.n?fmt(r.amt):'—'}</span><span class="num">${r.n?fmt(r.pay):'—'}</span><span class="num ${r.profit<0?'neg':r.profit>0?'pos':''}"><b>${r.n?fmt(r.profit):'—'}</b></span></div>`).join('')}
+      ${rows.filter(r=>!r.x.off||r.n).map(r=>`<div class="st-pg ${r.n?'':'st-z'}"><div><b>${esc(r.x.name)}</b>${r.x.off?'<small class="hint">（已結束合作）</small>':''}<div class="st-pr">${rateCell(r)}${r.buy&&!pos?`<button class="chip" data-stcost0="${r.x.id}">填進價</button>`:''}</div></div><span class="num">${r.n?fmt(r.amt):'—'}</span><span class="num">${r.n?fmt(r.pay):'—'}</span><span class="num ${r.profit<0?'neg':r.profit>0?'pos':''}"><b>${r.n?fmt(r.profit):'—'}</b></span></div>`).join('')}
       ${pos?(()=>{ const names=new Set((d.brands||[]).map(x=>x.name)), ex=(pos.list||[]).filter(r=>!names.has(r.brand)); return ex.length?`<p class="hint neg">肚肚有 ${ex.length} 筆的分類不在品牌清單：${esc([...new Set(ex.map(r=>r.brand))].join('、'))}</p>`:''; })():''}
       <div class="st-pg st-pt2"><b>合計<small>${sold.length} 個品牌有銷售</small></b><span class="num">${fmt(T('amt'))}</span><span class="num">${fmt(T('pay'))}</span><span class="num"><b>${fmt(T('profit'))}</b></span></div></div>`;
 }
@@ -3188,7 +3190,7 @@ function bindStock(){
     else if(t.dataset.stact){ const [id,type]=t.dataset.stact.split('|'); ST.act={id,type}; ST.actN=type==='sell'?'1':''; drawStock(); const i=$('#stActN'); i&&(i.focus(),i.select()); }
     else if(t.dataset.stax){ ST.act=null; drawStock(); }
     else if(t.dataset.stgo){ if(ST.act) await stMove(b,ST.act.id,ST.act.type,ST.actN); }
-    else if(t.dataset.stnew){ ST.form={brandId:ST.brand||((d.brands||[])[0]||{}).id,name:'',code:'',price:'',qty:'',safe:''}; drawStock(); }
+    else if(t.dataset.stnew){ ST.form={brandId:ST.brand||(stBrs2(b)[0]||{}).id,name:'',code:'',price:'',qty:'',safe:''}; drawStock(); }
     else if(t.dataset.stedit){ const it=(d.items||[]).find(x=>x.id===t.dataset.stedit); ST.form={...it}; drawStock(); scrollTo({top:0,behavior:'smooth'}); }
     else if(t.dataset.stfx){ ST.form=null; drawStock(); }
     else if(t.dataset.stfsave){ const f=ST.form; if(!(f.name||'').trim()){ toast('請填商品名稱'); return; } if(!f.brandId){ toast('請選品牌'); return; }
