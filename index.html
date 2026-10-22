@@ -1164,6 +1164,10 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 .bq-hd summary{cursor:pointer}.bq-hd{margin:4px 0}
 .bq-ro{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--soft);color:var(--ink-2);font-size:14px;text-align:center}
 .bq-in[readonly]{background:var(--soft);border-style:dashed;color:var(--ink)}
+.bq-sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.bq-sl{list-style:none;margin:0;padding:0;display:block}.bq-sl li{display:flex;justify-content:space-between;align-items:baseline;padding:9px 2px;border-bottom:1px dashed var(--rule);font-size:16px}
+.bq-sl li small{margin-left:6px;font-size:12px;color:var(--ink-3)}.bq-sl li b{font-size:20px}.bq-sl li b.neg{color:var(--neg)}
+.mstrip.wk{grid-template-columns:repeat(7,1fr)!important}.mstrip.wk .ms[disabled]{opacity:.35}
 </style>
 </head>
 <body>
@@ -1619,7 +1623,11 @@ const saveD=()=>{try{localStorage.setItem('bohu-daily',JSON.stringify({day:D.day
 const dMonth=()=>D.day.slice(0,7);
 const dId=(b,day)=>`${b}-${day}`;
 const dDoc=(b,day=D.day)=>D.docs[dId(b,day)];
-function setDay(day){D.edit=false;D.day=day;D.dirty={};saveD();subDaily();renderDaily();}
+/* 老闆以外的帳號只看本週（週一到今天）的結帳紀錄 */
+const dWeekOnly=()=>!isBoss();
+const dWeekStart=()=>{ const t=todayStr(), g=new Date(t+'T00:00:00').getDay(); return addDays(t,-((g+6)%7)); };
+const dClamp=day=>{ if(!dWeekOnly()) return day; const ws=dWeekStart(), t=todayStr(); return day<ws?ws:day>t?t:day; };
+function setDay(day){day=dClamp(day);D.edit=false;D.day=day;D.dirty={};saveD();subDaily();renderDaily();}
 function subDaily(){
   if(!S.db) return;
   const want=[...new Set([dMonth(), addDays(D.day,-7).slice(0,7)])];
@@ -1687,11 +1695,15 @@ function summaryHTML(b){
       <div><span>客單價</span><b>${tx?fmt(rev/tx):'—'}</b></div>
       <div><span>報廢・招待</span><b>${fmt(nval(b,'loss'))}</b>${rev&&nval(b,'loss')?`<small>佔 ${(nval(b,'loss')/rev*100).toFixed(1)}%</small>`:''}</div>
       <div><span>上週${wk(D.day)}營業額</span><b>${lwr==null?'—':fmt(lwr)}</b>${lwr!=null&&rev?`<small class="${rev-lwr<0?'neg':'pos'}">${sgn(rev-lwr)}</small>`:''}</div>
-      ${isMgr()?`<div><span>${+D.day.slice(5,7)} 月累計</span><b>${fmt(mrev)}</b><small>${fmt(mtx)} 筆</small></div>`:`<div><span>交易筆數</span><b>${fmt(tx)}</b><small>筆</small></div>`}
+      ${isBoss()?`<div><span>${+D.day.slice(5,7)} 月累計</span><b>${fmt(mrev)}</b><small>${fmt(mtx)} 筆</small></div>`:`<div><span>交易筆數</span><b>${fmt(tx)}</b><small>筆</small></div>`}
     </div>
   </div>`;
 }
 function monthStrip(b){
+  if(dWeekOnly()){ const ws=dWeekStart(), t=todayStr(); let h=`<div class="mstrip wk">`;
+    for(let i=0;i<7;i++){ const day=addDays(ws,i), r=D.docs[dId(b,day)], st=dStatusOf(r), v=r?+r.revenue||0:0, df=r&&!isCtr(b)?paidOf(b,r)-v:0, sc=st==='公休'?'off':st==='颱風假'?'ty':'';
+      h+=`<button class="ms ${day===D.day?'cur':''} ${st?'has':''} ${r&&df&&st==='營業'?'bad':''} ${sc}" data-dday="${day}" ${day>t?'disabled':''} title="${md(day)} ${st?(st!=='營業'?st:'已結帳'):'未結帳'}"><span class="msb"><i style="height:${st==='營業'?100:0}%"></i></span><span class="msd">${+day.slice(8)}</span><span class="msw">${wk(day)}</span></button>`; }
+    return h+`</div>`; }
   const [y,m]=dMonth().split('-').map(Number), days=new Date(y,m,0).getDate();
   const rows={}; Object.values(D.docs).filter(d=>d.branch===b&&d.month===dMonth()).forEach(d=>rows[d.date]=d);
   const mx=Math.max(1,...Object.values(rows).map(r=>+r.revenue||0));
@@ -1702,24 +1714,25 @@ function monthStrip(b){
   return h+`</div><div class="statline">${statusLine(statusCount(b,dMonth(),D.docs))}</div>`;
 }
 function monthTable(b){
-  const rows=Object.values(D.docs).filter(d=>d.branch===b&&d.month===dMonth()&&dStatusOf(d)).sort((a,c)=>a.date<c.date?-1:1);
+  const wo=dWeekOnly(), ws=dWeekStart(), we=addDays(ws,6);
+  const rows=Object.values(D.docs).filter(d=>d.branch===b&&(wo?d.date>=ws&&d.date<=we:d.month===dMonth())&&dStatusOf(d)).sort((a,c)=>a.date<c.date?-1:1);
   if(!rows.length) return '';
   const F=dFields(b).filter(f=>!isCtr(b)||f[3]!=='pay'), cols=F.map(f=>f[0]), tt=k=>sum(rows.map(r=>+r[k]||0)), diffOf=r=>isCtr(b)||dStatusOf(r)!=='營業'?0:paidOf(b,r)-(+r.revenue||0);
-  let h=`<div class="panel scroll"><div class="ph"><h2>${+dMonth().slice(5)} 月結帳紀錄</h2><span class="hint">點日期可修改那天</span></div><table class="dtab"><thead><tr><th>日期</th>${F.map(f=>`<th>${f[1]}</th>`).join('')}${isCtr(b)?'':'<th>差額</th>'}<th>客單價</th><th>存入銀行</th><th>結帳人</th></tr></thead><tbody>`;
+  let h=`<div class="panel scroll"><div class="ph"><h2>${wo?`本週結帳紀錄 <small class="hint">${md(ws)}–${md(we)}</small>`:`${+dMonth().slice(5)} 月結帳紀錄`}</h2><span class="hint">點日期可修改那天</span></div><table class="dtab"><thead><tr><th>日期</th>${F.map(f=>`<th>${f[1]}</th>`).join('')}${isCtr(b)?'':'<th>差額</th>'}<th>客單價</th><th>存入銀行</th><th>結帳人</th></tr></thead><tbody>`;
   for(const r of rows){const df=diffOf(r), st=dStatusOf(r);
     h+=`<tr class="${r.date===D.day?'cur':''}"><td><button class="ibtn" data-dday="${r.date}">${+r.date.slice(8)} 日（${wk(r.date)}）</button></td>${st!=='營業'?`<td colspan="${cols.length}" class="hint st-offc">${esc(st)}</td>`:cols.map(k=>`<td class="num">${r[k]?fmt(r[k]):''}</td>`).join('')}${isCtr(b)?'':`<td class="num ${df?'neg':'pos'}">${st!=='營業'?'':df?sgn(df):'✓'}</td>`}<td class="num">${st==='營業'&&+r.tx?fmt((+r.revenue||0)/(+r.tx)):''}</td><td class="num">${r.deposit?fmt(r.deposit):''}</td><td>${esc(r.staff||'')}</td></tr>`;}
   const td=sum(rows.map(diffOf));
   if(isMgr()) h+=`<tr class="net"><td>合計 ${rows.filter(r=>dStatusOf(r)==='營業').length} 天</td>${cols.map(k=>`<td class="num">${fmt(tt(k))}</td>`).join('')}${isCtr(b)?'':`<td class="num ${td?'neg':'pos'}">${td?sgn(td):'✓'}</td>`}<td class="num">${tt('tx')?fmt(tt('revenue')/tt('tx')):''}</td><td class="num">${fmt(tt('deposit'))}</td><td></td></tr>`;
   h+=`</tbody></table></div>`;
   const [y,m]=dMonth().split('-').map(Number), led=sum(listOfRaw(b,m,'rev',y).map(e=>+e.amt||0));
-  if(led&&isMgr()) h+=`<p class="hint" style="margin:-8px 4px 0">營業分析裡 ${y} 年 ${m} 月${esc(bshort(b))}手動填的營收是 ${fmt(led)} 元，每日結帳合計 ${fmt(tt('revenue'))} 元。</p>`;
+  if(led&&isBoss()) h+=`<p class="hint" style="margin:-8px 4px 0">營業分析裡 ${y} 年 ${m} 月${esc(bshort(b))}手動填的營收是 ${fmt(led)} 元，每日結帳合計 ${fmt(tt('revenue'))} 元。</p>`;
   return h;
 }
 function sheetTop(b,state,extra=''){
   return `<div class="sheet-top" style="--bc:var(${B[b].color})">
       <div class="st-l"><button class="btn ghost" data-dback="1">‹ 選擇分店</button>${extra}<div><div class="st-name">${esc(B[b].short)} <small>${esc(bfull(b))}</small></div><div class="st-state">${state}</div></div></div>
-      <div class="dnav"><button class="btn" data-dshift="-1" aria-label="前一天">‹</button>
-        <label class="ddate"><input type="date" id="dDate" value="${D.day}"><span>${+D.day.slice(5,7)} 月 ${+D.day.slice(8)} 日・星期${wk(D.day)}</span></label>
+      <div class="dnav"><button class="btn" data-dshift="-1" aria-label="前一天" ${dWeekOnly()&&D.day<=dWeekStart()?'disabled':''}>‹</button>
+        <label class="ddate"><input type="date" id="dDate" value="${D.day}" ${dWeekOnly()?`min="${dWeekStart()}" max="${todayStr()}"`:''}><span>${+D.day.slice(5,7)} 月 ${+D.day.slice(8)} 日・星期${wk(D.day)}</span></label>
         <button class="btn" data-dshift="1" aria-label="後一天">›</button>${D.day!==todayStr()?'<button class="btn" data-dtoday="1">今天</button>':''}</div>
     </div>`;
 }
@@ -1780,6 +1793,7 @@ function renderDaily(fromSnap){
   const main=$('#main');
   if(!$('#pickModal').hidden&&PK==='daily') $('#pickBox').innerHTML=renderChooser();
   if(!D.branch||S.mode!=='daily') return;
+  { const c=dClamp(D.day); if(c!==D.day){ D.day=c; D.edit=false; D.dirty={}; } }
   if(fromSnap&&main.contains(document.activeElement)&&document.activeElement.matches('.sheet input')){
     const s=$('#dSummary'); if(s) s.innerHTML=summaryHTML(D.branch); const t=$('#dTables'); if(t) t.innerHTML=monthTable(D.branch); return; }
   main.innerHTML=renderSheet(D.branch);
@@ -2385,7 +2399,7 @@ function renderHome(){
       ${card('plan','交辦與目標','明天交辦・本週目標與業績',planHomeRows(),'打開交辦')}
       ${card('daily','每日結帳','營業額、交易筆數、收款方式',liveBR().map(dRow).join(''),'選擇店點結帳')}
       ${card('spend','當日支出','零用金、食材、雜支',liveBR().map(sRow).join(''),'選擇店點記支出')}
-      ${canBake()?card('bake','庫存盤點','可麗露・法國麵包・原物料',bakeHomeRows(),'開始盤點'):''}
+      ${canBake()?(bkBrs().some(bkEdit)?card('bake','庫存盤點','可麗露・法國麵包・原物料',bakeHomeRows(),'開始盤點'):card('bake','分店庫存','各口味目前庫存',bakeHomeRows(),'查看庫存')):''}
       ${canStock()?card('stock','選品盤點','品牌・商品・入庫售出・盤點',stockHomeRows(),'開始盤點'):''}
       ${card('cash',isMgr()?'現金結算':'零用金結算',isMgr()?'營收現金・零用金清點':'查看零用金餘額',liveBR().filter(b=>!isCtr(b)||pettyOf(b)).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${isCtr(b)||!isMgr()?'':`現金 ${l?md(l.date):'未結'}・`}${isMgr()?`零用金 ${p?md(p.date):'未結'}`:`零用金剩 ${fmt(pettyLeft(b))}`}`);}).join(''),isMgr()?'開始結算':'查看結算')}
       ${isMgr()?card('ledger','營業分析','每月收支・人事・百貨櫃位',BR.filter(b=>ctrLive(b)||has(b,m)).map(lRow).join(''),'打開營業分析'):''}
@@ -3214,7 +3228,7 @@ async function bkSaveDay(){
 function bakeHomeRows(){
   const t=todayStr();
   return bkBrs().map(b=>{ const r=bkRec(b,t), its=bkItems(b).filter(x=>!isMat(x));
-    let txt; if(!its.length) txt='還沒設定品項'; else if(!r) txt='<span>今天尚未盤點</span>'; else { const c=bkDayRows(b,t,r.rows), bad=its.filter(x=>c[x.id].diff); txt=`<span class="${bad.length?'neg':'ok'}">已盤點${bad.length?`・${bad.length} 項有盤差`:'・沒有盤差'}</span>`; }
+    let txt; if(!its.length) txt='還沒設定品項'; else if(!bkEdit(b)){ const {l,last}=bkStockNow(b); txt=last?`${md(last)} 盤點・共 ${fmt(sum(l.map(x=>x.n)))} 個`:'還沒有盤點'; } else if(!r) txt='<span>今天尚未盤點</span>'; else { const c=bkDayRows(b,t,r.rows), bad=its.filter(x=>c[x.id].diff); txt=`<span class="${bad.length?'neg':'ok'}">已盤點${bad.length?`・${bad.length} 項有盤差`:'・沒有盤差'}</span>`; }
     return `<li><i style="background:var(${B[b].color})"></i>${esc(B[b].short)}<span>${txt}</span></li>`; }).join('');
 }
 const bqDiff=d=>d==null?'—':d===0?'0':(d>0?'+':'')+fmt(d);
@@ -3265,6 +3279,16 @@ function bkItemsHTML(b){
     ${BAKE_KINDS.map(k=>{ const l=its.filter(x=>x.kind===k); return l.length?`<h3 class="st-h3">${k}</h3><ul class="bq-l">${l.map(x=>`<li class="st-r ${x.off?'void':''}"><div class="st-m"><b>${esc(x.name)}</b><small>${x.off?'已停用':x.pre?'有預售':'使用中'}</small></div><span></span><div class="st-a">${x.off?`<button class="btn" data-bkon="${x.id}">恢復使用</button>`:`<button class="ibtn" data-bkup="${x.id}" aria-label="往上">↑</button><button class="ibtn" data-bkedit="${x.id}">編輯</button>`}</div></li>`).join('')}</ul>`:''; }).join('')}
     ${its.length?'':'<p class="hint">還沒有品項。</p>'}</div>`;
 }
+/* 不用盤點的夥伴：只看各店每個口味現在剩幾個 */
+function bkStockNow(b){ const t=todayStr(), its=bkItems(b).filter(x=>!isMat(x)); let last=null;
+  const l=its.map(it=>{ for(let i=0;i<=45;i++){ const d=addDays(t,-i), r=bkRec(b,d), raw=r&&r.rows&&r.rows[it.id]; if(bkHas(raw)){ const c=bkItemCalc(b,d,it,raw); if(!last||d>last) last=d; return {it,n:c.close!=null?c.close:c.exp}; } } return {it,n:null}; }).filter(x=>x.n!=null);
+  return {l,last}; }
+function bkSimpleHTML(bs){
+  return `<div class="sheet-top"><div class="st-l"><div><div class="st-name">分店庫存</div><div class="st-state">各口味目前庫存（以最近一次閉店盤點為準）</div></div></div></div>
+    <div class="bq-sg">${bs.map(b=>{ const {l,last}=bkStockNow(b), tot=sum(l.map(x=>x.n||0));
+      return `<div class="panel"><div class="ph"><h2><i class="sw" style="background:var(${B[b].color})"></i>${esc(bfull(b))}</h2><span class="hint">${last?`${md(last)} 盤點・共 ${fmt(tot)} 個`:'還沒有盤點'}</span></div>
+        ${l.length?`<ul class="bq-sl">${l.map(({it,n})=>`<li><span>${esc(it.name)}<small>${it.kind==='可麗露'?'':esc(it.kind)}</small></span><b class="num ${n===0?'neg':''}">${n==null?'—':fmt(n)}</b></li>`).join('')}</ul>`:'<p class="hint">還沒有品項。</p>'}</div>`; }).join('')}</div>`;
+}
 function drawBake(){
   if(!W.name){ renderLogin(); return; }
   if(S.mode!=='bake') return;
@@ -3273,6 +3297,7 @@ function drawBake(){
   const b=BK.b; BK.day=BK.day||todayStr();
   if(!isMgr()&&BK.tab==='items') BK.tab='day';
   if(S.bakeErr){ $('#main').innerHTML=`<div class="panel emptyb">庫存盤點還沒開通讀取權限，請老闆更新 Firestore 規則。</div>`; return; }
+  if(!bs.some(bkEdit)){ $('#main').innerHTML=bkSimpleHTML(bs); return; }
   const tabs=[['day','每日盤點'],['month','月盤點表']].concat(isMgr()?[['items','品項']]:[]);
   const a=document.activeElement, fid=a&&$('#main').contains(a)?(a.id||(a.dataset&&a.dataset.bkf?'bkf:'+a.dataset.bkf:null)):null;
   $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(${B[b].color})"><div class="st-l"><div><div class="st-name">庫存盤點 <small>${esc(bfull(b))}</small></div><div class="st-state">可麗露・法國麵包・原物料${bkEdit(b)?'':'・只能查看'}</div></div></div>
