@@ -1114,6 +1114,20 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 .hl-off{margin-top:8px;font-size:13px;color:var(--ink-2)}.hl-off summary{cursor:pointer}
 .hl-or{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}.hl-or b{min-width:3em}
 .sp-rule{margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--mustard) 18%,var(--paper));font-size:13px;color:var(--ink-2)}
+/* 選品盤點 */
+.st-tabs{margin:0 0 14px;flex-wrap:wrap}
+.st-bf{margin:4px 0 8px}.st-q{width:100%;margin-bottom:8px}
+.st-l{list-style:none;margin:0;padding:0}
+.st-r{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 2px;border-bottom:1px dashed var(--rule)}
+.st-r.low .st-q2 b{color:var(--neg)}.st-r.diff{background:color-mix(in srgb,var(--mustard) 14%,transparent)}.st-r.void{opacity:.45;text-decoration:line-through}
+.st-m{display:grid;gap:2px;min-width:0}.st-m b{font-size:15px}.st-m small{font-size:12px;color:var(--ink-3)}
+.st-q2{display:grid;justify-items:end;gap:0}.st-q2 b{font-size:18px}.st-q2 small{font-size:11px;color:var(--ink-3)}
+.st-a{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.st-a .din{width:92px}.st-a em{font-style:normal;font-weight:700}
+.st-form{background:var(--soft);border-radius:12px;padding:12px;margin:8px 0 12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.st-form h3{grid-column:1/-1;margin:0;font-size:15px}.st-form label{display:grid;gap:4px;font-size:12px;color:var(--ink-3)}.st-form .wide{grid-column:1/-1}
+.st-fa{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.st-fa .sp{flex:1}
+.st-h3{font-size:14px;margin:16px 0 4px}
+@media (max-width:640px){.st-form{grid-template-columns:1fr 1fr}.st-r{grid-template-columns:minmax(0,1fr) auto}.st-a{grid-column:1/-1;justify-content:flex-start}}
 </style>
 </head>
 <body>
@@ -1124,7 +1138,7 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
       <div class="eyebrow">恆春・台南・百貨櫃位</div>
       <h1>伯虎在二樓 收支總覽</h1>
     </div>
-    <div class="hright"><div class="seg mode" role="group" aria-label="頁面" id="modeSeg"><button data-mode="home">首頁</button><button data-mode="daily">每日結帳</button><button data-mode="spend">當日支出</button><button data-mode="plan">交辦與目標</button><button data-mode="ledger" class="mgr-only" hidden>營業分析</button><button data-mode="dept" class="mgr-only" hidden>百貨對帳</button><button data-mode="payroll" class="mgr-only" hidden>薪資</button><button data-mode="claim" class="mgr-only" hidden>代墊請款</button><button data-mode="cash">現金結算</button></div><span class="who" id="who" hidden></span><button class="reload-btn" id="reloadBtn" type="button" aria-label="重新整理" title="重新整理（載入最新版本）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button><span class="status" id="status"><i></i><span>連線中…</span></span></div>
+    <div class="hright"><div class="seg mode" role="group" aria-label="頁面" id="modeSeg"><button data-mode="home">首頁</button><button data-mode="plan">交辦與目標</button><button data-mode="daily">每日結帳</button><button data-mode="spend">當日支出</button><button data-mode="stock" class="stock-only" hidden>選品盤點</button><button data-mode="ledger" class="mgr-only" hidden>營業分析</button><button data-mode="dept" class="mgr-only" hidden>百貨對帳</button><button data-mode="payroll" class="mgr-only" hidden>薪資</button><button data-mode="claim" class="mgr-only" hidden>代墊請款</button><button data-mode="cash" id="cashSegL">現金結算</button></div><span class="who" id="who" hidden></span><button class="reload-btn" id="reloadBtn" type="button" aria-label="重新整理" title="重新整理（載入最新版本）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button><span class="status" id="status"><i></i><span>連線中…</span></span></div>
   </header>
 
   <div class="controls">
@@ -1144,11 +1158,12 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 
 <nav class="bnav" id="bnav" aria-label="頁面">
   <button data-mode="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>首頁</span></button>
+  <button data-mode="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span>交辦</span></button>
   <button data-mode="daily"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 14h3M8 17h6"/></svg><span>每日結帳</span></button>
   <button data-mode="spend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>當日支出</span></button>
-  <button data-mode="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span>交辦</span></button>
+  <button data-mode="stock" class="stock-only" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/></svg><span>選品</span></button>
   <button data-mode="ledger" class="mgr-only" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13"/><path d="M8 13l3-3 2 2 3-4"/></svg><span>營業分析</span></button>
-  <button data-mode="cash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg><span>現金結算</span></button>
+  <button data-mode="cash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg><span id="cashNavL">現金結算</span></button>
 </nav>
 <div class="modal" id="pickModal" hidden role="dialog" aria-modal="true" aria-labelledby="pickTitle"><div class="modal-box" id="pickBox"></div></div>
 
@@ -2201,6 +2216,7 @@ function bindLogin(){
     else if(t.dataset.lgmode){ A.mode=t.dataset.lgmode; A.err=''; renderLogin(); }
     else if(t.dataset.staffboss){ const n=t.dataset.staffboss; if(n===BOSS||n===W.name) return; if(A.confirmBoss!==n){ A.confirmBoss=n; renderHome(); return; } A.confirmBoss=null; const on=!(personOf(n)||{}).boss; if(await savePeople(people().map(p=>p.name===n?{...p,boss:on,mgr:on?true:p.mgr}:p))) toast(on?`${n} 已設為老闆，權限和你一樣`:`${n} 已取消老闆，改為管理者`); }
     else if(t.dataset.staffdel){ const n=t.dataset.staffdel; if(n===BOSS||n===W.name) return; if(A.confirmDel!==n){ A.confirmDel=n; renderHome(); return; } A.confirmDel=null; if(await savePeople(people().filter(p=>p.name!==n))) toast(`已移除 ${n}`); }
+    else if(t.dataset.staffstock){ const n=t.dataset.staffstock; const on=!(personOf(n)||{}).stock; if(await savePeople(people().map(p=>p.name===n?{...p,stock:on}:p))) toast(on?`${n} 可以做選品盤點了`:`${n} 已取消選品盤點`); }
     else if(t.dataset.staffmgr){ const n=t.dataset.staffmgr; if(isBossName(n)) return; const on=!(personOf(n)||{}).mgr; if(await savePeople(people().map(p=>p.name===n?{...p,mgr:on}:p))) toast(on?`${n} 已設為管理者，可以看薪資、百貨對帳和營業分析`:`${n} 已取消管理者`); }
     else if(t.dataset.staffbr){ const [n,b]=t.dataset.staffbr.split('|'); const p=personOf(n); if(!p) return; const cur=p.branches||[]; const nb=cur.includes(b)?cur.filter(x=>x!==b):BR.filter(x=>cur.includes(x)||x===b); if(await savePeople(people().map(x=>x.name===n?{...x,branches:nb}:x))) toast(`${n} 負責：${nb.length?nb.map(x=>B[x].short).join('、'):'（沒有指定店）'}`); }
     else if(t.dataset.pwreset){ const n=t.dataset.pwreset; if(n===BOSS) return; if(await savePeople(people().map(p=>p.name===n?{...p,v:(p.v||1)+1,mail:''}:p))) toast(`${n} 的密碼已重設，下次登入請按「第一次登入」重新設定`); }
@@ -2218,7 +2234,7 @@ function adminHTML(){
   if(!isBoss()) return '';
   return `<section class="panel adm"><div class="ph"><h2>人員管理</h2><span class="hint">只有老闆看得到</span></div>
     <p class="hint adm-note">勾選每位夥伴負責的店：一般夥伴只看得到、只能填自己負責的店，付款只能選零用金或營收現金。管理者可以看全部店點、營業分析、薪資、百貨對帳，也能完成現金結算。</p>
-    <div class="adm-people">${people().map(p=>`<div class="adm-p"><i>${esc(p.name.slice(0,1))}</i><b>${esc(p.name)}</b>${p.name===BOSS?'<small>老闆</small>':p.boss?`<small>老闆</small>${p.name===W.name?'':`<button class="chip" data-staffboss="${esc(p.name)}">${A.confirmBoss===p.name?'確定取消老闆？':'取消老闆'}</button>`}`:`<button class="chip" data-staffboss="${esc(p.name)}">${A.confirmBoss===p.name?'確定設為老闆？':'設為老闆'}</button><span class="adm-br">${p.mgr?'<small>全部店點</small>':BR.map(b=>{const on=(p.branches||[]).includes(b);return `<button class="chip br-chip ${on?'on':''}" style="--bc:var(${B[b].color})" data-staffbr="${esc(p.name)}|${b}">${on?'✓ ':''}${esc(B[b].short)}</button>`;}).join('')}${!p.mgr&&!(p.branches||[]).length?'<em class="adm-warn">還沒指定店</em>':''}</span><button class="chip ${p.mgr?'on':''}" data-staffmgr="${esc(p.name)}">${p.mgr?'✓ 管理者':'設為管理者'}</button><button class="chip" data-pwreset="${esc(p.name)}">重設密碼</button><button class="chip danger" data-staffdel="${esc(p.name)}">${A.confirmDel===p.name?'確定移除？':'移除'}</button>`}</div>`).join('')}</div>
+    <div class="adm-people">${people().map(p=>`<div class="adm-p"><i>${esc(p.name.slice(0,1))}</i><b>${esc(p.name)}</b>${p.name===BOSS?'<small>老闆</small>':p.boss?`<small>老闆</small>${p.name===W.name?'':`<button class="chip" data-staffboss="${esc(p.name)}">${A.confirmBoss===p.name?'確定取消老闆？':'取消老闆'}</button>`}`:`<button class="chip" data-staffboss="${esc(p.name)}">${A.confirmBoss===p.name?'確定設為老闆？':'設為老闆'}</button><span class="adm-br">${p.mgr?'<small>全部店點</small>':BR.map(b=>{const on=(p.branches||[]).includes(b);return `<button class="chip br-chip ${on?'on':''}" style="--bc:var(${B[b].color})" data-staffbr="${esc(p.name)}|${b}">${on?'✓ ':''}${esc(B[b].short)}</button>`;}).join('')}${!p.mgr&&!(p.branches||[]).length?'<em class="adm-warn">還沒指定店</em>':''}</span><button class="chip ${p.mgr?'on':''}" data-staffmgr="${esc(p.name)}">${p.mgr?'✓ 管理者':'設為管理者'}</button><button class="chip ${p.stock?'on':''}" data-staffstock="${esc(p.name)}">${p.stock?'✓ 選品盤點':'選品盤點'}</button><button class="chip" data-pwreset="${esc(p.name)}">重設密碼</button><button class="chip danger" data-staffdel="${esc(p.name)}">${A.confirmDel===p.name?'確定移除？':'移除'}</button>`}</div>`).join('')}</div>
     <form class="lg-add" id="staffForm"><input id="staffNew" maxlength="12" placeholder="新增夥伴名字" autocomplete="off"><button class="btn primary" type="submit">新增夥伴</button></form>
     <div class="adm-data"><label class="btn">匯入備份資料<input type="file" accept="application/json,.json" id="impFile" hidden></label><button class="btn" data-export="1">下載備份</button><span class="hint" id="impMsg">${esc(IMP.msg||'建議每個月下載一次備份')}</span></div>
   </section>`;
@@ -2270,7 +2286,8 @@ const payOfE=e=>PAYS.find(p=>p!=='其他'&&(e.note||'').split('・').includes(p)
 const spVisible=e=>isMgr()||STAFF_PAYS.includes(payOfE(e));
 const pettyOf=b=>+cfg().petty[b]||0;
 const pettyUsed=(b)=>sum(pettyPending(b).map(e=>+e.amt||0));
-const pettyLeft=(b)=>pettyOf(b)-pettyUsed(b);
+const pettyStart=b=>{ const l=lastSettle(b,'petty'); return l&&l.after!=null?+l.after:pettyOf(b); };
+const pettyLeft=(b)=>pettyStart(b)-pettyUsed(b);
 const spYM=day=>[+day.slice(0,4),+day.slice(5,7)];
 const spAll=(b,day)=>{const [y,m]=spYM(day);return listOfRaw(b,m,'exp',y);};
 const spList=(b,day)=>spAll(b,day).filter(e=>e.date===day&&spVisible(e));
@@ -2283,6 +2300,7 @@ const ICON={
   dept:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5M9 11h.01M15 11h.01"/></svg>',
   claim:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l3 3v15H4V3z"/><path d="M8 9h8M8 13h8M8 17h4M15 17l1.5 1.5L19 16"/></svg>',
   plan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>',
+  stock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/></svg>',
   cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>'
 };
 function homeStatsHTML(today){
@@ -2322,14 +2340,15 @@ function renderHome(){
     ${healthHTML()}
     ${homeStatsHTML(today)}
     <div class="hcards">
-      ${card('daily','每日結帳','營業額、交易筆數、收款方式',liveBR().map(dRow).join(''),'選擇店點結帳')}
       ${card('plan','交辦與目標','明天交辦・本週目標與業績',planHomeRows(),'打開交辦')}
+      ${card('daily','每日結帳','營業額、交易筆數、收款方式',liveBR().map(dRow).join(''),'選擇店點結帳')}
       ${card('spend','當日支出','零用金、食材、雜支',liveBR().map(sRow).join(''),'選擇店點記支出')}
+      ${canStock()?card('stock','選品盤點','品牌・商品・入庫售出・盤點',stockHomeRows(),'開始盤點'):''}
+      ${card('cash',isMgr()?'現金結算':'零用金結算',isMgr()?'營收現金・零用金清點':'查看零用金餘額',liveBR().filter(b=>!isCtr(b)||pettyOf(b)).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${isCtr(b)||!isMgr()?'':`現金 ${l?md(l.date):'未結'}・`}${isMgr()?`零用金 ${p?md(p.date):'未結'}`:`零用金剩 ${fmt(pettyLeft(b))}`}`);}).join(''),isMgr()?'開始結算':'查看結算')}
       ${isMgr()?card('ledger','營業分析','每月收支・人事・百貨櫃位',BR.filter(b=>ctrLive(b)||has(b,m)).map(lRow).join(''),'打開營業分析'):''}
       ${isMgr()?card('dept','百貨對帳',`${liveC.length?liveC.map(b=>esc(B[b].short)).join('、'):'目前沒有營業中的櫃位'}・抽成與撥款`,`<li><i style="background:var(--dp)"></i>本月<span>業績 ${fmt(dc.sales)}</span></li><li><i style="background:var(--rule)"></i>上月<span>${pdc.received==null?(pdc.sales?`應撥 ${fmt(pdc.due)}・未入帳`:'沒有紀錄'):`已入帳 ${fmt(pdc.received)}`}</span></li>`,'打開對帳'):''}
       ${isMgr()?card('payroll','薪資','三點人員薪資、業績獎金、薪資單',payLi(pdp,`${+ppm.slice(5)} 月`)+payLi(pd,`${+ym.slice(5)} 月`),'開始計算'):''}
       ${isMgr()?(()=>{ const used=claimedSet(), mine=advAll().filter(x=>x.e.adv===W.name&&!used.has(advKey(x.k,x.e.id))), un=claimsList().filter(c=>c.who===W.name&&!c.paidDate); return card('claim','代墊請款','先幫公司付的錢・彙整請款',`<li><i style="background:var(--accent)"></i>還沒請款<span>${mine.length} 筆・${fmt(sum(mine.map(x=>+x.e.amt||0)))} 元</span></li><li><i style="background:var(--rule)"></i>等公司撥款<span>${un.length} 張・${fmt(sum(un.map(c=>c.total)))} 元</span></li>`,'打開請款'); })():''}
-      ${card('cash',isMgr()?'現金結算':'零用金',isMgr()?'營收現金・零用金清點':'查看零用金餘額',liveBR().filter(b=>!isCtr(b)||pettyOf(b)).map(b=>{const l=lastSettle(b,'cash'),p=lastSettle(b,'petty');return li(b,`${isCtr(b)||!isMgr()?'':`現金 ${l?md(l.date):'未結'}・`}${isMgr()?`零用金 ${p?md(p.date):'未結'}`:`零用金剩 ${fmt(pettyLeft(b))}`}`);}).join(''),isMgr()?'開始結算':'查看結算')}
     </div>
     ${todoHomeHTML()}
     ${accountHTML()}
@@ -2352,7 +2371,7 @@ const fxList=b=>((((S.misc||{}).fixedexp)||{})[b])||[];
 function fxDone(b,day,id){ return spAll(b,day).find(e=>e.fixed===id); }
 function fixedHTML(b,day){
   const can=isMgr(), [y,m]=spYM(day), list=fxList(b), last=new Date(y,m,0).getDate();
-  if(!list.length&&!can) return '';
+  if(!can) return '';
   if(FX.edit&&can){ const dl=FX.draft;
     return `<div class="panel fx" id="fxPanel"><div class="ph"><h2>設定每月固定支出</h2><span class="hint">${esc(bfull(b))}</span></div>
       <div class="fx-ed">${dl.map((x,i)=>`<div class="fx-er">
@@ -2510,7 +2529,7 @@ function bindSpend(){
   main.addEventListener('submit',ev=>{ if(S.mode==='spend'){ev.preventDefault();ev.stopImmediatePropagation();} },true);
   main.addEventListener('click',ev=>{
     const t=ev.target.closest('button'); if(!t) return;
-    if((S.mode==='home'||S.mode==='ledger')&&t.dataset.home){ const k=t.dataset.home; if(['ledger','cash','payroll','dept','claim','plan'].includes(k)){S.mode=k;saveUI();render();scrollTo({top:0});} else openPick(k); return; }
+    if((S.mode==='home'||S.mode==='ledger')&&t.dataset.home){ const k=t.dataset.home; if(['ledger','cash','payroll','dept','claim','plan','stock'].includes(k)){S.mode=k;saveUI();render();scrollTo({top:0});} else openPick(k); return; }
     if(S.mode!=='spend') return;
     if(t.dataset.sback) openPick('spend');
     else if(t.dataset.sshift) setSpendDay(addDays(SP.day,+t.dataset.sshift));
@@ -2583,21 +2602,21 @@ function cashCard(b){
   </section>`;
 }
 function pettyCard(b){
-  const q=pettyOf(b), l=lastSettle(b,'petty'), list=pettyPending(b), used=sum(list.map(e=>+e.amt||0)), should=q-used;
+  const q=pettyOf(b), l=lastSettle(b,'petty'), st=pettyStart(b), list=pettyPending(b), used=sum(list.map(e=>+e.amt||0)), should=st-used;
   const dr=C.draft.petty[b]||{}, counted=dr.counted===undefined||dr.counted===''?null:+dr.counted;
-  const diff=counted==null?null:counted-should, refill=counted==null?q-should:q-counted, can=isMgr();
+  const diff=counted==null?null:counted-should, refill=dr.refill!==undefined&&dr.refill!==''?+dr.refill:(counted==null?q-should:q-counted), can=isMgr();
   return `<section class="cs-card">
-    <div class="cs-h"><span class="cs-ic g">${ICON.spend}</span><div><h3>零用金結帳</h3><p class="hint">額度 ${fmt(q)} 元・${l?`上次結算到 ${md(l.date)}（${esc(l.by||'')}）並補滿`:`尚未結帳過，從 ${md(monthStart())} 起算`}</p></div></div>
+    <div class="cs-h"><span class="cs-ic g">${ICON.spend}</span><div><h3>零用金結帳</h3><p class="hint">額度 ${fmt(q)} 元・${l?`上次結算到 ${md(l.date)}（${esc(l.by||'')}），結算後餘額 ${fmt(st)} 元`:`尚未結帳過，從 ${md(monthStart())} 起算`}</p></div></div>
     ${csUntilHTML('petty',b)}
     <div class="cs-list">${list.length?list.map(e=>`<div class="cs-li"><span>${md(e.date)} ${esc(e.item)}<small>${esc(e.cat)}${e.by?'・'+esc(e.by):''}</small></span>${e.receipt?`<a class="cs-r" href="${rcptURL(e.receipt)}" target="_blank" rel="noopener">收據</a>`:'<em class="cs-nr">無收據</em>'}<b class="num">${fmt(+e.amt||0)}</b></div>`).join(''):'<div class="cs-li empty"><span>上次結帳後沒有零用金支出</span></div>'}
       <div class="cs-li tot"><span>已用 ${fmt(used)}・應剩</span><b class="num">${fmt(should)}</b></div></div>
     <div class="cs-form"${can?'':' hidden'}>
       <label class="dfield"><span class="fl">實點零用金</span><span class="din"><input data-cs="petty" data-b="${b}" data-k="counted" id="cs-${b}-petty-counted" type="number" inputmode="numeric" value="${esc(dr.counted??'')}" placeholder="${should}">${PM}<small>元</small></span></label>
-      <label class="dfield"><span class="fl">補回金額</span><span class="din ro"><input id="cs-${b}-petty-refill" readonly tabindex="-1" value="${refill}"><small>元</small></span></label>
+      <label class="dfield"><span class="fl">補回金額<em>這次沒有補錢就填 0</em></span><span class="din"><input data-cs="petty" data-b="${b}" data-k="refill" id="cs-${b}-petty-refill" type="number" inputmode="numeric" value="${esc(dr.refill??refill)}"><small>元</small></span></label>
       <label class="dfield wide"><span class="fl">備註</span><input class="tin" data-cs="petty" data-b="${b}" data-k="note" id="cs-${b}-petty-note" maxlength="60" value="${esc(dr.note??'')}" placeholder="可不填"></label>
     </div>
-    <div class="cs-res num" id="csr-${b}-petty"${can?'':' hidden'}>${counted==null?'<span class="hint">填入實點零用金後會自動對帳</span>':`<span class="${diff===0?'ok':'bad'}">${diff===0?'✓ 零用金相符':`零用金${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元`}</span><span>補回 ${fmt(refill)} 元到 ${fmt(q)}</span>`}</div>
-    ${can?`<button class="btn primary cs-go" data-csave="petty" data-b="${b}">完成零用金結帳並補滿</button>`:`<p class="cs-lock">🔒 只有老闆和管理者可以完成清點結算</p>`}
+    <div class="cs-res num" id="csr-${b}-petty"${can?'':' hidden'}>${counted==null?'<span class="hint">填入實點零用金後會自動對帳</span>':`<span class="${diff===0?'ok':'bad'}">${diff===0?'✓ 零用金相符':`零用金${diff>0?'多':'少'} ${fmt(Math.abs(diff))} 元`}</span><span>補回 ${fmt(refill)} 元，結算後餘額 ${fmt(counted+refill)} 元</span>`}</div>
+    ${can?`<button class="btn primary cs-go" data-csave="petty" data-b="${b}">完成零用金結帳</button>`:`<p class="cs-lock">🔒 只有老闆和管理者可以完成清點結算</p>`}
   </section>`;
 }
 function historyHTML(b){
@@ -2635,8 +2654,8 @@ async function saveSettle(type,b){
   if(type==='cash'){ const list=cashPending(b), xl=cashExpPending(b), expected=sum(list.map(r=>(+r.cash||0)-(+r.deposit||0)))-sum(xl.map(e=>+e.amt||0)), spent=sum(xl.map(e=>+e.amt||0)), deposit=Math.round(+dr.deposit||0);
     if(deposit>0&&counted>=0&&deposit>counted){toast('存入金額不能大於實點現金');return;}
     doc={branch:b,type,date,at,by:W.name,uid:W.uid||'',expected,counted,deposit,keep:0,spent,diff:counted-expected,note:(dr.note||'').trim(),covered:list.map(r=>r.id).concat(xl.map(e=>e.id))};
-  } else { const q=pettyOf(b), list=pettyPending(b), used=sum(list.map(e=>+e.amt||0)), expected=q-used;
-    doc={branch:b,type,date,at,by:W.name,uid:W.uid||'',limit:q,used,expected,counted,refill:q-counted,diff:counted-expected,note:(dr.note||'').trim(),covered:list.map(e=>e.id)}; }
+  } else { const q=pettyOf(b), list=pettyPending(b), used=sum(list.map(e=>+e.amt||0)), expected=pettyStart(b)-used, refill=dr.refill!==undefined&&dr.refill!==''?Math.round(+dr.refill):q-counted;
+    doc={branch:b,type,date,at,by:W.name,uid:W.uid||'',limit:q,used,expected,counted,refill,after:counted+refill,diff:counted-expected,note:(dr.note||'').trim(),covered:list.map(e=>e.id)}; }
   const id=`${b}-${type}-${Date.now()}`;
   try{ await S.db.doc('settle/'+id).set(doc); S.settle={...S.settle,[id]:doc}; C.draft[type][b]={}; drawCash(); toast(`${bshort(b)}${type==='cash'?'營收現金':'零用金'}結帳完成${doc.diff?`（${doc.diff>0?'多':'少'} ${fmt(Math.abs(doc.diff))} 元）`:''}`); }
   catch(e){ toast('儲存失敗，請稍後再試'); }
@@ -2837,6 +2856,8 @@ function healthItems(){
       if(need.length&&late) out.push({b,ym,kind:'company',text:`${+ym.slice(5)} 月還沒記：${need.join('、')}`,who:payerOf(b)});
     }
   }
+  { const pe=addDays(today.slice(0,8)+'01',-1);
+    for(const b of BR){ if(isCtr(b)||!pettyOf(b)||!(liveBR().includes(b))) continue; const l=lastSettle(b,'petty'); if(!l||l.date<pe) out.push({b,ym:pe.slice(0,7),kind:'company',text:`${+pe.slice(5,7)} 月底還沒點零用金（額度 ${fmt(pettyOf(b))}）`,who:payerOf(b)}); } }
   return out;
 }
 function healthHTML(){
@@ -2936,11 +2957,175 @@ function bindPlan(){
   });
 }
 
+/* ---------- 選品盤點：寄售／買斷選品的品牌、商品、入庫售出、盤點 ---------- */
+const ST={b:null, tab:'items', brand:'', q:'', act:null, actN:'', form:null, bForm:null, take:null, takeBrand:'', ym:null, confirm:null};
+const canStock=()=>isMgr()||!!((personOf(W.name)||{}).stock);
+const stId=b=>`${b}-stock`, mvId=(b,ym)=>`${b}-stockmv-${ym}`;
+const stAll=()=>({...(S.allDaily||{}),...(D.docs||{})});
+const stDoc=b=>stAll()[stId(b)]||{branch:b,kind:'stock',brands:[],items:[],takes:[]};
+const stMoves=(b,ym)=>((stAll()[mvId(b,ym)]||{}).list)||[];
+const stBrand=(b,id)=>(stDoc(b).brands||[]).find(x=>x.id===id)||{name:'（未填品牌）'};
+const stBrs=()=>liveBR().filter(b=>!isCtr(b));
+async function stSave(b,patch,msg){
+  if(!S.db){ toast('資料庫沒有連線'); return false; }
+  const id=stId(b), cur=stDoc(b), data={...cur,...patch,branch:b,kind:'stock',updatedAt:new Date().toISOString()};
+  try{ await S.db.doc('daily/'+id).set(data); S.allDaily={...(S.allDaily||{}),[id]:data}; if(msg) toast(msg); drawStock(); return true; }
+  catch(e){ toast(e&&e.code==='permission-denied'?'你沒有這間店的權限':'儲存失敗，請稍後再試'); return false; }
+}
+async function stAddMoves(b,mv){
+  const ym=todayStr().slice(0,7), id=mvId(b,ym), cur=stAll()[id]||{branch:b,kind:'stockmv',month:'',list:[]};
+  const data={branch:b,kind:'stockmv',list:(cur.list||[]).concat(mv)};
+  await S.db.doc('daily/'+id).set(data); S.allDaily={...(S.allDaily||{}),[id]:data};
+}
+const MVN={in:'入庫',sell:'售出',ret:'退回店家',adj:'盤點調整'};
+async function stMove(b,itemId,type,n,note){
+  const d=stDoc(b), it=(d.items||[]).find(x=>x.id===itemId); if(!it) return;
+  n=Math.round(+n||0); if(n<=0){ toast('請填數量'); return; }
+  const delta=type==='in'?n:-n; if(it.qty+delta<0){ toast(`庫存只剩 ${it.qty}，不能${MVN[type]} ${n}`); return; }
+  try{ await stAddMoves(b,[{id:uid(),date:todayStr(),at:new Date().toISOString(),by:W.name||'',itemId,name:it.name,brandId:it.brandId,type,n,price:+it.price||0,note:note||''}]); }
+  catch(e){ toast('沒有存到，請再試一次'); return; }
+  const items=d.items.map(x=>x.id===itemId?{...x,qty:x.qty+delta}:x);
+  ST.act=null; ST.actN=''; await stSave(b,{items},`${it.name} ${MVN[type]} ${n}，剩 ${it.qty+delta}`);
+}
+function stItemsHTML(b){
+  const d=stDoc(b), brs=d.brands||[], q=ST.q.trim();
+  let items=(d.items||[]).filter(x=>!x.off&&(!ST.brand||x.brandId===ST.brand)&&(!q||(x.name+(x.code||'')+stBrand(b,x.brandId).name).includes(q)));
+  items=items.sort((a,c)=>stBrand(b,a.brandId).name.localeCompare(stBrand(b,c.brandId).name)||a.name.localeCompare(c.name));
+  const tot=sum(items.map(x=>x.qty)), low=items.filter(x=>+x.safe&&x.qty<=+x.safe).length;
+  const f=ST.form;
+  const formHTML=f?`<div class="st-form"><h3>${f.id?'編輯商品':'新增商品'}</h3>
+      <label>品牌<select class="tin" data-stf="brandId">${brs.map(x=>`<option value="${x.id}" ${x.id===f.brandId?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+      <label>商品名稱<input class="tin" data-stf="name" value="${esc(f.name||'')}" maxlength="40"></label>
+      <label>編號（選填）<input class="tin" data-stf="code" value="${esc(f.code||'')}" maxlength="20"></label>
+      <label>售價<span class="din"><input type="number" inputmode="numeric" data-stf="price" value="${esc(f.price??'')}"><small>元</small></span></label>
+      <label>${f.id?'目前數量（改這裡等於盤點調整）':'期初數量'}<span class="din"><input type="number" inputmode="numeric" data-stf="qty" value="${esc(f.qty??'')}"><small>件</small></span></label>
+      <label>安全庫存（剩這個數量以下提醒）<span class="din"><input type="number" inputmode="numeric" data-stf="safe" value="${esc(f.safe??'')}"><small>件</small></span></label>
+      <div class="st-fa">${f.id?`<button class="btn ${ST.confirm==='del'+f.id?'danger':''}" data-stidel="${f.id}">${ST.confirm==='del'+f.id?'確定下架？':'下架這個商品'}</button>`:''}<span class="sp"></span><button class="btn" data-stfx="1">取消</button><button class="btn primary" data-stfsave="1">儲存</button></div></div>`:'';
+  return `<div class="panel"><div class="ph"><h2>選品商品</h2><span class="hint num">${items.length} 項・共 ${fmt(tot)} 件${low?`・<b class="neg">${low} 項低庫存</b>`:''}</span>${brs.length?`<button class="btn primary" data-stnew="1">＋ 新增商品</button>`:''}</div>
+    ${brs.length?`<div class="chips st-bf"><button class="chip ${!ST.brand?'on':''}" data-stbf="">全部</button>${brs.map(x=>`<button class="chip ${ST.brand===x.id?'on':''}" data-stbf="${x.id}">${esc(x.name)}</button>`).join('')}</div>
+    <input class="tin st-q" id="stQ" value="${esc(ST.q)}" placeholder="搜尋商品、編號或品牌">`:'<p class="emptyb">還沒有品牌。先到「品牌」新增品牌名稱，再回來新增商品。</p>'}
+    ${formHTML}
+    ${items.length?`<ul class="st-l">${items.map(x=>{ const lowc=+x.safe&&x.qty<=+x.safe, a=ST.act&&ST.act.id===x.id?ST.act.type:null;
+      return `<li class="st-r ${lowc?'low':''}"><div class="st-m"><b>${esc(x.name)}</b><small>${esc(stBrand(b,x.brandId).name)}${x.code?`・${esc(x.code)}`:''}${x.price?`・${fmt(x.price)} 元`:''}</small></div>
+        <div class="st-q2 num"><b>${fmt(x.qty)}</b><small>${lowc?'低庫存':'件'}</small></div>
+        <div class="st-a">${a?`<span class="din"><input type="number" inputmode="numeric" id="stActN" value="${esc(ST.actN)}" placeholder="數量"><small>件</small></span><button class="btn primary" data-stgo="1">確定${MVN[a]}</button><button class="btn" data-stax="1">取消</button>`
+          :`<button class="btn" data-stact="${x.id}|sell">售出</button><button class="btn" data-stact="${x.id}|in">入庫</button><button class="btn" data-stact="${x.id}|ret">退回</button><button class="ibtn" data-stedit="${x.id}">編輯</button>`}</div></li>`; }).join('')}</ul>`:(brs.length?'<p class="hint">沒有符合的商品。</p>':'')}</div>`;
+}
+function stBrandsHTML(b){
+  const d=stDoc(b), brs=d.brands||[], f=ST.bForm;
+  return `<div class="panel"><div class="ph"><h2>品牌</h2><span class="hint">${brs.length} 個品牌</span><button class="btn primary" data-stbnew="1">＋ 新增品牌</button></div>
+    ${f?`<div class="st-form"><h3>${f.id?'編輯品牌':'新增品牌'}</h3>
+      <label>品牌名稱<input class="tin" data-stb="name" value="${esc(f.name||'')}" maxlength="30" placeholder="例：二五八茶莊"></label>
+      <label>合作方式<select class="tin" data-stb="type">${['寄售','買斷'].map(t=>`<option ${t===(f.type||'寄售')?'selected':''}>${t}</option>`).join('')}</select></label>
+      ${(f.type||'寄售')==='寄售'?`<label>我們抽成<span class="din"><input type="number" inputmode="numeric" data-stb="rate" value="${esc(f.rate??'')}" placeholder="例：30"><small>%</small></span></label>`:''}
+      <label class="wide">備註<input class="tin" data-stb="note" value="${esc(f.note||'')}" maxlength="60" placeholder="例：每月 5 號對帳、聯絡人"></label>
+      <div class="st-fa">${f.id?`<button class="btn ${ST.confirm==='bdel'+f.id?'danger':''}" data-stbdel="${f.id}">${ST.confirm==='bdel'+f.id?'確定刪除？':'刪除品牌'}</button>`:''}<span class="sp"></span><button class="btn" data-stbx="1">取消</button><button class="btn primary" data-stbsave="1">儲存</button></div></div>`:''}
+    ${brs.length?`<ul class="st-l">${brs.map(x=>{ const n=(d.items||[]).filter(i=>i.brandId===x.id&&!i.off); return `<li class="st-r"><div class="st-m"><b>${esc(x.name)}</b><small>${esc(x.type||'寄售')}${(x.type||'寄售')==='寄售'&&x.rate?`・抽成 ${x.rate}%`:''}${x.note?`・${esc(x.note)}`:''}</small></div><div class="st-q2 num"><b>${n.length}</b><small>項商品</small></div><div class="st-a"><button class="ibtn" data-stbedit="${x.id}">編輯</button></div></li>`; }).join('')}</ul>`:'<p class="hint">還沒有品牌，按「＋ 新增品牌」開始。</p>'}</div>`;
+}
+function stTakeHTML(b){
+  const d=stDoc(b), brs=d.brands||[], tk=ST.take;
+  if(tk){ const items=(d.items||[]).filter(x=>!x.off&&(!tk.brandId||x.brandId===tk.brandId));
+    const diffs=items.filter(x=>tk.act[x.id]!==undefined&&tk.act[x.id]!==''&&+tk.act[x.id]!==x.qty);
+    return `<div class="panel"><div class="ph"><h2>盤點：${esc(tk.brandId?stBrand(b,tk.brandId).name:'全部品牌')}</h2><span class="hint">數量跟系統一樣可以留空，不一樣才填實際數量</span></div>
+      <ul class="st-l">${items.map(x=>{ const v=tk.act[x.id]??'', df=v===''?0:+v-x.qty; return `<li class="st-r ${df?'diff':''}"><div class="st-m"><b>${esc(x.name)}</b><small>${esc(stBrand(b,x.brandId).name)}</small></div><div class="st-q2 num"><small>系統</small><b>${fmt(x.qty)}</b></div><div class="st-a"><span class="din"><input type="number" inputmode="numeric" data-sttk="${x.id}" value="${esc(v)}" placeholder="${x.qty}"><small>件</small></span>${df?`<em class="num ${df<0?'neg':'pos'}">${df>0?'+':''}${df}</em>`:''}</div></li>`; }).join('')}</ul>
+      <div class="st-fa"><button class="btn" data-sttx="1">取消盤點</button><span class="sp"></span><span class="hint">${diffs.length?`${diffs.length} 項有差異`:'目前全部相符'}</span><button class="btn primary" data-stfin="1">完成盤點</button></div></div>`; }
+  const hist=(d.takes||[]).slice().reverse().slice(0,20);
+  return `<div class="panel"><div class="ph"><h2>盤點</h2><span class="hint">清點實際數量，一次更新庫存</span></div>
+    ${brs.length?`<div class="st-fa"><select class="tin" id="stTB"><option value="">全部品牌</option>${brs.map(x=>`<option value="${x.id}" ${ST.takeBrand===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><button class="btn primary" data-stbegin="1">開始盤點</button></div>`:'<p class="hint">先新增品牌和商品才能盤點。</p>'}
+    ${hist.length?`<h3 class="st-h3">盤點紀錄</h3><ul class="st-l">${hist.map(h=>`<li class="st-r"><div class="st-m"><b>${md(h.date)} ${esc(h.brandName||'全部品牌')}</b><small>${esc(h.by||'')}・${h.count} 項${h.diffs.length?`・${h.diffs.map(x=>`${esc(x.name)} ${x.sys}→${x.act}`).join('、')}`:''}</small></div><div class="st-q2"><b class="${h.diffs.length?'neg':'pos'}">${h.diffs.length?`${h.diffs.length} 項差異`:'全部相符'}</b></div><div></div></li>`).join('')}</ul>`:''}</div>`;
+}
+function stLogHTML(b){
+  const ym=ST.ym||todayStr().slice(0,7), l=stMoves(b,ym).slice().reverse();
+  return `<div class="panel"><div class="ph"><h2>${+ym.slice(5)} 月紀錄</h2><span class="dnav"><button class="btn" data-stym="-1">‹</button><button class="btn" data-stym="1">›</button></span></div>
+    ${l.length?`<ul class="st-l">${l.map(m=>`<li class="st-r ${m.void?'void':''}"><div class="st-m"><b>${MVN[m.type]} ${esc(m.name)} ${m.type==='adj'?(m.n>0?'+':'')+m.n:'×'+m.n}</b><small>${md(m.date)}・${esc(stBrand(b,m.brandId).name)}・${esc(m.by||'')}${m.note?`・${esc(m.note)}`:''}${m.void?'・已作廢':''}</small></div><div></div><div class="st-a">${m.type==='sell'&&!m.void&&(isMgr()||m.by===W.name)&&ym===todayStr().slice(0,7)?`<button class="ibtn ${ST.confirm==='v'+m.id?'danger':''}" data-stvoid="${m.id}">${ST.confirm==='v'+m.id?'確定作廢？':'作廢'}</button>`:''}</div></li>`).join('')}</ul>`:'<p class="hint">這個月還沒有紀錄。</p>'}</div>`;
+}
+function stSettleHTML(b){
+  if(!isMgr()) return '';
+  const ym=ST.ym||todayStr().slice(0,7), l=stMoves(b,ym).filter(m=>m.type==='sell'&&!m.void), brs=stDoc(b).brands||[];
+  const rows=brs.map(x=>{ const s=l.filter(m=>m.brandId===x.id), n=sum(s.map(m=>m.n)), amt=sum(s.map(m=>m.n*m.price)); return {x,n,amt,pay:(x.type||'寄售')==='寄售'?Math.round(amt*(1-(+x.rate||0)/100)):0}; }).filter(r=>r.n);
+  return `<div class="panel"><div class="ph"><h2>${+ym.slice(5)} 月選品結算</h2><span class="hint">只有老闆看得到</span></div>
+    ${rows.length?`<table class="dtab"><thead><tr><th>品牌</th><th>售出</th><th>銷售額</th><th>付給店家</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.x.name)}<small class="hint"> ${esc(r.x.type||'寄售')}${r.x.rate?` ${r.x.rate}%`:''}</small></td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.amt)}</td><td class="num">${(r.x.type||'寄售')==='寄售'?fmt(r.pay):'買斷'}</td></tr>`).join('')}<tr class="net"><td>合計</td><td class="num">${fmt(sum(rows.map(r=>r.n)))}</td><td class="num">${fmt(sum(rows.map(r=>r.amt)))}</td><td class="num">${fmt(sum(rows.map(r=>r.pay)))}</td></tr></tbody></table>`:'<p class="hint">這個月還沒有售出。</p>'}</div>`;
+}
+function drawStock(){
+  if(!W.name){ renderLogin(); return; }
+  if(S.mode!=='stock') return;
+  if(!canStock()){ S.mode='home'; renderHome(); return; }
+  const bs=stBrs(); if(!bs.length){ $('#main').innerHTML=`<div class="panel emptyb">你還沒有被指定負責的店。</div>`; return; }
+  if(!bs.includes(ST.b)) ST.b=bs[0]; const b=ST.b;
+  const tabs=[['items','商品'],['take','盤點'],['log','紀錄'],['brands','品牌']].concat(isMgr()?[['settle','結算']]:[]);
+  const a=document.activeElement, fid=a&&a.id&&$('#main').contains(a)?a.id:null;
+  $('#main').innerHTML=`<div class="sheet-top" style="--bc:var(${B[b].color})"><div class="st-l"><div><div class="st-name">選品盤點 <small>${esc(bfull(b))}</small></div><div class="st-state">寄售・買斷選品庫存</div></div></div>
+      <div class="seg cs-seg"${bs.length>1?'':' hidden'}>${bs.map(x=>`<button data-stb2="${x}" aria-pressed="${x===b}"><i class="sw" style="background:var(${B[x].color})"></i>${esc(B[x].short)}</button>`).join('')}</div></div>
+    <div class="seg st-tabs">${tabs.map(([k,l])=>`<button data-sttab="${k}" aria-pressed="${ST.tab===k}">${l}</button>`).join('')}</div>
+    ${ST.tab==='items'?stItemsHTML(b):ST.tab==='take'?stTakeHTML(b):ST.tab==='log'?stLogHTML(b):ST.tab==='brands'?stBrandsHTML(b):stSettleHTML(b)}`;
+  if(fid){ const e=document.getElementById(fid); if(e){ e.focus({preventScroll:true}); if(e.setSelectionRange&&e.type==='text'){ const n=e.value.length; e.setSelectionRange(n,n);} } }
+}
+function bindStock(){
+  const main=$('#main');
+  main.addEventListener('input',ev=>{ if(S.mode!=='stock') return; const t=ev.target;
+    if(t.id==='stQ'){ ST.q=t.value; drawStock(); }
+    else if(t.id==='stActN') ST.actN=t.value;
+    else if(t.dataset.stf&&ST.form) ST.form[t.dataset.stf]=t.value;
+    else if(t.dataset.stb&&ST.bForm){ ST.bForm[t.dataset.stb]=t.value; }
+    else if(t.dataset.sttk&&ST.take){ ST.take.act[t.dataset.sttk]=t.value; } });
+  main.addEventListener('change',ev=>{ if(S.mode!=='stock') return; const t=ev.target;
+    if(t.dataset.stb==='type'&&ST.bForm){ ST.bForm.type=t.value; drawStock(); }
+    else if(t.dataset.stf==='brandId'&&ST.form) ST.form.brandId=t.value;
+    else if(t.id==='stTB') ST.takeBrand=t.value;
+    else if(t.dataset.sttk&&ST.take){ const it=(stDoc(ST.b).items||[]).find(x=>x.id===t.dataset.sttk), li=t.closest('.st-r'); if(it&&li){ const v=t.value, df=v===''?0:+v-it.qty; li.classList.toggle('diff',!!df); let em=li.querySelector('.st-a em'); if(!em){ em=document.createElement('em'); li.querySelector('.st-a').appendChild(em); } em.className='num '+(df<0?'neg':'pos'); em.textContent=df?(df>0?'+':'')+df:''; } } });
+  main.addEventListener('keydown',ev=>{ if(S.mode!=='stock'||ev.key!=='Enter') return; if(ev.target.id==='stActN'){ ev.preventDefault(); const g=main.querySelector('[data-stgo]'); g&&g.click(); } });
+  main.addEventListener('click',async ev=>{ if(S.mode!=='stock') return; const t=ev.target.closest('button'); if(!t) return; const b=ST.b, d=stDoc(b);
+    if(t.dataset.stb2){ ST.b=t.dataset.stb2; ST.form=ST.bForm=ST.take=ST.act=null; drawStock(); }
+    else if(t.dataset.sttab){ ST.tab=t.dataset.sttab; ST.confirm=null; drawStock(); }
+    else if(t.dataset.stbf!==undefined){ ST.brand=t.dataset.stbf; drawStock(); }
+    else if(t.dataset.stact){ const [id,type]=t.dataset.stact.split('|'); ST.act={id,type}; ST.actN=type==='sell'?'1':''; drawStock(); const i=$('#stActN'); i&&(i.focus(),i.select()); }
+    else if(t.dataset.stax){ ST.act=null; drawStock(); }
+    else if(t.dataset.stgo){ if(ST.act) await stMove(b,ST.act.id,ST.act.type,ST.actN); }
+    else if(t.dataset.stnew){ ST.form={brandId:ST.brand||((d.brands||[])[0]||{}).id,name:'',code:'',price:'',qty:'',safe:''}; drawStock(); }
+    else if(t.dataset.stedit){ const it=(d.items||[]).find(x=>x.id===t.dataset.stedit); ST.form={...it}; drawStock(); scrollTo({top:0,behavior:'smooth'}); }
+    else if(t.dataset.stfx){ ST.form=null; drawStock(); }
+    else if(t.dataset.stfsave){ const f=ST.form; if(!(f.name||'').trim()){ toast('請填商品名稱'); return; } if(!f.brandId){ toast('請選品牌'); return; }
+      const it={id:f.id||uid(),brandId:f.brandId,name:f.name.trim(),code:(f.code||'').trim(),price:Math.round(+f.price||0),qty:Math.max(0,Math.round(+f.qty||0)),safe:Math.round(+f.safe||0)};
+      const old=(d.items||[]).find(x=>x.id===it.id);
+      if(old&&old.qty!==it.qty){ try{ await stAddMoves(b,[{id:uid(),date:todayStr(),at:new Date().toISOString(),by:W.name||'',itemId:it.id,name:it.name,brandId:it.brandId,type:'adj',n:it.qty-old.qty,price:it.price,note:`編輯時調整 ${old.qty}→${it.qty}`}]); }catch(e){} }
+      else if(!old&&it.qty){ try{ await stAddMoves(b,[{id:uid(),date:todayStr(),at:new Date().toISOString(),by:W.name||'',itemId:it.id,name:it.name,brandId:it.brandId,type:'in',n:it.qty,price:it.price,note:'期初數量'}]); }catch(e){} }
+      const items=old?d.items.map(x=>x.id===it.id?{...x,...it}:x):(d.items||[]).concat([it]);
+      if(await stSave(b,{items},old?`已儲存 ${it.name}`:`已新增 ${it.name}`)) { ST.form=null; drawStock(); } }
+    else if(t.dataset.stidel){ const id=t.dataset.stidel; if(ST.confirm!=='del'+id){ ST.confirm='del'+id; drawStock(); return; } ST.confirm=null; ST.form=null; await stSave(b,{items:d.items.map(x=>x.id===id?{...x,off:true}:x)},'已下架'); }
+    else if(t.dataset.stbnew){ ST.bForm={name:'',type:'寄售',rate:'',note:''}; drawStock(); const i=main.querySelector('[data-stb="name"]'); i&&i.focus(); }
+    else if(t.dataset.stbedit){ ST.bForm={...(d.brands||[]).find(x=>x.id===t.dataset.stbedit)}; drawStock(); }
+    else if(t.dataset.stbx){ ST.bForm=null; drawStock(); }
+    else if(t.dataset.stbsave){ const f=ST.bForm, name=(f.name||'').trim(); if(!name){ toast('請填品牌名稱'); return; }
+      if((d.brands||[]).some(x=>x.name===name&&x.id!==f.id)){ toast('已經有這個品牌名稱了'); return; }
+      const br={id:f.id||uid(),name,type:f.type||'寄售',rate:(f.type||'寄售')==='寄售'?Math.round(+f.rate||0):0,note:(f.note||'').trim(),by:f.by||W.name||''};
+      const brands=f.id?d.brands.map(x=>x.id===br.id?br:x):(d.brands||[]).concat([br]);
+      if(await stSave(b,{brands},f.id?`已儲存 ${name}`:`已新增品牌 ${name}`)){ ST.bForm=null; drawStock(); } }
+    else if(t.dataset.stbdel){ const id=t.dataset.stbdel; if((d.items||[]).some(x=>x.brandId===id&&!x.off)){ toast('這個品牌還有商品，請先下架商品'); return; } if(ST.confirm!=='bdel'+id){ ST.confirm='bdel'+id; drawStock(); return; } ST.confirm=null; ST.bForm=null; await stSave(b,{brands:d.brands.filter(x=>x.id!==id)},'已刪除品牌'); }
+    else if(t.dataset.stbegin){ ST.take={brandId:ST.takeBrand,act:{}}; drawStock(); }
+    else if(t.dataset.sttx){ ST.take=null; drawStock(); }
+    else if(t.dataset.stfin){ const tk=ST.take, items=(d.items||[]).filter(x=>!x.off&&(!tk.brandId||x.brandId===tk.brandId));
+      const diffs=items.filter(x=>tk.act[x.id]!==undefined&&tk.act[x.id]!==''&&+tk.act[x.id]!==x.qty).map(x=>({id:x.id,name:x.name,sys:x.qty,act:Math.max(0,Math.round(+tk.act[x.id]))}));
+      if(diffs.length){ try{ await stAddMoves(b,diffs.map(x=>({id:uid(),date:todayStr(),at:new Date().toISOString(),by:W.name||'',itemId:x.id,name:x.name,brandId:(items.find(i=>i.id===x.id)||{}).brandId,type:'adj',n:x.act-x.sys,price:0,note:`盤點 ${x.sys}→${x.act}`}))); }catch(e){ toast('沒有存到，請再試一次'); return; } }
+      const items2=d.items.map(x=>{ const df=diffs.find(y=>y.id===x.id); return df?{...x,qty:df.act}:x; });
+      const take={id:uid(),date:todayStr(),by:W.name||'',brandId:tk.brandId||'',brandName:tk.brandId?stBrand(b,tk.brandId).name:'',count:items.length,diffs};
+      if(await stSave(b,{items:items2,takes:(d.takes||[]).concat([take]).slice(-60)},diffs.length?`盤點完成，調整了 ${diffs.length} 項`:'盤點完成，全部相符')){ ST.take=null; drawStock(); } }
+    else if(t.dataset.stym){ const cur=ST.ym||todayStr().slice(0,7); ST.ym=ymShift(cur,+t.dataset.stym); drawStock(); }
+    else if(t.dataset.stvoid){ const id=t.dataset.stvoid; if(ST.confirm!=='v'+id){ ST.confirm='v'+id; drawStock(); return; } ST.confirm=null;
+      const ym=todayStr().slice(0,7), docId=mvId(b,ym), cur=stAll()[docId]; const m=(cur.list||[]).find(x=>x.id===id); if(!m) return;
+      const list=cur.list.map(x=>x.id===id?{...x,void:true,voidBy:W.name||''}:x); await S.db.doc('daily/'+docId).set({...cur,list}); S.allDaily={...(S.allDaily||{}),[docId]:{...cur,list}};
+      await stSave(b,{items:d.items.map(x=>x.id===m.itemId?{...x,qty:x.qty+m.n}:x)},`已作廢，${m.name} 加回 ${m.n}`); }
+  });
+}
+function stockHomeRows(){ return stBrs().map(b=>{ const its=(stDoc(b).items||[]).filter(x=>!x.off), low=its.filter(x=>+x.safe&&x.qty<=+x.safe).length, lt=(stDoc(b).takes||[]).slice(-1)[0];
+  return `<li><i style="background:var(${B[b].color})"></i>${esc(B[b].short)}<span>${its.length} 項・${fmt(sum(its.map(x=>x.qty)))} 件${low?`・<b class="neg">${low} 項低庫存</b>`:''}・${lt?`上次盤點 ${md(lt.date)}`:'還沒盤點'}</span></li>`; }).join(''); }
+
 /* ---------- render & events ---------- */
 const MGR_MODES=['ledger','dept','payroll','claim'];
 function render(){
   document.querySelectorAll('#modeSeg button,#bnav button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
   document.querySelectorAll('#modeSeg button.mgr-only,#bnav button.mgr-only').forEach(b=>b.hidden=!(W.name&&isMgr()));
+  document.querySelectorAll('#modeSeg button.stock-only,#bnav button.stock-only').forEach(b=>b.hidden=!(W.name&&canStock()));
+  { const l=W.name&&!isMgr()?'零用金結算':'現金結算'; const a=$('#cashNavL'), c=$('#cashSegL'); if(a) a.textContent=l; if(c) c.textContent=l; }
   if(!W.name){ document.body.classList.add('locked'); ['#yearSeg','#branchSeg'].forEach(q=>$(q).hidden=true); document.querySelector('.controls2').hidden=true; renderLogin(); return; }
   document.body.classList.remove('locked');
   if(MGR_MODES.includes(S.mode)&&!isMgr()) S.mode='home';
@@ -2950,6 +3135,7 @@ function render(){
   if(S.mode==='payroll'){ drawPay(); return; }
   if(S.mode==='dept'){ drawDept(); return; }
   if(S.mode==='claim'){ drawClaim(); return; }
+  if(S.mode==='stock'){ if(!S.loaded){ $('#main').innerHTML=`<div class="panel emptyb">正在讀取…</div>`; return; } drawStock(); return; }
   if(S.mode==='plan'){ if(!S.loaded){ $('#main').innerHTML=`<div class="panel emptyb">正在讀取…</div>`; return; } drawPlan(); return; }
   if(S.mode==='cash'){ if(!S.loaded){ $('#main').innerHTML=`<div class="panel emptyb">正在讀取…</div>`; return; } drawCash(); return; }
   if(S.mode==='spend'){ if(!SP.branch){ S.mode='home'; return render(); } if(!S.loaded){ $('#main').innerHTML=`<div class="panel emptyb">正在讀取…</div>`; return; } drawSpend(); return; }
@@ -2979,7 +3165,7 @@ document.getElementById('reloadBtn')?.addEventListener('click',async()=>{
   try{ const r=await navigator.serviceWorker?.getRegistration(); await r?.update(); }catch(e){}
   location.reload();
 });
-bindDaily(); bindPay(); bindDept(); bindSpend(); bindClaim(); bindPlan(); bindHealth(); bindLogin(); bindCash(); renderWho();
+bindDaily(); bindPay(); bindDept(); bindSpend(); bindClaim(); bindPlan(); bindHealth(); bindStock(); bindLogin(); bindCash(); renderWho();
 
 $('#main').addEventListener('click',async ev=>{
   if(S.mode!=='ledger') return;
@@ -3059,7 +3245,7 @@ function showLoadErr(){ let el=$('#loadErr'); if(!el){ el=document.createElement
   el.innerHTML=S.loadErr?`⚠️ 讀取資料失敗（${esc(S.loadErr)}）。${S.loadErr==='permission-denied'?`這個帳號目前沒有讀取權限，請找老闆確認人員名單，或登出後重新登入。`:'請檢查網路後重新整理頁面。'} <button class="btn" onclick="location.reload()">重新整理</button>`:''; el.hidden=!S.loadErr; }
 function stopData(){ FB.unsubs.forEach(u=>{try{u()}catch(e){}}); FB.unsubs=[]; if(D.unsub){try{D.unsub()}catch(e){}} D.unsub=null; D.subMonth=null; if(C.unsub){try{C.unsub()}catch(e){}} C.unsub=null; C.subB=null;
   S.db=null; S.docs={}; S.allDaily={}; S.loadErr=null; showLoadErr(); S.misc={}; S.settle={}; S.payroll={}; S.dept={}; D.docs={}; C.daily={}; S.loaded=false; FB.dataOn=false; FB.mgrOn=false; }
-function redrawFor(kinds){ if(kinds.includes(S.mode)){ if(S.mode==='home') renderHome(); else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='claim') drawClaim(); else if(S.mode==='plan') drawPlan(); else if(S.mode==='ledger'&&!S.editing&&!S.adding) render(); } }
+function redrawFor(kinds){ if(kinds.includes(S.mode)){ if(S.mode==='home') renderHome(); else if(S.mode==='spend') drawSpend(); else if(S.mode==='cash') drawCash(); else if(S.mode==='claim') drawClaim(); else if(S.mode==='plan') drawPlan(); else if(S.mode==='stock') drawStock(); else if(S.mode==='ledger'&&!S.editing&&!S.adding) render(); } }
 /* 管理者看全部；一般夥伴每間店各開一個查詢（branch == 那間店），資料庫規則才會放行 */
 function watchBr(col,refine,cb,onErr){
   const db=FB.fs, f=refine||(q=>q);
@@ -3081,7 +3267,7 @@ function startData(){
   },e=>{ const c=(e&&e.code)||'unknown';
     if(c==='permission-denied'&&!FB.retried){ FB.retried=true; setTimeout(()=>{ if(FB.auth.currentUser){ stopData(); applyAuth(); } },2500); return; }
     setStatus('ro',c==='permission-denied'?'沒有權限':'連線中斷'); S.loaded=true; S.loadErr=c; showLoadErr(); render(); }));
-  FB.unsubs.push(watchBr('daily',null,o=>{ S.allDaily=o; redrawFor(['home','ledger','plan']); if(S.mode==='dept'&&!DP.dirty) drawDept(); }));
+  FB.unsubs.push(watchBr('daily',null,o=>{ S.allDaily=o; redrawFor(['home','ledger','plan','stock']); if(S.mode==='dept'&&!DP.dirty) drawDept(); }));
   FB.unsubs.push(watchBr('settle',null,o=>{ S.settle=o; redrawFor(['home','spend','cash']); }));
   FB.unsubs.push(db.collection('misc').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{m[d.id]=fsDec(d.data());}); S.misc=m; setupBranches(); renderWho(); redrawFor(['home','spend','cash','ledger','claim']); if(S.mode==='dept'&&!DP.dirty) drawDept(); },()=>{}));
   startMgrData();
