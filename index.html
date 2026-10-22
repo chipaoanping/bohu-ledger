@@ -1110,6 +1110,10 @@ table.opdays tr.na td{border-bottom:2px solid var(--rule)}
 .pl-bar{height:12px;border-radius:99px;background:var(--rule);overflow:hidden}.pl-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--hc),var(--mustard));border-radius:99px}
 .pl-gs{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--ink-2)}.pl-gs b{color:var(--ink)}.pl-gs .pos b{color:var(--pos)}
 .pl-gh2{font-weight:700;display:flex;gap:10px;align-items:baseline}
+.health .hl-g.warn.other{background:var(--soft);border-color:var(--rule)}
+.hl-off{margin-top:8px;font-size:13px;color:var(--ink-2)}.hl-off summary{cursor:pointer}
+.hl-or{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}.hl-or b{min-width:3em}
+.sp-rule{margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--mustard) 18%,var(--paper));font-size:13px;color:var(--ink-2)}
 </style>
 </head>
 <body>
@@ -1165,12 +1169,12 @@ const isCtr=b=>!!(B[b]&&B[b].counter);
 const ALLNAME='全部合計';
 const BOSS='妃妃';
 const MAILDOM='bohu-ledger.app';
-const EXP_COMMON=['食材','包材','雜項支出','人事支出','勞健保','房租','水電','保險','選物寄售','器具','設備','佈置陳列','活動與市集','尾牙公關聚餐','進修學習','啤酒','物流運費','行銷推廣','金流手續費','稅費','其他'];
+const EXP_COMMON=['食材','包材','雜項支出','人事支出','勞健保','房租','水電','保險','選物寄售','器具','設備','佈置陳列','裝修工程','活動與市集','尾牙公關聚餐','進修學習','啤酒','物流運費','行銷推廣','金流手續費','稅費','其他'];
 const CATS = {
   hc:{ rev:['門市銷售','企業・團購訂單','宅配・網購','活動・市集','其他'], exp:EXP_COMMON },
   tn:{ rev:['門市銷售','企業・團購訂單','活動・市集','其他'], exp:EXP_COMMON },
 };
-const CTR_CATS={ rev:['櫃位銷售','企業・團購訂單','其他'], exp:['百貨抽成・費用','食材','包材','雜項支出','人事支出','勞健保','選物寄售','器具','設備','佈置陳列','物流運費','行銷推廣','其他'] };
+const CTR_CATS={ rev:['櫃位銷售','企業・團購訂單','其他'], exp:['百貨抽成・費用','食材','包材','雜項支出','人事支出','勞健保','選物寄售','器具','設備','佈置陳列','裝修工程','物流運費','行銷推廣','其他'] };
 const KIND = {
   rev:{label:'營收', unit:'元', val:'金額（元）', money:true},
   exp:{label:'支出', unit:'元', val:'金額（元）', money:true, date:true},
@@ -1579,9 +1583,12 @@ const DSTAT=[['營業','營業日'],['公休','公休'],['颱風假','颱風假'
 const paidOf=(b,d)=>sum(payKeys(b).map(k=>+d[k]||0));
 /* 有明確狀態就用狀態；沒有狀態時，有營業額／收款才算「營業」 */
 const dStatusOf=d=>{ if(!d) return null; if(d.status) return d.status; if(d.closed||(+d.revenue||0)||PAYK_ALL.some(k=>+d[k]||0)) return '營業'; return null; };
+const OFF_DEF={hc:[3,4],tn:[2,3]};
+const offDays=b=>{ const c=((S.misc||{}).cfg||{}).closedDays||{}; return Array.isArray(c[b])?c[b]:(OFF_DEF[b]||[]); };
+const isOffDay=(b,day)=>offDays(b).includes(new Date(day+'T00:00:00').getDay());
 function statusCount(b,ym,docs){
   const [y,m]=ym.split('-').map(Number), days=new Date(y,m,0).getDate(), t=todayStr(); const c={營業:0,公休:0,颱風假:0,未記錄:0};
-  for(let i=1;i<=days;i++){ const day=`${ym}-${pad(i)}`; if(day>t) break; const st=dStatusOf(docs[dId(b,day)]); if(st) c[st]=(c[st]||0)+1; else c.未記錄++; }
+  for(let i=1;i<=days;i++){ const day=`${ym}-${pad(i)}`; if(day>t) break; const st=dStatusOf(docs[dId(b,day)]); if(st) c[st]=(c[st]||0)+1; else if(isOffDay(b,day)) c.公休++; else c.未記錄++; }
   return c;
 }
 const statusLine=c=>`<span class="sl-i op">營業 <b>${c.營業}</b> 天</span><span class="sl-i off">公休 <b>${c.公休}</b> 天</span>${c.颱風假?`<span class="sl-i ty">颱風假 <b>${c.颱風假}</b> 天</span>`:''}${c.未記錄?`<span class="sl-i na">未記錄 <b>${c.未記錄}</b> 天</span>`:''}`;
@@ -2281,7 +2288,7 @@ const ICON={
 function homeStatsHTML(today){
   if(!isMgr()) return staffStatsHTML(today);
   const ym=today.slice(0,7), m=+ym.slice(5), docs={...(S.allDaily||{}),...D.docs};
-  const one=b=>{ const ds=Object.values(docs).filter(d=>d&&d.branch===b&&String(d.date||'').startsWith(ym)&&dStatusOf(d)==='營業'), rev=sum(ds.map(d=>+d.revenue||0)), c=statusCount(b,ym,docs); if(c.未記錄&&!dStatusOf(docs[dId(b,today)])) c.未記錄--; const tx=sum(ds.map(d=>+d.tx||0));
+  const one=b=>{ const ds=Object.values(docs).filter(d=>d&&d.branch===b&&String(d.date||'').startsWith(ym)&&dStatusOf(d)==='營業'), rev=sum(ds.map(d=>+d.revenue||0)), c=statusCount(b,ym,docs); if(c.未記錄&&!dStatusOf(docs[dId(b,today)])&&!isOffDay(b,today)) c.未記錄--; const tx=sum(ds.map(d=>+d.tx||0));
     return {b,rev,c,tx,avg:c.營業?Math.round(rev/c.營業):0}; };
   const st=liveBR().map(one), all=sum(st.map(x=>x.rev));
   return `<div class="hstats"><div class="hs-h"><b>${m} 月營業概況</b>${st.length>1?`<span class="num">${isMgr()?ALLNAME:'合計'} <em>${fmt(all)}</em> 元</span>`:''}</div>
@@ -2423,6 +2430,7 @@ function renderSpend(b){
           </div></section>
         <section class="dsec"><div class="ds-h"><span class="ds-n">3</span><h3>付款方式</h3></div>
           <div class="chips">${paysFor(b).map(p=>`<button type="button" class="chip ${p===SP.pay?'on':''}" data-spay="${p}">${p}</button>`).join('')}</div>
+          ${['房租','水電','人事支出','勞健保'].includes(SP.cat)?`<p class="sp-rule">「${esc(SP.cat)}」請記在<b>費用所屬的月份</b>：例如 9 月的健保費 11 月才繳，日期請選 9 月，備註寫實際付款日。</p>`:''}
           <label class="dfield"><span class="fl">備註</span><input class="tin" id="s-note" maxlength="80" value="${esc(dr.note||'')}" placeholder="可不填" ${editable?'':'disabled'}></label></section>
         <section class="dsec"><div class="ds-h"><span class="ds-n">4</span><h3>收據照片</h3><span class="hint">有收據請拍照，會跟這筆支出存在一起</span></div>
           <div class="rc-row">${SP.photoURL?`<span class="rc-prev"><img src="${SP.photoURL}" alt="收據預覽"><button type="button" class="rc-x" data-sphotox="1" aria-label="移除照片">×</button></span>`:''}
@@ -2766,8 +2774,18 @@ function drawClaim(){
       <div class="cl-f"><label>日期 <input type="date" class="tin" id="clPayD" value="${esc(CL.pd||today)}"></label><label>金額 <span class="din"><input type="number" inputmode="numeric" id="clPayA" value="${esc(CL.pa||'')}" placeholder="0"><small>元</small></span></label><label class="cl-wide">備註 <input class="tin" id="clPayN" value="${esc(CL.pn||'')}" placeholder="例：秋香玉山轉帳"></label><button class="btn primary" data-clpadd="1">記錄撥款</button></div>
       ${pays.length?`<ul class="cl-l">${pays.map(p=>`<li class="cl-p"><span class="num">${p.date.replace(/-/g,'/')}</span><span class="cl-i">${esc(p.note||'公司撥款')}<small>${esc(p.by?p.by+' 記錄':'')}</small></span><b class="num">${fmt(p.amt)}</b><button class="ibtn ${CL.confirm==='p'+p.id?'danger':''}" data-clpdel="${p.id}">${CL.confirm==='p'+p.id?'確定刪除':'刪除'}</button></li>`).join('')}</ul>`:'<p class="hint">還沒有撥款紀錄。公司每次匯錢給你，就在這裡記一筆。</p>'}</div>
     <div class="panel"><div class="ph"><h2>請款紀錄</h2><span class="hint">${cl.length} 張</span></div>${cl.length?cl.map(claimRow).join(''):'<p class="hint">還沒有請款紀錄。</p>'}</div>
+    ${capitalHTML()}
   </section>`;
 }
+const capList=()=>((((S.misc||{}).capital)||{}).list)||[];
+function capitalHTML(){
+  const l=capList().slice().sort((a,c)=>a.date<c.date?1:-1), by={}; l.forEach(x=>by[x.who]=(by[x.who]||0)+(+x.amt||0));
+  return `<div class="panel"><div class="ph"><h2>股東增資</h2><span class="hint">股東投入公司的錢，不算營收也不算代墊</span></div>
+    ${Object.keys(by).length?`<div class="cl-sum num">${Object.entries(by).map(([w,v])=>`<div><span>${esc(w)} 累計投入</span><b>${fmt(v)}</b></div>`).join('')}<div><span>合計</span><b>${fmt(sum(Object.values(by)))}</b></div></div>`:''}
+    <div class="cl-f"><label>日期 <input type="date" class="tin" id="capD" value="${esc(CL.cd||todayStr())}"></label><label>股東 <input class="tin" id="capW" value="${esc(CL.cw||'')}" placeholder="例：妃妃" style="width:7em"></label><label>金額 <span class="din"><input type="number" inputmode="numeric" id="capA" value="${esc(CL.ca||'')}" placeholder="0"><small>元</small></span></label><label class="cl-wide">備註 <input class="tin" id="capN" value="${esc(CL.cn||'')}" placeholder="例：9 月增資"></label><button class="btn primary" data-capadd="1">記錄增資</button></div>
+    ${l.length?`<ul class="cl-l">${l.map(x=>`<li class="cl-p"><span class="num">${x.date.replace(/-/g,'/')}</span><span class="cl-i">${esc(x.who)}・${esc(x.note||'增資')}</span><b class="num">${fmt(x.amt)}</b><button class="ibtn ${CL.confirm==='c'+x.id?'danger':''}" data-capdel="${x.id}">${CL.confirm==='c'+x.id?'確定刪除':'刪除'}</button></li>`).join('')}</ul>`:''}</div>`;
+}
+async function capSave(list,msg){ try{ await S.db.doc('misc/capital').set({list}); S.misc={...(S.misc||{}),capital:{list}}; toast(msg); drawClaim(); return true; }catch(e){ toast('儲存失敗'); return false; } }
 function bindClaim(){
   const main=$('#main');
   main.addEventListener('change',ev=>{ if(S.mode!=='claim') return; const t=ev.target;
@@ -2776,7 +2794,7 @@ function bindClaim(){
     else if(t.id==='clDate'){ CL.date=t.value||todayStr(); }
     else if(t.dataset.clpd){ CL.payDate[t.dataset.clpd]=t.value; }
     else if(t.id==='clPayD') CL.pd=t.value; });
-  main.addEventListener('input',ev=>{ if(S.mode!=='claim') return; const t=ev.target; if(t.id==='clPayA') CL.pa=t.value; else if(t.id==='clPayN') CL.pn=t.value; });
+  main.addEventListener('input',ev=>{ if(S.mode!=='claim') return; const t=ev.target; if(t.id==='clPayA') CL.pa=t.value; else if(t.id==='clPayN') CL.pn=t.value; else if(t.id==='capA') CL.ca=t.value; else if(t.id==='capN') CL.cn=t.value; else if(t.id==='capW') CL.cw=t.value; else if(t.id==='capD') CL.cd=t.value; });
   main.addEventListener('click',async ev=>{ if(S.mode!=='claim') return; const t=ev.target.closest('button'); if(!t) return;
     const find=id=>claimsList().find(c=>c.id===id);
     if(t.dataset.clwho){ CL.who=t.dataset.clwho; CL.off={}; drawClaim(); }
@@ -2791,6 +2809,8 @@ function bindClaim(){
     else if(t.dataset.cldel){ const id=t.dataset.cldel; if(CL.confirm!==id){ CL.confirm=id; drawClaim(); return; } CL.confirm=null; await claimsSave(claimsList().filter(c=>c.id!==id),'已撤銷請款單，項目回到未請款'); }
     else if(t.dataset.clcopy){ const c=find(t.dataset.clcopy); try{ await navigator.clipboard.writeText(claimText(c)); toast('已複製，可以貼到 LINE 或 email'); }catch(e){ toast('無法複製，請改用列印'); } }
     else if(t.dataset.clprint){ claimPrint(find(t.dataset.clprint)); }
+    else if(t.dataset.capadd){ const amt=Math.round(+(CL.ca||0)), who=(CL.cw||'').trim(), d=CL.cd||todayStr(); if(!who||!amt){ toast('請填股東和金額'); return; } if(await capSave(capList().concat([{id:'cap'+uid(),date:d,who,amt,note:(CL.cn||'').trim(),by:W.name||''}]),`已記錄 ${who} 增資 ${fmt(amt)} 元`)){ CL.ca=''; CL.cn=''; drawClaim(); } }
+    else if(t.dataset.capdel){ const id=t.dataset.capdel; if(CL.confirm!=='c'+id){ CL.confirm='c'+id; drawClaim(); return; } CL.confirm=null; await capSave(capList().filter(x=>x.id!==id),'已刪除增資紀錄'); }
     else if(t.dataset.clpadd){ const amt=Math.round(+($('#clPayA')||{}).value||0), d=(($('#clPayD')||{}).value)||todayStr(); if(!amt){ toast('請填撥款金額'); return; }
       const p={id:'cp'+uid(),who:CL.who,date:d,amt,note:(($('#clPayN')||{}).value||'').trim(),by:W.name||'',at:new Date().toISOString()};
       if(await claimsSave(claimsList(),`已記錄 ${d.replace(/-/g,'/')} 撥款 ${fmt(amt)} 元`,claimPays().concat([p]))){ CL.pa=''; CL.pn=''; drawClaim(); } }
@@ -2800,7 +2820,8 @@ function bindClaim(){
 
 /* ---------- 本月帳務健檢：哪裡還沒記，一眼看到 ---------- */
 const HC_NEED={store:['人事支出','房租','水電','勞健保'], ctr:['人事支出']};
-const PAYER='菜菜';
+const PAYER_OF={hc:'菜菜'}, PAYER_DEF='妃妃';
+const payerOf=b=>PAYER_OF[b]||PAYER_DEF;
 function healthItems(){
   const today=todayStr(), cur=today.slice(0,7), prev=ymShift(cur,-1), docs={...(S.allDaily||{}),...D.docs}, out=[];
   for(const b of BR){
@@ -2808,11 +2829,12 @@ function healthItems(){
       const live=isCtr(b)?ctrOpen(b,ym):!!(S.docs||{})[`${b}-${ym}`]||(S.allDaily&&Object.values(S.allDaily).some(d=>d&&d.branch===b&&String(d.date||'').startsWith(ym)));
       if(!live) continue;
       const [y,m]=ym.split('-').map(Number), exp=listOf(b,m,'exp',y), cats=new Set(exp.map(e=>e.cat));
-      const c=statusCount(b,ym,docs); let miss=c.未記錄; if(ym===cur&&!dStatusOf(docs[dId(b,today)])) miss--;
+      const c=statusCount(b,ym,docs); let miss=c.未記錄; if(ym===cur&&!dStatusOf(docs[dId(b,today)])&&!isOffDay(b,today)) miss--;
       const need=(isCtr(b)?HC_NEED.ctr:HC_NEED.store).filter(x=>!cats.has(x));
       const late=ym===prev||+today.slice(8)>=20;
-      if(miss>0) out.push({b,ym,kind:'daily',text:`${+ym.slice(5)} 月有 ${miss} 天沒結帳`,who:'店長'});
-      if(need.length&&late) out.push({b,ym,kind:'company',text:`${+ym.slice(5)} 月還沒記：${need.join('、')}`,who:PAYER});
+      if(miss>0){ const days=[]; for(let i=1;i<=new Date(y,m,0).getDate();i++){ const dd=`${ym}-${pad(i)}`; if(dd>=today) break; if(!dStatusOf(docs[dId(b,dd)])&&!isOffDay(b,dd)) days.push(`${m}/${i}（${wk(dd)}）`); }
+        out.push({b,ym,kind:'daily',text:`${+ym.slice(5)} 月有 ${days.length} 天沒結帳：${days.slice(0,8).join('、')}${days.length>8?'…':''}`,who:'店長'}); }
+      if(need.length&&late) out.push({b,ym,kind:'company',text:`${+ym.slice(5)} 月還沒記：${need.join('、')}`,who:payerOf(b)});
     }
   }
   return out;
@@ -2822,14 +2844,29 @@ function healthHTML(){
   const it=healthItems(), co=it.filter(x=>x.kind==='company'), dl=it.filter(x=>x.kind==='daily');
   const used=claimedSet(), adv=advAll().filter(x=>x.e.adv===W.name&&!used.has(advKey(x.k,x.e.id)));
   const todo=((((S.misc||{}).todo)||{}).list||[]).filter(t=>!t.done);
-  const meP=W.name&&W.name.includes(PAYER);
   const row=x=>`<li><i style="background:var(${B[x.b].color})"></i><b>${esc(B[x.b].short)}</b><span>${esc(x.text)}</span></li>`;
   const ok=!co.length&&!dl.length;
   return `<div class="panel health ${ok?'ok':''}"><div class="ph"><h2>${ok?'✓ 帳都記齊了':'本月帳務健檢'}</h2><span class="hint">${todayStr().slice(5).replace('-','/')} 自動檢查</span></div>
-    ${co.length?`<div class="hl-g warn"><div class="hl-h">${meP?'菜菜，公司帳戶付的費用記了嗎？':`公司帳戶付款（請${PAYER}記）`}</div><ul>${co.map(row).join('')}</ul>
-      <p class="hint">房租、薪資、勞健保、水電從公司帳戶付出去的當天，請到「當日支出」記一筆，付款方式選「轉帳」。</p></div>`:''}
+    ${(()=>{ const whos=[...new Set(co.map(x=>x.who))].sort((a,c)=>(W.name||'').includes(a)?-1:(W.name||'').includes(c)?1:0);
+      return whos.map(w=>{ const mine=(W.name||'').includes(w), l=co.filter(x=>x.who===w);
+        return `<div class="hl-g warn ${mine?'':'other'}"><div class="hl-h">${mine?`${esc(w)}，你負責的公司費用記了嗎？`:`${esc(w)}負責的公司費用`}</div><ul>${l.map(row).join('')}</ul></div>`; }).join('')+(co.length?`<p class="hint">房租、薪資、勞健保、水電付出去的當天，請到「當日支出」記一筆，付款方式選「轉帳」或「代墊」。</p>`:''); })()}
     ${dl.length?`<div class="hl-g"><div class="hl-h">每日結帳</div><ul>${dl.map(row).join('')}</ul></div>`:''}
+    ${offCfgHTML()}
     <div class="hl-x num">${adv.length?`<span>你的代墊還沒請款 <b>${adv.length}</b> 筆・${fmt(sum(adv.map(x=>+x.e.amt||0)))} 元</span>`:''}${todo.length?`<span>待補紀錄 <b>${todo.length}</b> 項</span>`:''}</div></div>`;
+}
+
+const WKN='日一二三四五六';
+function offCfgHTML(){
+  const bs=BR.filter(b=>!isCtr(b)); if(!bs.length) return '';
+  return `<details class="hl-off"><summary>固定店休：${bs.map(b=>`${esc(B[b].short)} 週${offDays(b).map(d=>WKN[d]).join('、')||'無'}`).join('・')}（店休日不算沒結帳）</summary>
+    ${bs.map(b=>`<div class="hl-or"><b>${esc(B[b].short)}</b><span class="chips">${[1,2,3,4,5,6,0].map(d=>`<button type="button" class="chip ${offDays(b).includes(d)?'on':''}" data-offd="${b}|${d}">週${WKN[d]}</button>`).join('')}</span></div>`).join('')}</details>`;
+}
+function bindHealth(){
+  $('#main').addEventListener('click',async ev=>{ const t=ev.target.closest('[data-offd]'); if(!t||S.mode!=='home'||!isMgr()) return;
+    const [b,d]=t.dataset.offd.split('|'), n=+d, cur=offDays(b), nx=cur.includes(n)?cur.filter(x=>x!==n):cur.concat([n]).sort();
+    const all={...(((S.misc||{}).cfg||{}).closedDays||{}),[b]:nx};
+    try{ await S.db.doc('misc/cfg').set({closedDays:all},{merge:true}); S.misc={...(S.misc||{}),cfg:{...((S.misc||{}).cfg||{}),closedDays:all}}; toast(`${B[b].short} 固定店休：週${nx.map(x=>WKN[x]).join('、')||'無'}`); renderHome(); const o=document.querySelector('.hl-off'); if(o) o.open=true; }
+    catch(e){ toast('儲存失敗'); } });
 }
 
 /* ---------- 交辦與目標：明天交辦事項、本週工作目標、本週業績目標 ---------- */
@@ -2942,7 +2979,7 @@ document.getElementById('reloadBtn')?.addEventListener('click',async()=>{
   try{ const r=await navigator.serviceWorker?.getRegistration(); await r?.update(); }catch(e){}
   location.reload();
 });
-bindDaily(); bindPay(); bindDept(); bindSpend(); bindClaim(); bindPlan(); bindLogin(); bindCash(); renderWho();
+bindDaily(); bindPay(); bindDept(); bindSpend(); bindClaim(); bindPlan(); bindHealth(); bindLogin(); bindCash(); renderWho();
 
 $('#main').addEventListener('click',async ev=>{
   if(S.mode!=='ledger') return;
