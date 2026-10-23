@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>伯虎飲品SOP手冊</title>
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#24414a">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="伯虎飲品">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+/* Layout: 與收支總覽同一套紙面、墨綠； 上方切換「上桌速查／吧台SOP／考核／人員」，下方是依菜單分類排列的品項清單 */
+:root{
+  --bg:#f3f4f1; --paper:#fcfcfa; --ink:#1b211e; --ink-2:#4f5a54; --ink-3:#86908a;
+  --rule:#dde1dc; --soft:#ebeee9; --hover:#f0f2ee;
+  --jade:#1f5e4a; --jade-soft:#e3efe9;
+  --amber:#b8651a; --amber-soft:#fbf0e3; --amber-ink:#7a3f0c;
+  --pos:#1f7a4d; --neg:#c23a3a; --focus:#2a78d6;
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Heiti TC",system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(28px + env(safe-area-inset-top,0px)) calc(64px + env(safe-area-inset-bottom,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;display:grid;gap:20px}
+.num{font-variant-numeric:tabular-nums}
+
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 20px}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--jade);font-weight:700}
+h1{font-family:var(--f-display);font-weight:900;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:700;font-size:19px;margin:0}
+.who{font-size:13px;color:var(--ink-2);display:inline-flex;gap:8px;align-items:center}
+.role{font-size:12px;padding:2px 10px;border-radius:999px;background:var(--jade-soft);color:var(--jade);font-weight:700}
+
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;background:var(--paper);padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--ink-2);padding:6px 16px;border-radius:999px;cursor:pointer;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--rule);background:var(--paper);color:var(--ink-2);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--jade);color:var(--jade);background:var(--jade-soft);font-weight:700}
+.search{flex:1;min-width:160px;max-width:280px;border:1px solid var(--rule);background:var(--paper);border-radius:999px;padding:6px 14px}
+.btn{border:1px solid var(--rule);background:var(--paper);border-radius:10px;padding:7px 14px;cursor:pointer;font-size:14px}
+.btn:hover{background:var(--hover)}
+.btn.pri{background:var(--jade);border-color:var(--jade);color:var(--paper);font-weight:700}
+.btn.danger{color:var(--neg)}
+.hint{font-size:13px;color:var(--ink-3)}
+.notice{background:var(--paper);border:1px dashed var(--rule);border-radius:12px;padding:18px;color:var(--ink-2);font-size:14px}
+
+.cat{display:grid;gap:10px}
+.cat-h{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--rule);padding-bottom:6px}
+.cat-h small{color:var(--ink-3);font-size:12px;letter-spacing:.1em}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.item{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;display:grid;gap:6px;align-content:start;min-width:0}
+.item-top{display:flex;gap:8px;align-items:baseline;justify-content:space-between}
+.item-name{font-weight:700;font-size:16px}
+.item-en{font-size:12.5px;color:var(--ink-3)}
+.price{font-weight:700;color:var(--ink-2);white-space:nowrap}
+.tags{display:flex;gap:4px}
+.tag{font-size:11px;padding:1px 7px;border-radius:5px;background:var(--soft);color:var(--ink-2);font-weight:700}
+.desc{font-size:13.5px;color:var(--ink-2)}
+.tip{background:var(--amber-soft);color:var(--amber-ink);border-radius:8px;padding:8px 10px;font-size:14px;line-height:1.55}
+.tip b{display:block;font-size:11px;letter-spacing:.12em;color:var(--amber);margin-bottom:1px}
+.tip.empty{background:var(--soft);color:var(--ink-3)}
+
+/* SOP */
+.sop{background:var(--paper);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+.sop summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;gap:10px;align-items:center}
+.sop summary::-webkit-details-marker{display:none}
+.sop summary .item-name{flex:1;min-width:0}
+.sop[open] summary{border-bottom:1px solid var(--soft)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--rule);flex:none}
+.dot.ok{background:var(--jade)}
+.sop-body{padding:14px 16px;display:grid;gap:14px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.fact{background:var(--soft);border-radius:8px;padding:8px 10px}
+.fact span{display:block;font-size:11px;color:var(--ink-3);letter-spacing:.08em}
+.fact b{font-weight:500}
+.ing{width:100%;border-collapse:collapse;font-size:14px}
+.ing td{border-bottom:1px solid var(--soft);padding:6px 4px}
+.ing td:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.steps{margin:0;padding-left:22px;display:grid;gap:4px}
+.lbl{font-size:12px;color:var(--ink-3);letter-spacing:.1em;font-weight:700;margin-bottom:4px}
+
+/* Quiz */
+.panel{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:18px;display:grid;gap:14px}
+.q-prog{height:4px;background:var(--soft);border-radius:2px;overflow:hidden}
+.q-prog i{display:block;height:100%;background:var(--jade)}
+.q-text{font-size:17px;font-weight:700}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--rule);background:var(--bg);border-radius:10px;padding:10px 14px;cursor:pointer}
+.opt:hover{background:var(--hover)}
+.opt.right{border-color:var(--pos);background:var(--jade-soft)}
+.opt.wrong{border-color:var(--neg)}
+.big{font-family:var(--f-display);font-size:44px;font-weight:900;line-height:1}
+table.list{width:100%;border-collapse:collapse;font-size:14px}
+table.list th{text-align:left;font-size:12px;color:var(--ink-3);font-weight:500;border-bottom:1px solid var(--rule);padding:6px}
+table.list td{border-bottom:1px solid var(--soft);padding:8px 6px}
+.tbl{overflow-x:auto}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(10,12,11,.5);display:grid;place-items:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.mbox{background:var(--paper);border-radius:14px;width:min(620px,100%);max-height:100%;overflow:auto;padding:20px;display:grid;gap:12px}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.form label{display:grid;gap:4px;font-size:12.5px;color:var(--ink-2);min-width:0}
+.form .full{grid-column:1/-1}
+.form input,.form select,.form textarea{border:1px solid var(--rule);background:var(--bg);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+.form textarea{min-height:76px;resize:vertical}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+.mfoot .sp{margin-right:auto}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:999px;font-size:14px;z-index:50}
+@media (max-width:520px){.form{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.top-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.who-n{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--ink)}
+.who-n i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--jade-soft);color:var(--jade);display:grid;place-items:center;font-size:13px}
+a.back{font-size:13px;color:var(--jade);text-decoration:none}
+.lg{display:grid;gap:12px;justify-items:center;text-align:center}
+.lg-names{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.lg-names button{border:1px solid var(--rule);background:var(--bg);border-radius:999px;padding:8px 16px;cursor:pointer;font-size:15px}
+.lg form{display:grid;gap:10px;width:min(300px,100%)}
+.lg input{font-size:18px;letter-spacing:.15em;text-align:center;border:1px solid var(--rule);border-radius:12px;padding:10px;background:var(--bg)}
+.lg-err{color:var(--neg);font-size:13px;margin:0;min-height:1em}
+.linkbtn{border:0;background:none;color:var(--jade);cursor:pointer;font-size:13px;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">伯虎在二樓・飲品</div>
+      <h1>飲品 SOP 手冊</h1>
+    </div>
+    <div class="top-r"><a class="back" href="./">← 收支總覽</a><span class="who" id="who"></span></div>
+  </header>
+
+  <div class="ctl">
+    <div class="seg" role="group" aria-label="頁面" id="tabs">
+      <button data-v="serve">上桌速查</button>
+      <button data-v="sop" hidden>吧台SOP</button>
+      <button data-v="quiz" hidden>考核</button>
+      <button data-v="team" hidden>人員</button>
+    </div>
+  </div>
+
+  <div class="ctl" id="filters">
+    <div class="chips" id="cats"></div>
+    <input class="search" id="q" type="search" placeholder="搜尋品名" aria-label="搜尋品名">
+    <button class="btn pri" id="addBtn" hidden>＋ 新增品項</button>
+  </div>
+
+  <main id="main" style="display:grid;gap:22px"></main>
+</div>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true"><div class="mbox" id="mbox"></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="config.js"></script>
+<script>
+/* 伯虎在二樓 飲品SOP手冊：與收支總覽共用 Firebase 帳號
+   權限：老闆（妃妃）＞ 吧台負責人（可編修）＞ 夥伴（看SOP、考核）＞ 外場（不用登入，只看上桌速查） */
+const BOSS='妃妃';
+const MAILDOM='bohu-ledger.app';
+const CATS=[
+  {k:'coffee',n:'Coffee',z:'咖啡'},
+  {k:'sparkling',n:'Sparkling House Blend',z:'氣泡飲'},
+  {k:'specialty',n:'Specialty Drink',z:'特調'},
+  {k:'tea',n:'Tea Drink',z:'茶'},
+  {k:'tipsy',n:'Tipsy Drink',z:'微醺'}
+];
+const DEFAULT_TEAM=[{name:'土豆',role:'bar'},{name:'小不點',role:'partner'},{name:'李樂',role:'partner'},{name:'雅淳',role:'partner'}];
+/* 2026 菜單，第一次由老闆或吧台負責人按「匯入菜單」寫進資料庫 */
+const SEED=[
+ ['coffee',1,'Affogato 香草冰淇淋','','150','I','香草冰淇淋、濃縮咖啡','冰淇淋遇到咖啡會很快化開，建議上桌就先吃'],
+ ['coffee',2,'南南里檸檬咖啡','Espresso Romano','160','I','','裡面有新鮮檸檬，放久會轉苦，建議先喝幾口'],
+ ['coffee',3,'蘋蘋里 蘋果咖啡','Apple Coffee','160','I','','喝之前輕輕攪拌，蘋果和咖啡會更融合'],
+ ['coffee',4,'落日香橙','Orange Espresso','160','I','','先看一下漸層，攪拌後再喝'],
+ ['coffee',5,'黑泰奶咖啡','Thai tea with espresso','160','I','','攪拌均勻再喝，泰奶的香料和咖啡才會合在一起'],
+ ['coffee',6,'炸彈可樂咖啡','Coca Cola with espresso','160','I','','氣泡會越放越少，趁氣泡還在的時候喝'],
+ ['coffee',7,'冰磚咖啡','Coffee cubes in milk','170','I','咖啡冰磚、鮮奶','咖啡冰磚會在牛奶裡慢慢融，越喝越濃'],
+ ['coffee',8,'脆糖炫泡','Caramel Crunch Latte','180','I','','上面的脆糖會慢慢變軟，建議先吃一口脆的'],
+ ['coffee',9,'Espresso','','100','H','','小小一杯，趁熱一兩口喝完最香'],
+ ['coffee',10,'美式','Americano','120','H/I','','熱的趁熱，冰的會被冰塊稀釋，都建議先喝'],
+ ['coffee',11,'卡布奇諾','Cappuccino','130','H','','奶泡會慢慢消，趁綿密的時候喝'],
+ ['coffee',12,'拿鐵','Caffe Latte','140','H/I','','熱的趁熱，冰的攪拌一下再喝'],
+ ['coffee',13,'馥芮白','Flat White','150','H/I','','剛上桌時奶香和咖啡最平衡'],
+ ['coffee',14,'茶拿鐵','Earl Grey Caffe Latte','150','H','伯爵茶、濃縮咖啡、鮮奶','伯爵茶香在熱的時候最明顯，趁熱喝'],
+ ['coffee',15,'摩卡','Mocha','170','H/I','','巧克力容易沉底，喝之前攪拌一下'],
+ ['sparkling',1,'樂園｜無花果氣泡飲','Fig jam flavored & gummy bear','140','','無花果果醬、小熊軟糖、氣泡','底下有無花果醬和小熊軟糖，輕輕攪拌再喝'],
+ ['sparkling',2,'ALOHA｜青梅醋氣泡飲','Plum vinegar & grapefruit','140','','青梅醋、葡萄柚、氣泡','氣泡會慢慢消，攪拌輕一點，趁冰喝'],
+ ['sparkling',3,'海水淡化｜海鹽氣泡飲','Sea salt flavored & cucumber','140','','海鹽、小黃瓜、氣泡','小黃瓜的清香在一開始最明顯，建議先喝'],
+ ['sparkling',4,'香香｜百香果氣泡飲','Passion fruit and lactic acid beverage','150','','百香果、乳酸飲、氣泡','百香果和乳酸沉在底下，喝之前攪拌一下'],
+ ['specialty',1,'港口鮮奶茶','Gangkou milk tea','160','I','恆春港口茶、鮮奶','用恆春的港口茶做的，攪拌一下再喝'],
+ ['specialty',2,'麥香核桃鮮奶茶','Barley milk tea with crushed walnut','170','I','麥茶、鮮奶、碎核桃，附一小碟核桃','旁邊的核桃可以撒上去，或配著一起吃'],
+ ['specialty',3,'抹茶歐蕾','Matcha latte','160','H/I','抹茶、鮮奶','抹茶和牛奶分層，攪拌後再喝'],
+ ['specialty',4,'麥芽奶茶','Wheat germ milk tea','120','H/I','','熱的趁熱，冰的攪拌一下'],
+ ['specialty',5,'真的檸檬','Lemonade','160','','現壓真檸檬','現壓的真檸檬，放久會慢慢變苦，建議先喝幾口'],
+ ['specialty',6,'鮮奶巧克力','Chocolate milk','130','H/I','巧克力、鮮奶','巧克力容易沉底，喝之前攪拌一下'],
+ ['tea',1,'伯爵紅茶','Earl Grey Tea','140','H','熱茶，可回沖','可以回沖，喝完跟我們說，幫你加熱水'],
+ ['tea',2,'恆春半島・港口茶','Gangkou','160','H','熱茶，可回沖','恆春半島的港口茶，可以回沖，喝完跟我們說'],
+ ['tea',3,'金萱烏龍茶（冰）','Jhinhsuan','200','I','茶冰球，附小茶點，不可回沖','茶冰球會慢慢融，茶味越來越濃，冰的不能回沖喔'],
+ ['tea',4,'金萱烏龍茶（熱）','Jhinhsuan','190','H','附小茶點，可回沖','附小茶點，可以回沖，喝完跟我們說'],
+ ['tipsy',1,'蔓蔓喝','Cranberry Lychee Sparkling Wine','160','','蔓越莓醬、荔枝酒','有含酒精，氣泡在的時候最好喝'],
+ ['tipsy',2,'海洋沙瓦','Ocean Sour','180','','琴酒冰沙、香草冰淇淋','琴酒冰沙和冰淇淋都會融，趁冰吃'],
+ ['tipsy',3,'稻香','Golden Fields','180','','麥茶、橙酒','有含酒精，麥茶和橙酒攪拌一下再喝']
+];
+const ROLE_NAME={boss:'老闆',bar:'吧台負責人',partner:'夥伴',guest:'外場'};
+const S={drinks:{},drinksLoaded:false,sop:{},cfg:null,staff:null,pwset:{},quizAll:{},quizMine:null,
+  user:null,view:'serve',cat:'all',q:'',quiz:null};
+let fs=null,auth=null,subs=[];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lc=x=>String(x||'').trim().toLowerCase();
+const hexOf=s=>[...new TextEncoder().encode(s)].map(b=>b.toString(16).padStart(2,'0')).join('');
+const emailOf=(name,v)=>`s${hexOf(name)}${(v||1)>1?'-v'+v:''}@${MAILDOM}`;
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),2400)}
+
+/* ---------- 人員與權限 ---------- */
+const ledgerPeople=()=>(S.staff&&Array.isArray(S.staff.people))?S.staff.people:[];
+const teamList=()=>(S.cfg&&Array.isArray(S.cfg.people))?S.cfg.people:[];
+const ledgerOf=n=>ledgerPeople().find(p=>p.name===n);
+/* 同一個名字在帳本有帳號就沿用同一組密碼 */
+function mailsOf(n){const p=ledgerOf(n);const a=[emailOf(n,p?p.v:1)];if(p&&p.mail)a.push(lc(p.mail));return a}
+function isBossMail(m){const st=S.staff||{};return !!m&&(m===lc(st.bossEmail)||m===lc(st.bossMail)||(st.bossEmails||[]).map(lc).includes(m))}
+function nameOfMail(m){
+  for(const p of [...ledgerPeople(),...teamList()]) if(mailsOf(p.name).includes(m)) return p.name;
+  return null;
+}
+function role(){
+  const u=S.user; if(!u) return 'guest';
+  const m=lc(u.email);
+  if(isBossMail(m)) return 'boss';
+  const c=S.cfg||{};
+  if((c.barEmails||[]).includes(m)) return 'bar';
+  if((c.partnerEmails||[]).includes(m)) return 'partner';
+  return 'guest';
+}
+const canEditMenu=()=>['boss','bar'].includes(role());
+const seesSop=()=>role()!=='guest';
+const loginNames=()=>{const set=new Set([BOSS,...teamList().map(p=>p.name)]);return [...set]};
+
+/* ---------- 列表 ---------- */
+function sorted(){
+  return Object.entries(S.drinks).map(([id,d])=>({id,...d}))
+    .sort((a,b)=>CATS.findIndex(c=>c.k===a.cat)-CATS.findIndex(c=>c.k===b.cat)||(a.order??99)-(b.order??99));
+}
+function filtered(){
+  const q=S.q.trim().toLowerCase();
+  return sorted().filter(d=>(S.cat==='all'||d.cat===S.cat)&&(!q||(d.name+' '+(d.en||'')).toLowerCase().includes(q)));
+}
+const tempTag=t=>t?`<span class="tag">${t==='H/I'?'冷熱':t==='H'?'熱':'冰'}</span>`:'';
+
+function renderServe(){
+  if(!S.drinksLoaded) return `<div class="notice">讀取中…</div>`;
+  if(!Object.keys(S.drinks).length) return canEditMenu()
+    ? `<div class="notice" style="display:grid;gap:10px"><div>還沒有品項。把 2026 菜單的 32 杯飲品匯入，上桌提醒也會一起帶進來。</div><div><button class="btn pri" id="seedBtn">匯入菜單</button></div></div>`
+    : `<div class="notice">品項還沒建立，請老闆或吧台負責人登入後匯入菜單。</div>`;
+  const list=filtered();
+  if(!list.length) return `<div class="notice">找不到符合的品項。</div>`;
+  return CATS.map(c=>{
+    const ds=list.filter(d=>d.cat===c.k); if(!ds.length) return '';
+    return `<section class="cat"><div class="cat-h"><h2>${c.n}</h2><small>${c.z}</small></div><div class="items">${ds.map(d=>`
+      <article class="item">
+        <div class="item-top"><div style="min-width:0"><div class="item-name">${esc(d.name)}</div>${d.en?`<div class="item-en">${esc(d.en)}</div>`:''}</div>
+          <div style="display:grid;justify-items:end;gap:3px"><span class="price num">$${esc(d.price)}</span><span class="tags">${tempTag(d.temp)}</span></div></div>
+        ${d.desc?`<div class="desc">${esc(d.desc)}</div>`:''}
+        <div class="tip ${d.tip?'':'empty'}"><b>上桌提醒</b>${d.tip?esc(d.tip):'尚未填寫'}</div>
+        ${canEditMenu()?`<div><button class="btn" data-edit="${d.id}" style="padding:3px 10px;font-size:13px">編修</button></div>`:''}
+      </article>`).join('')}</div></section>`;
+  }).join('');
+}
+
+function lines(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean)}
+function hasSop(id){const s=S.sop[id];return !!(s&&(lines(s.ingredients).length||lines(s.steps).length))}
+function renderSop(){
+  const list=filtered();
+  const done=sorted().filter(d=>hasSop(d.id)).length, all=Object.keys(S.drinks).length;
+  const head=`<div class="hint">已建立 ${done} / ${all} 杯的做法${canEditMenu()?'，點開品項後按「編修」填寫':'，由吧台負責人維護'}</div>`;
+  return head+CATS.map(c=>{
+    const ds=list.filter(d=>d.cat===c.k); if(!ds.length) return '';
+    return `<section class="cat"><div class="cat-h"><h2>${c.n}</h2><small>${c.z}</small></div><div style="display:grid;gap:8px">${ds.map(d=>{
+      const s=S.sop[d.id]||{}; const ing=lines(s.ingredients), st=lines(s.steps);
+      return `<details class="sop"><summary><i class="dot ${hasSop(d.id)?'ok':''}"></i><span class="item-name">${esc(d.name)}</span>${tempTag(d.temp)}<span class="price num">$${esc(d.price)}</span></summary>
+        <div class="sop-body">
+          ${hasSop(d.id)?'':'<div class="hint">這杯的做法還沒填。</div>'}
+          <div class="facts">
+            <div class="fact"><span>杯型</span><b>${esc(s.cup)||'—'}</b></div>
+            <div class="fact"><span>冰量／溫度</span><b>${esc(s.ice)||'—'}</b></div>
+            <div class="fact"><span>裝飾</span><b>${esc(s.garnish)||'—'}</b></div>
+          </div>
+          ${ing.length?`<div><div class="lbl">材料與份量</div><table class="ing">${ing.map(l=>{const [a,b]=l.split(/[｜|]/);return `<tr><td>${esc(a)}</td><td>${esc(b||'')}</td></tr>`}).join('')}</table></div>`:''}
+          ${st.length?`<div><div class="lbl">步驟</div><ol class="steps">${st.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:''}
+          ${s.note?`<div><div class="lbl">注意</div><div>${esc(s.note)}</div></div>`:''}
+          <div class="tip ${d.tip?'':'empty'}"><b>上桌提醒</b>${d.tip?esc(d.tip):'尚未填寫'}</div>
+          ${canEditMenu()?`<div><button class="btn" data-edit="${d.id}">編修</button></div>`:''}
+        </div></details>`;}).join('')}</div></section>`;
+  }).join('');
+}
+
+/* ---------- 考核 ---------- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function makeQuiz(){
+  const ds=sorted(); const qs=[];
+  const pick=(arr,n,ex)=>shuffle([...new Set(arr)].filter(x=>x!==ex)).slice(0,n);
+  const withTip=ds.filter(d=>d.tip);
+  const prices=ds.map(d=>String(d.price));
+  const cups=Object.values(S.sop).map(x=>x.cup).filter(Boolean);
+  for(const d of shuffle(ds)){
+    const kinds=[]; const s=S.sop[d.id];
+    if(d.tip&&withTip.length>=4) kinds.push('tip','which');
+    if(new Set(prices).size>=4) kinds.push('price');
+    if(s&&s.cup&&new Set(cups).size>=3) kinds.push('cup');
+    if(!kinds.length) continue;
+    const k=kinds[Math.floor(Math.random()*kinds.length)];
+    if(k==='tip') qs.push({t:`「${d.name}」上桌時要提醒客人什麼？`,a:d.tip,o:shuffle([d.tip,...pick(withTip.map(x=>x.tip),3,d.tip)])});
+    if(k==='which') qs.push({t:`哪一杯上桌要這樣提醒：「${d.tip}」`,a:d.name,o:shuffle([d.name,...pick(withTip.filter(x=>x.tip!==d.tip).map(x=>x.name),3,d.name)])});
+    if(k==='price') qs.push({t:`「${d.name}」售價多少？`,a:'$'+d.price,o:shuffle(['$'+d.price,...pick(prices,3,String(d.price)).map(p=>'$'+p)])});
+    if(k==='cup') qs.push({t:`「${d.name}」用哪一種杯子？`,a:s.cup,o:shuffle([s.cup,...pick(cups,3,s.cup)])});
+    if(qs.length>=10) break;
+  }
+  return {qs,i:0,score:0,picked:null};
+}
+function renderQuiz(){
+  const Q=S.quiz; let out='';
+  if(!Q){
+    const runs=(S.quizMine&&S.quizMine.runs)||[];
+    out+=`<div class="panel"><div><h2>飲品考核</h2><div class="hint">每次隨機 10 題，題目來自上桌提醒、售價，以及吧台SOP裡填好的杯型。</div></div>
+      <div><button class="btn pri" id="startQuiz">開始考核</button></div>
+      ${runs.length?`<div><div class="lbl">我的紀錄</div><div class="tbl"><table class="list"><tr><th>日期</th><th>分數</th></tr>${runs.slice().reverse().slice(0,8).map(r=>`<tr><td class="num">${esc(r.at.slice(0,10))}</td><td class="num">${r.score} / ${r.total}</td></tr>`).join('')}</table></div></div>`:'<div class="hint">你還沒有考核紀錄。</div>'}
+    </div>`;
+  }else if(Q.i>=Q.qs.length){
+    out+=`<div class="panel"><div class="lbl">本次成績</div><div class="big num">${Q.score} <span style="font-size:22px;color:var(--ink-3)">/ ${Q.qs.length}</span></div>
+      <div class="hint">${Q.saved===false?'成績沒有存到，請確認網路後再考一次。':Q.saved?'成績已記錄。':'儲存中…'}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="startQuiz">再考一次</button><button class="btn" id="endQuiz">回到考核首頁</button></div></div>`;
+  }else{
+    const q=Q.qs[Q.i];
+    out+=`<div class="panel"><div class="q-prog"><i style="width:${Q.i/Q.qs.length*100}%"></i></div>
+      <div class="hint num">第 ${Q.i+1} / ${Q.qs.length} 題</div><div class="q-text">${esc(q.t)}</div>
+      <div class="opts">${q.o.map((o,n)=>{let c='';if(Q.picked!=null){if(o===q.a)c='right';else if(n===Q.picked)c='wrong'}return `<button class="opt ${c}" data-opt="${n}" ${Q.picked!=null?'disabled':''}>${esc(o)}</button>`}).join('')}</div>
+      ${Q.picked!=null?`<div><button class="btn pri" id="nextQ">${Q.i+1<Q.qs.length?'下一題':'看成績'}</button></div>`:''}</div>`;
+  }
+  if(canEditMenu()){
+    const rows=Object.values(S.quizAll).filter(r=>(r.runs||[]).length);
+    out+=`<div class="panel"><div><h2>全員成績</h2><div class="hint">每位夥伴最近一次與最佳成績</div></div>
+      ${rows.length?`<div class="tbl"><table class="list"><tr><th>夥伴</th><th>最近</th><th>最佳</th><th>次數</th></tr>${rows.map(r=>{const rs=r.runs;const last=rs[rs.length-1];
+        return `<tr><td>${esc(r.name||'—')}</td><td class="num">${last.score}/${last.total}・${esc(last.at.slice(5,10))}</td><td class="num">${Math.max(...rs.map(x=>x.score))}</td><td class="num">${rs.length}</td></tr>`}).join('')}</table></div>`:'<div class="hint">還沒有人完成考核。</div>'}</div>`;
+  }
+  return out;
+}
+async function saveQuiz(Q){
+  const runs=((S.quizMine&&S.quizMine.runs)||[]).slice(-29);
+  runs.push({at:new Date().toISOString(),score:Q.score,total:Q.qs.length});
+  try{await fs.doc('drinkquiz/'+S.user.uid).set({name:nameOfMail(lc(S.user.email))||'',runs});Q.saved=true}catch(e){Q.saved=false}
+  render();
+}
+
+/* ---------- 人員（老闆） ---------- */
+let TEAM_DRAFT=null;
+function renderTeam(){
+  if(!TEAM_DRAFT) TEAM_DRAFT=(teamList().length?teamList():DEFAULT_TEAM).map(p=>({...p}));
+  return `<div class="panel"><div><h2>人員與權限</h2>
+    <div class="hint">吧台負責人可以編修品項與SOP；夥伴可以看SOP和考核。新人與換宿小幫手不用帳號，打開這頁就能看上桌速查。帳本裡已有帳號的人，用同一組密碼登入；沒有的人第一次登入時自己設定密碼。</div></div>
+    <div class="tbl"><table class="list"><tr><th>名字</th><th>角色</th><th></th></tr>${TEAM_DRAFT.map((p,i)=>`<tr>
+      <td><input id="tn-${i}" data-tn="${i}" value="${esc(p.name)}" aria-label="名字" style="border:1px solid var(--rule);border-radius:8px;padding:5px 8px;width:9em;max-width:100%;background:var(--bg)"> ${ledgerOf(p.name)?'<span class="tag">帳本帳號</span>':''}</td>
+      <td><select id="tr-${i}" data-tr="${i}" aria-label="角色"><option value="partner" ${p.role!=='bar'?'selected':''}>夥伴（看SOP、考核）</option><option value="bar" ${p.role==='bar'?'selected':''}>吧台負責人（可編修）</option></select></td>
+      <td><button class="btn danger" data-tdel="${i}" style="padding:3px 10px;font-size:13px">移除</button></td></tr>`).join('')}</table></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="tAdd">＋ 新增人員</button><button class="btn pri" id="tSave">儲存名單</button></div>
+    ${teamList().length?'':'<div class="hint">這是預設名單，按「儲存名單」後才會生效。</div>'}</div>`;
+}
+async function saveTeam(){
+  const list=TEAM_DRAFT.map(p=>({name:p.name.trim(),role:p.role==='bar'?'bar':'partner'})).filter(p=>p.name);
+  const data={people:list,
+    barEmails:list.filter(p=>p.role==='bar').flatMap(p=>mailsOf(p.name)),
+    partnerEmails:list.filter(p=>p.role!=='bar').flatMap(p=>mailsOf(p.name)),
+    updatedAt:new Date().toISOString()};
+  try{await fs.doc('drinkcfg/roles').set(data);TEAM_DRAFT=null;toast('名單已儲存')}catch(e){toast('沒有存到：只有老闆可以改名單')}
+}
+
+/* ---------- 編修 ---------- */
+function openEditor(id){
+  const d=id?S.drinks[id]:{cat:S.cat==='all'?'coffee':S.cat,name:'',price:'',temp:'',desc:'',tip:''};
+  const s=(id&&S.sop[id])||{};
+  $('#mbox').innerHTML=`<h2>${id?'編修品項':'新增品項'}</h2>
+  <form class="form" id="ef">
+    <label>品名<input id="f-name" required value="${esc(d.name)}"></label>
+    <label>英文<input id="f-en" value="${esc(d.en)}"></label>
+    <label>分類<select id="f-cat">${CATS.map(c=>`<option value="${c.k}" ${d.cat===c.k?'selected':''}>${c.n}</option>`).join('')}</select></label>
+    <label>售價<input id="f-price" inputmode="numeric" value="${esc(d.price)}"></label>
+    <label>冷熱<select id="f-temp"><option value="">未標示</option><option value="I" ${d.temp==='I'?'selected':''}>只有冰</option><option value="H" ${d.temp==='H'?'selected':''}>只有熱</option><option value="H/I" ${d.temp==='H/I'?'selected':''}>冷熱皆可</option></select></label>
+    <label>排序<input id="f-order" inputmode="numeric" value="${esc(d.order??'')}"></label>
+    <label class="full">產品內容（外場介紹用）<textarea id="f-desc">${esc(d.desc)}</textarea></label>
+    <label class="full">上桌提醒<textarea id="f-tip">${esc(d.tip)}</textarea></label>
+    <div class="full lbl" style="margin-top:6px">吧台SOP（只有登入的夥伴看得到）</div>
+    <label>杯型<input id="s-cup" value="${esc(s.cup)}"></label>
+    <label>冰量／溫度<input id="s-ice" value="${esc(s.ice)}"></label>
+    <label class="full">材料與份量（一行一項，用｜分隔，例：濃縮咖啡｜40ml）<textarea id="s-ing">${esc(s.ingredients)}</textarea></label>
+    <label class="full">步驟（一行一步）<textarea id="s-steps">${esc(s.steps)}</textarea></label>
+    <label>裝飾<input id="s-garnish" value="${esc(s.garnish)}"></label>
+    <label>注意<input id="s-note" value="${esc(s.note)}"></label>
+  </form>
+  <div class="mfoot">${id?'<button class="btn danger sp" id="delBtn">刪除品項</button>':''}<button class="btn" id="cancelBtn">取消</button><button class="btn pri" id="saveBtn">儲存</button></div>`;
+  $('#modal').hidden=false;
+  $('#cancelBtn').onclick=closeModal;
+  if(id) $('#delBtn').onclick=e=>{
+    const b=e.currentTarget;
+    if(b.dataset.sure){Promise.all([fs.doc('drinks/'+id).delete(),fs.doc('drinksop/'+id).delete()]).then(()=>{closeModal();toast('已刪除')}).catch(()=>toast('刪除失敗，請稍後再試'))}
+    else{b.dataset.sure=1;b.textContent='再按一次確認刪除'}
+  };
+  $('#saveBtn').onclick=async()=>{
+    const v=k=>$('#'+k).value.trim();
+    if(!v('f-name')){$('#f-name').focus();return}
+    const nid=id||('d'+Date.now().toString(36));
+    const drink={cat:v('f-cat'),name:v('f-name'),en:v('f-en'),price:v('f-price'),temp:v('f-temp'),desc:v('f-desc'),tip:v('f-tip'),order:Number(v('f-order'))||99,
+      updatedBy:nameOfMail(lc(S.user.email))||'',updatedAt:new Date().toISOString()};
+    const sop={cup:v('s-cup'),ice:v('s-ice'),ingredients:$('#s-ing').value.trim(),steps:$('#s-steps').value.trim(),garnish:v('s-garnish'),note:v('s-note')};
+    $('#saveBtn').disabled=true;
+    try{
+      await fs.doc('drinks/'+nid).set(drink);
+      const o=S.sop[nid]||{}; const same=['cup','ice','ingredients','steps','garnish','note'].every(k=>(o[k]||'')===sop[k]);
+      if(!same) await fs.doc('drinksop/'+nid).set(sop);
+      closeModal(); toast('已儲存');
+    }catch(e){ $('#saveBtn').disabled=false; toast('沒有存到：你可能沒有編修權限，或網路中斷') }
+  };
+}
+async function seedMenu(){
+  const b=$('#seedBtn'); if(b) b.disabled=true;
+  try{
+    const batch=fs.batch();
+    SEED.forEach(([cat,order,name,en,price,temp,desc,tip],i)=>batch.set(fs.collection('drinks').doc(cat+'-'+String(order).padStart(2,'0')),{cat,order,name,en,price,temp,desc,tip}));
+    await batch.commit(); toast('菜單已匯入');
+  }catch(e){ if(b) b.disabled=false; toast('匯入失敗：請確認 Firestore 規則已更新') }
+}
+
+/* ---------- 登入（與收支總覽同一套帳號） ---------- */
+const A={name:null,mode:'login',err:'',busy:false};
+function openLogin(){A.name=null;A.err='';renderLogin();$('#modal').hidden=false}
+function closeModal(){$('#modal').hidden=true;render()}
+function renderLogin(){
+  let body;
+  if(!A.name){
+    body=`<h2>誰要登入？</h2><div class="lg-names">${loginNames().map(n=>`<button data-lgname="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+      <p class="hint" style="margin:0">外場的新人和換宿小幫手不用登入，直接看上桌速查就好。</p>`;
+  }else{
+    const first=A.mode==='set';
+    body=`<div class="who-n"><i>${esc(A.name.slice(0,1))}</i>${esc(A.name)}</div>
+      <h2>${first?'第一次登入，請設定密碼':'請輸入密碼'}</h2>
+      <form id="pwForm" autocomplete="on">
+        <input type="text" name="username" value="${esc(A.name)}" autocomplete="username" hidden>
+        <input type="password" id="pw1" autocomplete="${first?'new-password':'current-password'}" placeholder="${first?'設定密碼（至少 6 個字）':'密碼'}" maxlength="64">
+        ${first?'<input type="password" id="pw2" autocomplete="new-password" placeholder="再輸入一次" maxlength="64">':''}
+        <p class="lg-err" role="alert">${esc(A.err)}</p>
+        <button class="btn pri" type="submit" ${A.busy?'disabled':''}>${first?'設定密碼並登入':'登入'}</button>
+      </form>
+      <button class="linkbtn" data-lgmode="${first?'login':'set'}">${first?'已經設定過密碼？直接登入':'第一次登入，設定密碼'}</button>
+      ${ledgerOf(A.name)?'<p class="hint" style="margin:0">密碼和收支總覽一樣</p>':''}
+      <button class="linkbtn" data-lgback="1">換人</button>`;
+  }
+  $('#mbox').innerHTML=`<div class="lg">${body}<button class="btn" id="cancelBtn">關閉</button></div>`;
+  $('#cancelBtn').onclick=closeModal;
+  const f=$('#pwForm'); if(f){ f.onsubmit=e=>{e.preventDefault();submitPw()}; setTimeout(()=>$('#pw1')&&$('#pw1').focus(),30); }
+}
+function pwDone(n){const p=ledgerOf(n);return !!(S.pwset&&S.pwset[n]===((p&&p.v)||1))}
+const authMsg=e=>{const c=(e&&e.code)||'';
+  if(c==='auth/too-many-requests') return '嘗試太多次，請過幾分鐘再試';
+  if(c==='auth/network-request-failed') return '網路連線失敗，請檢查網路';
+  if(c==='auth/email-already-in-use') return '這個名字已經設定過密碼了，請直接登入；忘記密碼請找妃妃重設';
+  if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)) return pwDone(A.name)?'密碼不對，忘記密碼請找妃妃重設':'密碼不對。第一次使用的話，請按下方「第一次登入，設定密碼」';
+  return '登入失敗（'+(c||'未知錯誤')+'）';};
+async function submitPw(){
+  if(A.busy) return;
+  const p1=$('#pw1').value, p2=$('#pw2')?$('#pw2').value:null;
+  const fail=m=>{A.err=m;A.busy=false;renderLogin()};
+  if(A.mode==='set'){ if(p1.length<6) return fail('密碼至少要 6 個字'); if(p1!==p2) return fail('兩次輸入的密碼不一樣'); }
+  else if(!p1) return fail('請輸入密碼');
+  A.busy=true; A.err=''; renderLogin();
+  const tries=mailsOf(A.name);
+  try{
+    if(A.mode==='set'){
+      await auth.createUserWithEmailAndPassword(tries[0],p1);
+      const p=ledgerOf(A.name); fs.doc('public/pwset').set({[A.name]:(p&&p.v)||1},{merge:true}).catch(()=>{});
+    }else{
+      let last; for(const m of tries){ try{ await auth.signInWithEmailAndPassword(m,p1); last=null; break; }catch(e){ last=e; } }
+      if(last) throw last;
+    }
+    A.busy=false; closeModal(); toast('已登入');
+  }catch(e){ fail(authMsg(e)) }
+}
+
+/* ---------- 畫面 ---------- */
+function render(){
+  const r=role();
+  document.querySelectorAll('#tabs button').forEach(b=>{
+    const v=b.dataset.v;
+    b.hidden= v==='serve'?false : v==='team'? r!=='boss' : !seesSop();
+    b.setAttribute('aria-pressed',String(v===S.view));
+  });
+  if($(`#tabs [data-v="${S.view}"]`).hidden) S.view='serve';
+  const nm=S.user?(nameOfMail(lc(S.user.email))||'已登入'):'';
+  $('#who').innerHTML=S.user
+    ? `<span class="who-n"><i>${esc(nm.slice(0,1))}</i>${esc(nm)}</span><span class="role">${ROLE_NAME[r]}</span><button class="linkbtn" data-logout="1">登出</button>`
+    : `<button class="btn" id="loginBtn">夥伴登入</button>`;
+  const showFilters=(S.view==='serve'||S.view==='sop')&&Object.keys(S.drinks).length>0;
+  $('#filters').hidden=!showFilters;
+  $('#addBtn').hidden=!(canEditMenu()&&showFilters);
+  $('#cats').innerHTML=[{k:'all',z:'全部'},...CATS].map(c=>`<button class="chip" data-cat="${c.k}" aria-pressed="${S.cat===c.k}">${c.z}</button>`).join('');
+  const v=S.view;
+  $('#main').innerHTML= v==='serve'?renderServe(): v==='sop'?renderSop(): v==='quiz'?renderQuiz(): renderTeam();
+  if(S.user&&r==='guest'&&S.cfg) $('#main').insertAdjacentHTML('afterbegin','<div class="notice">你的帳號還沒加進飲品手冊名單，請妃妃在「人員」把你加進去。現在先顯示上桌速查。</div>');
+}
+const quizBusy=()=>S.view==='quiz'&&S.quiz&&S.quiz.i<S.quiz.qs.length;
+const safeRender=()=>{ const a=document.activeElement; if(quizBusy()||!$('#modal').hidden||(a&&a.matches&&a.matches('#main input,#main select,#main textarea'))) return; render(); };
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button'); if(!t) return;
+  if(t.closest('#tabs')&&t.dataset.v){S.view=t.dataset.v;try{history.replaceState(null,'','#'+S.view)}catch(_){}render();return}
+  if(t.dataset.cat){S.cat=t.dataset.cat;render();return}
+  if(t.dataset.edit){openEditor(t.dataset.edit);return}
+  if(t.id==='addBtn'){openEditor(null);return}
+  if(t.id==='seedBtn'){seedMenu();return}
+  if(t.id==='loginBtn'){openLogin();return}
+  if(t.dataset.logout){auth.signOut();return}
+  if(t.dataset.lgname){A.name=t.dataset.lgname;A.mode=pwDone(A.name)?'login':'set';A.err='';renderLogin();return}
+  if(t.dataset.lgmode){A.mode=t.dataset.lgmode;A.err='';renderLogin();return}
+  if(t.dataset.lgback){A.name=null;renderLogin();return}
+  if(t.id==='startQuiz'){S.quiz=makeQuiz();if(!S.quiz.qs.length){S.quiz=null;toast('題目不夠，請先填寫上桌提醒')}render();return}
+  if(t.id==='endQuiz'){S.quiz=null;render();return}
+  if(t.dataset.opt!=null&&S.quiz){const Q=S.quiz;Q.picked=Number(t.dataset.opt);if(Q.qs[Q.i].o[Q.picked]===Q.qs[Q.i].a)Q.score++;render();return}
+  if(t.id==='nextQ'){const Q=S.quiz;Q.i++;Q.picked=null;if(Q.i>=Q.qs.length)saveQuiz(Q);render();return}
+  if(t.id==='tAdd'){TEAM_DRAFT.push({name:'',role:'partner'});render();return}
+  if(t.dataset.tdel!=null){TEAM_DRAFT.splice(Number(t.dataset.tdel),1);render();return}
+  if(t.id==='tSave'){saveTeam();return}
+});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.tn!=null)TEAM_DRAFT[Number(t.dataset.tn)].name=t.value});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.tr!=null)TEAM_DRAFT[Number(t.dataset.tr)].role=t.value});
+$('#q').addEventListener('input',e=>{S.q=e.target.value;render()});
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+(function(){const h=(location.hash||'').slice(1);if(['serve','sop','quiz','team'].includes(h))S.view=h})();
+render();
+
+/* ---------- 連線 ---------- */
+(function boot(){
+  if(!window.firebase||!window.FIREBASE_CONFIG){ $('#main').innerHTML='<div class="notice">連不上資料庫，請確認網路後重新整理。</div>'; return; }
+  firebase.initializeApp(window.FIREBASE_CONFIG); auth=firebase.auth(); fs=firebase.firestore();
+  try{ fs.enablePersistence({synchronizeTabs:true}).catch(()=>{}); }catch(e){}
+  fs.collection('drinks').onSnapshot(s=>{S.drinks={};s.docs.forEach(d=>S.drinks[d.id]=d.data());S.drinksLoaded=true;safeRender()},()=>{S.drinksLoaded=true;safeRender()});
+  fs.doc('drinkcfg/roles').onSnapshot(d=>{S.cfg=d.exists?d.data():{};safeRender();attach()},()=>{S.cfg={}});
+  fs.doc('public/staff').onSnapshot(d=>{S.staff=d.exists?d.data():null;safeRender();attach()},()=>{});
+  fs.doc('public/pwset').onSnapshot(d=>{S.pwset=d.exists?d.data():{}},()=>{});
+  auth.onAuthStateChanged(u=>{S.user=u;S.quiz=null;attach();render()});
+})();
+/* 依角色掛上需要登入才能讀的資料 */
+let attachedKey='';
+function attach(){
+  const r=role(), key=(S.user?S.user.uid:'')+'|'+r;
+  if(key===attachedKey) return; attachedKey=key;
+  subs.forEach(u=>u()); subs=[]; S.sop={}; S.quizAll={}; S.quizMine=null;
+  if(!S.user||r==='guest') return;
+  subs.push(fs.collection('drinksop').onSnapshot(s=>{S.sop={};s.docs.forEach(d=>S.sop[d.id]=d.data());safeRender()},()=>{}));
+  subs.push(fs.doc('drinkquiz/'+S.user.uid).onSnapshot(d=>{S.quizMine=d.exists?d.data():null;safeRender()},()=>{}));
+  if(r==='boss'||r==='bar') subs.push(fs.collection('drinkquiz').onSnapshot(s=>{S.quizAll={};s.docs.forEach(d=>S.quizAll[d.id]=d.data());safeRender()},()=>{}));
+}
+</script>
+
+</body>
+</html>
