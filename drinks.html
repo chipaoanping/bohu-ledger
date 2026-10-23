@@ -167,7 +167,8 @@ a.back{font-size:13px;color:var(--jade);text-decoration:none}
 <script src="config.js"></script>
 <script>
 /* 伯虎在二樓 飲品SOP手冊：與收支總覽共用 Firebase 帳號
-   權限：老闆（妃妃）＞ 吧台負責人（可編修）＞ 夥伴（看SOP、考核）＞ 外場（不用登入，只看上桌速查） */
+   權限：老闆（妃妃）＞ 吧台負責人（可編修）＞ 夥伴（看SOP、考核）＞ 外場（只看上桌速查）
+   所有內容都要登入，而且要妃妃核准才看得到 */
 const BOSS='妃妃';
 const MAILDOM='bohu-ledger.app';
 const CATS=[
@@ -178,43 +179,8 @@ const CATS=[
   {k:'tipsy',n:'Tipsy Drink',z:'微醺'}
 ];
 const DEFAULT_TEAM=[{name:'土豆',role:'bar'},{name:'小不點',role:'partner'},{name:'李樂',role:'partner'},{name:'雅淳',role:'partner'}];
-/* 2026 菜單，第一次由老闆或吧台負責人按「匯入菜單」寫進資料庫 */
-const SEED=[
- ['coffee',1,'Affogato 香草冰淇淋','','150','I','香草冰淇淋、濃縮咖啡','冰淇淋遇到咖啡會很快化開，建議上桌就先吃'],
- ['coffee',2,'南南里檸檬咖啡','Espresso Romano','160','I','','裡面有新鮮檸檬，放久會轉苦，建議先喝幾口'],
- ['coffee',3,'蘋蘋里 蘋果咖啡','Apple Coffee','160','I','','喝之前輕輕攪拌，蘋果和咖啡會更融合'],
- ['coffee',4,'落日香橙','Orange Espresso','160','I','','先看一下漸層，攪拌後再喝'],
- ['coffee',5,'黑泰奶咖啡','Thai tea with espresso','160','I','','攪拌均勻再喝，泰奶的香料和咖啡才會合在一起'],
- ['coffee',6,'炸彈可樂咖啡','Coca Cola with espresso','160','I','','氣泡會越放越少，趁氣泡還在的時候喝'],
- ['coffee',7,'冰磚咖啡','Coffee cubes in milk','170','I','咖啡冰磚、鮮奶','咖啡冰磚會在牛奶裡慢慢融，越喝越濃'],
- ['coffee',8,'脆糖炫泡','Caramel Crunch Latte','180','I','','上面的脆糖會慢慢變軟，建議先吃一口脆的'],
- ['coffee',9,'Espresso','','100','H','','小小一杯，趁熱一兩口喝完最香'],
- ['coffee',10,'美式','Americano','120','H/I','','熱的趁熱，冰的會被冰塊稀釋，都建議先喝'],
- ['coffee',11,'卡布奇諾','Cappuccino','130','H','','奶泡會慢慢消，趁綿密的時候喝'],
- ['coffee',12,'拿鐵','Caffe Latte','140','H/I','','熱的趁熱，冰的攪拌一下再喝'],
- ['coffee',13,'馥芮白','Flat White','150','H/I','','剛上桌時奶香和咖啡最平衡'],
- ['coffee',14,'茶拿鐵','Earl Grey Caffe Latte','150','H','伯爵茶、濃縮咖啡、鮮奶','伯爵茶香在熱的時候最明顯，趁熱喝'],
- ['coffee',15,'摩卡','Mocha','170','H/I','','巧克力容易沉底，喝之前攪拌一下'],
- ['sparkling',1,'樂園｜無花果氣泡飲','Fig jam flavored & gummy bear','140','','無花果果醬、小熊軟糖、氣泡','底下有無花果醬和小熊軟糖，輕輕攪拌再喝'],
- ['sparkling',2,'ALOHA｜青梅醋氣泡飲','Plum vinegar & grapefruit','140','','青梅醋、葡萄柚、氣泡','氣泡會慢慢消，攪拌輕一點，趁冰喝'],
- ['sparkling',3,'海水淡化｜海鹽氣泡飲','Sea salt flavored & cucumber','140','','海鹽、小黃瓜、氣泡','小黃瓜的清香在一開始最明顯，建議先喝'],
- ['sparkling',4,'香香｜百香果氣泡飲','Passion fruit and lactic acid beverage','150','','百香果、乳酸飲、氣泡','百香果和乳酸沉在底下，喝之前攪拌一下'],
- ['specialty',1,'港口鮮奶茶','Gangkou milk tea','160','I','恆春港口茶、鮮奶','用恆春的港口茶做的，攪拌一下再喝'],
- ['specialty',2,'麥香核桃鮮奶茶','Barley milk tea with crushed walnut','170','I','麥茶、鮮奶、碎核桃，附一小碟核桃','旁邊的核桃可以撒上去，或配著一起吃'],
- ['specialty',3,'抹茶歐蕾','Matcha latte','160','H/I','抹茶、鮮奶','抹茶和牛奶分層，攪拌後再喝'],
- ['specialty',4,'麥芽奶茶','Wheat germ milk tea','120','H/I','','熱的趁熱，冰的攪拌一下'],
- ['specialty',5,'真的檸檬','Lemonade','160','','現壓真檸檬','現壓的真檸檬，放久會慢慢變苦，建議先喝幾口'],
- ['specialty',6,'鮮奶巧克力','Chocolate milk','130','H/I','巧克力、鮮奶','巧克力容易沉底，喝之前攪拌一下'],
- ['tea',1,'伯爵紅茶','Earl Grey Tea','140','H','熱茶，可回沖','可以回沖，喝完跟我們說，幫你加熱水'],
- ['tea',2,'恆春半島・港口茶','Gangkou','160','H','熱茶，可回沖','恆春半島的港口茶，可以回沖，喝完跟我們說'],
- ['tea',3,'金萱烏龍茶（冰）','Jhinhsuan','200','I','茶冰球，附小茶點，不可回沖','茶冰球會慢慢融，茶味越來越濃，冰的不能回沖喔'],
- ['tea',4,'金萱烏龍茶（熱）','Jhinhsuan','190','H','附小茶點，可回沖','附小茶點，可以回沖，喝完跟我們說'],
- ['tipsy',1,'蔓蔓喝','Cranberry Lychee Sparkling Wine','160','','蔓越莓醬、荔枝酒','有含酒精，氣泡在的時候最好喝'],
- ['tipsy',2,'海洋沙瓦','Ocean Sour','180','','琴酒冰沙、香草冰淇淋','琴酒冰沙和冰淇淋都會融，趁冰吃'],
- ['tipsy',3,'稻香','Golden Fields','180','','麥茶、橙酒','有含酒精，麥茶和橙酒攪拌一下再喝']
-];
-const ROLE_NAME={boss:'老闆',bar:'吧台負責人',partner:'夥伴',guest:'外場'};
-const S={drinks:{},drinksLoaded:false,sop:{},cfg:null,staff:null,pwset:{},quizAll:{},quizMine:null,
+const ROLE_NAME={boss:'老闆',bar:'吧台負責人',partner:'夥伴',front:'外場',guest:'待核准'};
+const S={pending:{},drinks:{},drinksLoaded:false,sop:{},cfg:null,staff:null,pwset:{},quizAll:{},quizMine:null,
   user:null,view:'serve',cat:'all',q:'',quiz:null};
 let fs=null,auth=null,subs=[];
 const $=s=>document.querySelector(s);
@@ -233,6 +199,8 @@ function mailsOf(n){const p=ledgerOf(n);const a=[emailOf(n,p?p.v:1)];if(p&&p.mai
 function isBossMail(m){const st=S.staff||{};return !!m&&(m===lc(st.bossEmail)||m===lc(st.bossMail)||(st.bossEmails||[]).map(lc).includes(m))}
 function nameOfMail(m){
   for(const p of [...ledgerPeople(),...teamList()]) if(mailsOf(p.name).includes(m)) return p.name;
+  const x=/^s([0-9a-f]+)(?:-v\d+)?@/.exec(m||'');
+  if(x&&m.endsWith('@'+MAILDOM)){ try{ return new TextDecoder().decode(new Uint8Array(x[1].match(/../g).map(h=>parseInt(h,16)))); }catch(e){} }
   return null;
 }
 function role(){
@@ -242,11 +210,12 @@ function role(){
   const c=S.cfg||{};
   if((c.barEmails||[]).includes(m)) return 'bar';
   if((c.partnerEmails||[]).includes(m)) return 'partner';
+  if((c.frontEmails||[]).includes(m)) return 'front';
   return 'guest';
 }
 const canEditMenu=()=>['boss','bar'].includes(role());
-const seesSop=()=>role()!=='guest';
-const loginNames=()=>{const set=new Set([BOSS,...teamList().map(p=>p.name)]);return [...set]};
+const seesSop=()=>['boss','bar','partner'].includes(role());
+const seesMenu=()=>role()!=='guest';
 
 /* ---------- 列表 ---------- */
 function sorted(){
@@ -261,9 +230,7 @@ const tempTag=t=>t?`<span class="tag">${t==='H/I'?'冷熱':t==='H'?'熱':'冰'}<
 
 function renderServe(){
   if(!S.drinksLoaded) return `<div class="notice">讀取中…</div>`;
-  if(!Object.keys(S.drinks).length) return canEditMenu()
-    ? `<div class="notice" style="display:grid;gap:10px"><div>還沒有品項。把 2026 菜單的 32 杯飲品匯入，上桌提醒也會一起帶進來。</div><div><button class="btn pri" id="seedBtn">匯入菜單</button></div></div>`
-    : `<div class="notice">品項還沒建立，請老闆或吧台負責人登入後匯入菜單。</div>`;
+  if(!Object.keys(S.drinks).length) return `<div class="notice">還沒有品項。${canEditMenu()?'按上方「＋ 新增品項」建立。':'請吧台負責人建立品項。'}</div>`;
   const list=filtered();
   if(!list.length) return `<div class="notice">找不到符合的品項。</div>`;
   return CATS.map(c=>{
@@ -368,21 +335,38 @@ let TEAM_DRAFT=null;
 function renderTeam(){
   if(!TEAM_DRAFT) TEAM_DRAFT=(teamList().length?teamList():DEFAULT_TEAM).map(p=>({...p}));
   return `<div class="panel"><div><h2>人員與權限</h2>
-    <div class="hint">吧台負責人可以編修品項與SOP；夥伴可以看SOP和考核。新人與換宿小幫手不用帳號，打開這頁就能看上桌速查。帳本裡已有帳號的人，用同一組密碼登入；沒有的人第一次登入時自己設定密碼。</div></div>
+    <div class="hint">只有名單裡的人看得到這本手冊。吧台負責人可以編修品項與SOP；夥伴可以看SOP和考核；外場（新人、換宿小幫手）只看得到上桌速查。帳本裡已有帳號的人用同一組密碼登入，其他人第一次登入時自己設定密碼，再由你在這裡核准。</div></div>
+    ${renderPending()}
     <div class="tbl"><table class="list"><tr><th>名字</th><th>角色</th><th></th></tr>${TEAM_DRAFT.map((p,i)=>`<tr>
       <td><input id="tn-${i}" data-tn="${i}" value="${esc(p.name)}" aria-label="名字" style="border:1px solid var(--rule);border-radius:8px;padding:5px 8px;width:9em;max-width:100%;background:var(--bg)"> ${ledgerOf(p.name)?'<span class="tag">帳本帳號</span>':''}</td>
-      <td><select id="tr-${i}" data-tr="${i}" aria-label="角色"><option value="partner" ${p.role!=='bar'?'selected':''}>夥伴（看SOP、考核）</option><option value="bar" ${p.role==='bar'?'selected':''}>吧台負責人（可編修）</option></select></td>
+      <td><select id="tr-${i}" data-tr="${i}" aria-label="角色">${roleOpts(p.role)}</select></td>
       <td><button class="btn danger" data-tdel="${i}" style="padding:3px 10px;font-size:13px">移除</button></td></tr>`).join('')}</table></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="tAdd">＋ 新增人員</button><button class="btn pri" id="tSave">儲存名單</button></div>
     ${teamList().length?'':'<div class="hint">這是預設名單，按「儲存名單」後才會生效。</div>'}</div>`;
 }
-async function saveTeam(){
-  const list=TEAM_DRAFT.map(p=>({name:p.name.trim(),role:p.role==='bar'?'bar':'partner'})).filter(p=>p.name);
-  const data={people:list,
-    barEmails:list.filter(p=>p.role==='bar').flatMap(p=>mailsOf(p.name)),
-    partnerEmails:list.filter(p=>p.role!=='bar').flatMap(p=>mailsOf(p.name)),
-    updatedAt:new Date().toISOString()};
-  try{await fs.doc('drinkcfg/roles').set(data);TEAM_DRAFT=null;toast('名單已儲存')}catch(e){toast('沒有存到：只有老闆可以改名單')}
+const ROLES=[['bar','吧台負責人（可編修）'],['partner','夥伴（看SOP、考核）'],['front','外場（只看上桌速查）']];
+const roleOpts=r=>ROLES.map(([k,n])=>`<option value="${k}" ${(r||'partner')===k?'selected':''}>${n}</option>`).join('');
+function renderPending(){
+  const inList=new Set(teamList().map(p=>p.name));
+  const ps=Object.entries(S.pending).filter(([,p])=>p.name&&!inList.has(p.name));
+  if(!ps.length) return '';
+  return `<div style="display:grid;gap:8px"><div class="lbl">等待核准</div>${ps.map(([uid,p])=>`<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--amber-soft);border-radius:10px;padding:8px 12px">
+    <b style="margin-right:auto">${esc(p.name)}</b><span class="hint">${esc((p.at||'').slice(0,10))} 申請</span>
+    <select id="pr-${esc(uid)}" aria-label="核准角色">${roleOpts('front')}</select>
+    <button class="btn pri" data-approve="${esc(uid)}">核准</button><button class="btn danger" data-reject="${esc(uid)}">拒絕</button></div>`).join('')}</div>`;
+}
+async function saveTeam(draft){
+  const list=(draft||TEAM_DRAFT).map(p=>({name:p.name.trim(),role:['bar','partner','front'].includes(p.role)?p.role:'partner'})).filter(p=>p.name);
+  const em=r=>list.filter(p=>p.role===r).flatMap(p=>mailsOf(p.name));
+  const data={people:list,barEmails:em('bar'),partnerEmails:em('partner'),frontEmails:em('front'),updatedAt:new Date().toISOString()};
+  try{await fs.doc('drinkcfg/roles').set(data);TEAM_DRAFT=null;toast('名單已儲存');return true}catch(e){toast('沒有存到：只有老闆可以改名單');return false}
+}
+async function approve(uid){
+  const p=S.pending[uid]; if(!p) return;
+  const r=$('#pr-'+uid).value;
+  const base=(TEAM_DRAFT||teamList()).map(x=>({...x})).filter(x=>x.name!==p.name);
+  base.push({name:p.name,role:r});
+  if(await saveTeam(base)) fs.doc('drinkreq/'+uid).delete().catch(()=>{});
 }
 
 /* ---------- 編修 ---------- */
@@ -431,14 +415,6 @@ function openEditor(id){
     }catch(e){ $('#saveBtn').disabled=false; toast('沒有存到：你可能沒有編修權限，或網路中斷') }
   };
 }
-async function seedMenu(){
-  const b=$('#seedBtn'); if(b) b.disabled=true;
-  try{
-    const batch=fs.batch();
-    SEED.forEach(([cat,order,name,en,price,temp,desc,tip],i)=>batch.set(fs.collection('drinks').doc(cat+'-'+String(order).padStart(2,'0')),{cat,order,name,en,price,temp,desc,tip}));
-    await batch.commit(); toast('菜單已匯入');
-  }catch(e){ if(b) b.disabled=false; toast('匯入失敗：請確認 Firestore 規則已更新') }
-}
 
 /* ---------- 登入（與收支總覽同一套帳號） ---------- */
 const A={name:null,mode:'login',err:'',busy:false};
@@ -447,8 +423,9 @@ function closeModal(){$('#modal').hidden=true;render()}
 function renderLogin(){
   let body;
   if(!A.name){
-    body=`<h2>誰要登入？</h2><div class="lg-names">${loginNames().map(n=>`<button data-lgname="${esc(n)}">${esc(n)}</button>`).join('')}</div>
-      <p class="hint" style="margin:0">外場的新人和換宿小幫手不用登入，直接看上桌速查就好。</p>`;
+    body=`<h2>請輸入你的名字</h2>
+      <form id="nameForm" autocomplete="on"><input id="lgName" autocomplete="username" placeholder="例：土豆" maxlength="20" style="letter-spacing:.05em"><button class="btn pri" type="submit">下一步</button></form>
+      <p class="hint" style="margin:0">跟收支總覽用同一個名字。第一次使用的人登入後，要等妃妃核准才看得到內容。</p>`;
   }else{
     const first=A.mode==='set';
     body=`<div class="who-n"><i>${esc(A.name.slice(0,1))}</i>${esc(A.name)}</div>
@@ -466,6 +443,7 @@ function renderLogin(){
   }
   $('#mbox').innerHTML=`<div class="lg">${body}<button class="btn" id="cancelBtn">關閉</button></div>`;
   $('#cancelBtn').onclick=closeModal;
+  const nf=$('#nameForm'); if(nf){ nf.onsubmit=e=>{e.preventDefault();const n=$('#lgName').value.trim();if(!n)return;A.name=n;A.mode=pwDone(n)?'login':'set';A.err='';renderLogin()}; setTimeout(()=>$('#lgName')&&$('#lgName').focus(),30); }
   const f=$('#pwForm'); if(f){ f.onsubmit=e=>{e.preventDefault();submitPw()}; setTimeout(()=>$('#pw1')&&$('#pw1').focus(),30); }
 }
 function pwDone(n){const p=ledgerOf(n);return !!(S.pwset&&S.pwset[n]===((p&&p.v)||1))}
@@ -500,21 +478,25 @@ function render(){
   const r=role();
   document.querySelectorAll('#tabs button').forEach(b=>{
     const v=b.dataset.v;
-    b.hidden= v==='serve'?false : v==='team'? r!=='boss' : !seesSop();
+    b.hidden= v==='serve'?!seesMenu() : v==='team'? r!=='boss' : !seesSop();
     b.setAttribute('aria-pressed',String(v===S.view));
   });
   if($(`#tabs [data-v="${S.view}"]`).hidden) S.view='serve';
+  $('#tabs').parentElement.hidden=!seesMenu();
   const nm=S.user?(nameOfMail(lc(S.user.email))||'已登入'):'';
   $('#who').innerHTML=S.user
     ? `<span class="who-n"><i>${esc(nm.slice(0,1))}</i>${esc(nm)}</span><span class="role">${ROLE_NAME[r]}</span><button class="linkbtn" data-logout="1">登出</button>`
     : `<button class="btn" id="loginBtn">夥伴登入</button>`;
-  const showFilters=(S.view==='serve'||S.view==='sop')&&Object.keys(S.drinks).length>0;
+  const showFilters=seesMenu()&&(S.view==='serve'||S.view==='sop')&&(Object.keys(S.drinks).length>0||canEditMenu());
   $('#filters').hidden=!showFilters;
   $('#addBtn').hidden=!(canEditMenu()&&showFilters);
   $('#cats').innerHTML=[{k:'all',z:'全部'},...CATS].map(c=>`<button class="chip" data-cat="${c.k}" aria-pressed="${S.cat===c.k}">${c.z}</button>`).join('');
   const v=S.view;
+  if(!S.authReady){ $('#main').innerHTML='<div class="notice">讀取中…</div>'; return; }
+  if(!S.user){ $('#main').innerHTML=`<div class="panel" style="justify-items:start"><h2>伯虎內部資料</h2><div class="hint">這本手冊只給妃妃核准的夥伴使用，請先登入。</div><button class="btn pri" id="loginBtn2">夥伴登入</button></div>`; return; }
+  if(!S.cfg){ $('#main').innerHTML='<div class="notice">讀取中…</div>'; return; }
+  if(r==='guest'){ $('#main').innerHTML=`<div class="panel" style="justify-items:start"><h2>等待核准</h2><div class="hint">已經通知妃妃。核准之後重新整理這頁，就看得到內容。</div></div>`; return; }
   $('#main').innerHTML= v==='serve'?renderServe(): v==='sop'?renderSop(): v==='quiz'?renderQuiz(): renderTeam();
-  if(S.user&&r==='guest'&&S.cfg) $('#main').insertAdjacentHTML('afterbegin','<div class="notice">你的帳號還沒加進飲品手冊名單，請妃妃在「人員」把你加進去。現在先顯示上桌速查。</div>');
 }
 const quizBusy=()=>S.view==='quiz'&&S.quiz&&S.quiz.i<S.quiz.qs.length;
 const safeRender=()=>{ const a=document.activeElement; if(quizBusy()||!$('#modal').hidden||(a&&a.matches&&a.matches('#main input,#main select,#main textarea'))) return; render(); };
@@ -525,8 +507,7 @@ document.addEventListener('click',e=>{
   if(t.dataset.cat){S.cat=t.dataset.cat;render();return}
   if(t.dataset.edit){openEditor(t.dataset.edit);return}
   if(t.id==='addBtn'){openEditor(null);return}
-  if(t.id==='seedBtn'){seedMenu();return}
-  if(t.id==='loginBtn'){openLogin();return}
+  if(t.id==='loginBtn'||t.id==='loginBtn2'){openLogin();return}
   if(t.dataset.logout){auth.signOut();return}
   if(t.dataset.lgname){A.name=t.dataset.lgname;A.mode=pwDone(A.name)?'login':'set';A.err='';renderLogin();return}
   if(t.dataset.lgmode){A.mode=t.dataset.lgmode;A.err='';renderLogin();return}
@@ -538,6 +519,8 @@ document.addEventListener('click',e=>{
   if(t.id==='tAdd'){TEAM_DRAFT.push({name:'',role:'partner'});render();return}
   if(t.dataset.tdel!=null){TEAM_DRAFT.splice(Number(t.dataset.tdel),1);render();return}
   if(t.id==='tSave'){saveTeam();return}
+  if(t.dataset.approve){approve(t.dataset.approve);return}
+  if(t.dataset.reject){fs.doc('drinkreq/'+t.dataset.reject).delete().then(()=>toast('已拒絕')).catch(()=>{});return}
 });
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.tn!=null)TEAM_DRAFT[Number(t.dataset.tn)].name=t.value});
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.tr!=null)TEAM_DRAFT[Number(t.dataset.tr)].role=t.value});
@@ -551,20 +534,34 @@ render();
 (function boot(){
   if(!window.firebase||!window.FIREBASE_CONFIG){ $('#main').innerHTML='<div class="notice">連不上資料庫，請確認網路後重新整理。</div>'; return; }
   firebase.initializeApp(window.FIREBASE_CONFIG); auth=firebase.auth(); fs=firebase.firestore();
-  try{ fs.enablePersistence({synchronizeTabs:true}).catch(()=>{}); }catch(e){}
-  fs.collection('drinks').onSnapshot(s=>{S.drinks={};s.docs.forEach(d=>S.drinks[d.id]=d.data());S.drinksLoaded=true;safeRender()},()=>{S.drinksLoaded=true;safeRender()});
-  fs.doc('drinkcfg/roles').onSnapshot(d=>{S.cfg=d.exists?d.data():{};safeRender();attach()},()=>{S.cfg={}});
   fs.doc('public/staff').onSnapshot(d=>{S.staff=d.exists?d.data():null;safeRender();attach()},()=>{});
   fs.doc('public/pwset').onSnapshot(d=>{S.pwset=d.exists?d.data():{}},()=>{});
-  auth.onAuthStateChanged(u=>{S.user=u;S.quiz=null;attach();render()});
+  auth.onAuthStateChanged(u=>{S.user=u;S.authReady=true;S.quiz=null;watchCfg();attach();render()});
 })();
 /* 依角色掛上需要登入才能讀的資料 */
+/* 名單只有登入後讀得到 */
+let cfgUnsub=null,cfgUid='';
+function watchCfg(){
+  const uid=S.user?S.user.uid:'';
+  if(uid===cfgUid) return; cfgUid=uid;
+  if(cfgUnsub){cfgUnsub();cfgUnsub=null} S.cfg=null;
+  if(!uid) return;
+  cfgUnsub=fs.doc('drinkcfg/roles').onSnapshot(d=>{S.cfg=d.exists?d.data():{};attach();safeRender()},()=>{S.cfg={};attach();safeRender()});
+}
 let attachedKey='';
 function attach(){
-  const r=role(), key=(S.user?S.user.uid:'')+'|'+r;
+  const r=role(), key=(S.user?S.user.uid:'')+'|'+r+'|'+(S.cfg?1:0);
   if(key===attachedKey) return; attachedKey=key;
-  subs.forEach(u=>u()); subs=[]; S.sop={}; S.quizAll={}; S.quizMine=null;
-  if(!S.user||r==='guest') return;
+  subs.forEach(u=>u()); subs=[]; S.drinks={}; S.drinksLoaded=false; S.sop={}; S.quizAll={}; S.quizMine=null; S.pending={};
+  if(!S.user||!S.cfg) return;
+  if(r==='guest'){
+    const n=nameOfMail(lc(S.user.email))||A.name||'', ref=fs.doc('drinkreq/'+S.user.uid);
+    ref.get().then(d=>{ if(!d.exists&&n) return ref.set({name:n,at:new Date().toISOString()}); }).catch(()=>{});
+    return;
+  }
+  subs.push(fs.collection('drinks').onSnapshot(s=>{S.drinks={};s.docs.forEach(d=>S.drinks[d.id]=d.data());S.drinksLoaded=true;safeRender()},()=>{S.drinksLoaded=true;safeRender()}));
+  if(r==='boss') subs.push(fs.collection('drinkreq').onSnapshot(s=>{S.pending={};s.docs.forEach(d=>S.pending[d.id]=d.data());safeRender()},()=>{}));
+  if(!seesSop()) return;
   subs.push(fs.collection('drinksop').onSnapshot(s=>{S.sop={};s.docs.forEach(d=>S.sop[d.id]=d.data());safeRender()},()=>{}));
   subs.push(fs.doc('drinkquiz/'+S.user.uid).onSnapshot(d=>{S.quizMine=d.exists?d.data():null;safeRender()},()=>{}));
   if(r==='boss'||r==='bar') subs.push(fs.collection('drinkquiz').onSnapshot(s=>{S.quizAll={};s.docs.forEach(d=>S.quizAll[d.id]=d.data());safeRender()},()=>{}));
