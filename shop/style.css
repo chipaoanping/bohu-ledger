@@ -1,0 +1,30 @@
+:root{
+  --orange:#EF6101; --orange-2:#FC6F20; --cream:#FEE8D0; --paper:#F5F3F3;
+  --ink:#323232; --brown:#4E3B34; --char:#3B3A3A; --mute:#8C837D; --line:#DED7D1;
+  --serif:"Noto Serif TC",serif; --sans:"Outfit","Noto Sans TC",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.75;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+input,textarea,select{font:inherit;font-size:16px;color:inherit}
+.serif{font-family:var(--serif);font-weight:900;letter-spacing:.02em}
+.label{font-family:var(--sans);font-size:13px;letter-spacing:.18em;font-weight:300}
+.hide{display:none!important}
+
+/* 按鈕 */
+.btn{border:0;border-radius:0;background:var(--orange);color:#fff;font-weight:600;font-size:16px;padding:14px 24px;letter-spacing:.08em}
+.btn:disabled{opacity:.35}
+.btn.dark{background:var(--ink)}
+.btn.ghost{background:transparent;color:inherit;border:1px solid currentColor}
+.btn.block{width:100%}
+
+/* 輸入 */
+.field{margin-bottom:22px}
+.field label{display:block;font-size:12px;letter-spacing:.16em;opacity:.7;margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;background:transparent;border:0;border-bottom:1px solid currentColor;border-radius:0;padding:8px 0;outline:none}
+.field textarea{min-height:64px;resize:vertical}
+.field input:focus,.field textarea:focus{border-bottom-color:var(--orange)}
+
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--ink);color:var(--cream);font-size:14px;padding:9px 18px;opacity:0;transition:.3s;pointer-events:none;z-index:99;white-space:nowrap}
+.toast.on{opacity:.95}

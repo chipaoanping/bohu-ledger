@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>伯虎宅配後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+body{background:var(--paper)}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+
+/* 登入 */
+#login{min-height:100vh;background:linear-gradient(var(--orange) 0 55%,var(--char) 55% 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+#login .box{width:100%;max-width:360px;background:var(--paper);padding:32px 26px}
+#login h1{font-size:36px;color:var(--brown);line-height:1.1;margin:10px 0 28px}
+
+/* 頂部 */
+.head{background:var(--char);color:var(--paper)}
+.head .in{max-width:760px;margin:0 auto;padding:18px 18px 0}
+.head .l1{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.18em}
+.head .l1 button{background:none;border:0;color:inherit;font-size:12px;letter-spacing:.14em;opacity:.7}
+.head h1{font-size:30px;margin:14px 0 18px}
+.tabs{display:flex;gap:2px}
+.tabs button{flex:1;background:transparent;border:0;color:var(--paper);opacity:.55;padding:12px 0;font-size:15px;letter-spacing:.14em;border-bottom:3px solid transparent}
+.tabs button.on{opacity:1;border-bottom-color:var(--orange)}
+
+/* 訂單 */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:20px 0 14px}
+.chip{background:transparent;border:1px solid var(--ink);padding:5px 12px;font-size:13px;letter-spacing:.06em}
+.chip.on{background:var(--ink);color:var(--paper)}
+.chip i{font-style:normal;font-family:"Outfit";font-weight:600;margin-left:4px;color:var(--orange)}
+.chip.on i{color:var(--orange-2)}
+.search{flex:1;min-width:160px;border:0;border-bottom:1px solid var(--ink);background:transparent;padding:6px 0;outline:none}
+.mini{background:none;border:0;font-size:13px;letter-spacing:.08em;color:var(--orange);font-weight:600}
+
+.order{background:#fff;border-left:4px solid var(--line);margin-bottom:10px}
+.order.pending{border-left-color:var(--orange)}
+.order.paid{border-left-color:var(--brown)}
+.order.shipped{border-left-color:var(--char)}
+.order.cancelled{opacity:.55}
+.order .sum{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:14px 16px;cursor:pointer}
+.order .no{font-family:"Outfit";font-weight:600;letter-spacing:.06em}
+.order .t{font-size:12px;color:var(--mute)}
+.order .amt{font-family:"Outfit";font-weight:600;font-size:18px;text-align:right}
+.pill{font-size:11px;letter-spacing:.1em;padding:1px 8px;justify-self:end;background:var(--paper)}
+.pill.pending{background:var(--orange);color:#fff}
+.order .detail{padding:4px 16px 18px;border-top:1px dashed var(--line);font-size:14px}
+.order .detail dl{display:grid;grid-template-columns:84px 1fr;gap:6px 10px;margin:12px 0}
+.order .detail dt{color:var(--mute);font-size:13px}
+.order .detail dd{word-break:break-all}
+.order .detail a{color:var(--orange)}
+.items-t{width:100%;border-collapse:collapse;margin:8px 0}
+.items-t td{padding:4px 0;border-bottom:1px solid var(--paper)}
+.items-t td:last-child{text-align:right;font-family:"Outfit"}
+.edit-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.edit-row select,.edit-row input{border:1px solid var(--line);background:#fff;padding:8px 10px;flex:1;min-width:130px}
+.edit-row .btn{padding:9px 18px;font-size:14px}
+
+/* 商品 */
+.prod{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;background:#fff;padding:12px 14px;margin-bottom:8px}
+.prod .ph{width:64px;height:64px;background:var(--cream);overflow:hidden;display:grid;place-items:center;font-family:"Outfit";font-weight:800;color:var(--orange)}
+.prod .ph img{width:100%;height:100%;object-fit:cover}
+.prod .nm{font-family:var(--serif);font-weight:900}
+.prod .meta{font-size:12px;color:var(--mute)}
+.prod.off{opacity:.5}
+.switch{position:relative;width:44px;height:24px;background:var(--line);border:0;border-radius:12px;transition:.2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.switch.on{background:var(--orange)}.switch.on::after{left:23px}
+
+/* 編輯視窗 */
+.modal{position:fixed;inset:0;background:rgba(50,50,50,.6);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.modal .sheet{background:var(--paper);width:100%;max-width:560px;max-height:92vh;overflow:auto;padding:24px 20px calc(24px + env(safe-area-inset-bottom))}
+.modal h3{font-size:24px;color:var(--brown);margin-bottom:20px}
+.imgpick{display:flex;gap:14px;align-items:center;margin-bottom:22px}
+.imgpick .ph{width:96px;height:96px;background:var(--cream);overflow:hidden;display:grid;place-items:center;font-size:12px;color:var(--mute)}
+.imgpick .ph img{width:100%;height:100%;object-fit:contain}
+.checks{display:flex;gap:24px;margin-bottom:22px;font-size:15px}
+.checks label{display:flex;gap:8px;align-items:center}
+.checks input{width:18px;height:18px;accent-color:var(--orange)}
+
+/* 設定 */
+.panel{background:#fff;padding:22px 18px;margin:20px 0}
+.panel h3{font-size:20px;color:var(--brown);margin-bottom:18px}
+.hint{font-size:12px;color:var(--mute);margin:-14px 0 20px}
+.empty{padding:40px 0;text-align:center;color:var(--mute);font-size:14px}
+main{padding-bottom:80px}
+</style>
+</head>
+<body>
+
+<section id="login" class="hide">
+  <div class="box">
+    <div class="label" style="color:var(--mute)">{ 伯虎宅配 — 後台 }</div>
+    <h1 class="serif">登入</h1>
+    <div class="field"><label>Email</label><input id="em" type="email" autocomplete="username"></div>
+    <div class="field"><label>密碼</label><input id="pw" type="password" autocomplete="current-password"></div>
+    <button class="btn block" id="doLogin">登入</button>
+    <p id="loginErr" style="color:var(--orange);font-size:13px;margin-top:12px"></p>
+  </div>
+</section>
+
+<div id="app" class="hide">
+  <header class="head"><div class="in">
+    <div class="l1"><span>{ 伯虎宅配 — 後台 }</span><button id="logout">登出</button></div>
+    <h1 class="serif" id="pageTitle">訂單</h1>
+    <nav class="tabs">
+      <button data-tab="orders" class="on">訂單</button>
+      <button data-tab="products">商品</button>
+      <button data-tab="settings">設定</button>
+    </nav>
+  </div></header>
+
+  <main class="wrap">
+    <!-- 訂單 -->
+    <section id="tab-orders">
+      <div class="toolbar" id="chips"></div>
+      <div class="toolbar">
+        <input class="search" id="q" placeholder="搜尋訂單編號、姓名、電話、付款名稱">
+        <button class="mini" id="csv">匯出 CSV</button>
+      </div>
+      <div id="orderList"></div>
+    </section>
+
+    <!-- 商品 -->
+    <section id="tab-products" class="hide">
+      <div class="toolbar" style="justify-content:space-between">
+        <span class="label" style="color:var(--mute)">關閉開關即下架，排序數字小的在前</span>
+        <button class="btn" id="addProd" style="padding:10px 18px;font-size:14px">＋ 新增商品</button>
+      </div>
+      <div id="prodList"></div>
+    </section>
+
+    <!-- 設定 -->
+    <section id="tab-settings" class="hide">
+      <div class="panel">
+        <h3 class="serif">接單</h3>
+        <div class="checks"><label><input type="checkbox" id="s-open">開放宅配訂購</label></div>
+        <div class="field"><label>暫停接單時顯示的文字</label><input id="s-closedText"></div>
+      </div>
+      <div class="panel">
+        <h3 class="serif">付款</h3>
+        <div class="field"><label>伯虎官方 LINE ID（含 @）</label><input id="s-lineOaId" placeholder="@xxxxxxx"></div>
+        <div class="imgpick">
+          <div class="ph" id="qrPrev">尚未上傳</div>
+          <div>
+            <div style="font-size:14px;margin-bottom:8px">LINE Pay 收款碼</div>
+            <label class="btn dark" style="padding:8px 16px;font-size:13px;display:inline-block">選擇圖片<input type="file" accept="image/*" id="qrFile" hidden></label>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 class="serif">運送</h3>
+        <div class="field"><label>冷凍運費</label><input id="s-shipFee" type="number" inputmode="numeric"></div>
+        <div class="field"><label>滿額免運（0＝不提供）</label><input id="s-freeShipOver" type="number" inputmode="numeric"></div>
+        <div class="field"><label>最快幾天後到貨</label><input id="s-leadDays" type="number" inputmode="numeric"></div>
+      </div>
+      <div class="panel">
+        <h3 class="serif">前言</h3>
+        <div class="field"><label>首頁介紹文字</label><textarea id="s-intro" rows="5"></textarea></div>
+      </div>
+      <button class="btn block" id="saveSettings">儲存設定</button>
+    </section>
+  </main>
+</div>
+
+<!-- 商品編輯 -->
+<div class="modal hide" id="modal">
+  <div class="sheet">
+    <h3 class="serif" id="mTitle">新增商品</h3>
+    <div class="imgpick">
+      <div class="ph" id="pPrev">無圖片</div>
+      <div>
+        <label class="btn dark" style="padding:8px 16px;font-size:13px;display:inline-block">選擇圖片<input type="file" accept="image/*" id="pFile" hidden></label>
+        <div><button class="mini" id="pImgClear" style="margin-top:8px">移除圖片</button></div>
+      </div>
+    </div>
+    <div class="field"><label>品名</label><input id="p-name" maxlength="40"></div>
+    <div class="row" style="display:flex;gap:16px">
+      <div class="field" style="flex:1"><label>售價</label><input id="p-price" type="number" inputmode="numeric"></div>
+      <div class="field" style="flex:1"><label>標籤（選填，如 限定、六入）</label><input id="p-tag" maxlength="10"></div>
+    </div>
+    <div class="field"><label>描述</label><textarea id="p-desc" maxlength="200"></textarea></div>
+    <div class="field"><label>排序（數字小的排前面）</label><input id="p-sort" type="number" inputmode="numeric"></div>
+    <div class="checks">
+      <label><input type="checkbox" id="p-active">上架</label>
+      <label><input type="checkbox" id="p-soldOut">售完</label>
+    </div>
+    <button class="btn block" id="pSave">儲存</button>
+    <button class="btn ghost block" id="pCancel" style="margin-top:10px">取消</button>
+    <button class="mini" id="pDel" style="display:block;margin:22px auto 0;color:var(--mute)">刪除這個商品</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { firebaseConfig, SDK, STATUS, DEFAULT_SETTINGS, esc, money } from "./firebase-config.js";
+const { initializeApp } = await import(`${SDK}/firebase-app.js`);
+const { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } = await import(`${SDK}/firebase-auth.js`);
+const F = await import(`${SDK}/firebase-firestore.js`);
+const { getFirestore, collection, doc, onSnapshot, query, orderBy, limit, updateDoc, setDoc, addDoc, deleteDoc, getDoc, serverTimestamp } = F;
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app), db = getFirestore(app);
+const $ = s => document.querySelector(s);
+const toast = t => { const el=$("#toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"),2200); };
+
+/* ---------- 登入 ---------- */
+let unsubs = [];
+onAuthStateChanged(auth, user => {
+  unsubs.forEach(u => u()); unsubs = [];
+  if (!user) { $("#login").classList.remove("hide"); $("#app").classList.add("hide"); return; }
+  $("#login").classList.add("hide"); $("#app").classList.remove("hide");
+  start();
+});
+$("#doLogin").onclick = async () => {
+  $("#loginErr").textContent = "";
+  try { await signInWithEmailAndPassword(auth, $("#em").value.trim(), $("#pw").value); }
+  catch { $("#loginErr").textContent = "帳號或密碼不正確"; }
+};
+$("#pw").addEventListener("keydown", e => e.key === "Enter" && $("#doLogin").click());
+$("#logout").onclick = () => signOut(auth);
+
+/* ---------- 分頁 ---------- */
+const TITLES = { orders:"訂單", products:"商品", settings:"設定" };
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("on", x===b));
+  Object.keys(TITLES).forEach(k => $("#tab-"+k).classList.toggle("hide", k !== b.dataset.tab));
+  $("#pageTitle").textContent = TITLES[b.dataset.tab];
+});
+
+function denied(e){
+  console.error(e);
+  if (e.code === "permission-denied") {
+    $("#orderList").innerHTML = `<p class="empty">這個帳號沒有宅配後台權限。</p>`;
+  }
+}
+
+/* ---------- 訂單 ---------- */
+let orders = [], filter = "pending", openId = null;
+function start(){
+  unsubs.push(onSnapshot(query(collection(db,"shop_orders"), orderBy("createdAt","desc"), limit(500)), s => {
+    orders = s.docs.map(d => ({ id:d.id, ...d.data() })); renderOrders();
+  }, denied));
+  unsubs.push(onSnapshot(collection(db,"shop_products"), s => {
+    products = s.docs.map(d => ({ id:d.id, ...d.data() })).sort((a,b)=>(a.sort??99)-(b.sort??99)); renderProducts();
+  }, denied));
+  loadSettings();
+}
+
+const fmtTime = ts => ts?.toDate ? ts.toDate().toLocaleString("zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit",hour12:false}) : "剛剛";
+function visible(){
+  const q = $("#q").value.trim().toLowerCase();
+  return orders.filter(o => (filter==="all" || o.status===filter) &&
+    (!q || [o.orderNo,o.name,o.phone,o.payer].some(x => String(x||"").toLowerCase().includes(q))));
+}
+function renderOrders(){
+  const count = k => k==="all" ? orders.length : orders.filter(o=>o.status===k).length;
+  $("#chips").innerHTML = [["pending"],["paid"],["shipped"],["done"],["cancelled"],["all"]].map(([k]) =>
+    `<button class="chip ${filter===k?"on":""}" data-f="${k}">${k==="all"?"全部":STATUS[k]}<i>${count(k)}</i></button>`).join("");
+  const list = visible();
+  $("#orderList").innerHTML = list.length ? list.map(o => `
+    <article class="order ${o.status}" data-id="${o.id}">
+      <div class="sum" data-toggle="${o.id}">
+        <span class="no">${esc(o.orderNo)}</span><span class="amt">${money(o.total)}</span>
+        <span class="t">${fmtTime(o.createdAt)}・${esc(o.name)}・到貨 ${esc(o.date)}</span><span class="pill ${o.status}">${STATUS[o.status]||o.status}</span>
+      </div>
+      ${openId===o.id ? detail(o) : ""}
+    </article>`).join("") : `<p class="empty">沒有符合的訂單</p>`;
+}
+function detail(o){
+  return `<div class="detail">
+    <table class="items-t">${(o.items||[]).map(i=>`<tr><td>${esc(i.name)} × ${i.qty}</td><td>${money(i.price*i.qty)}</td></tr>`).join("")}
+      <tr><td>運費</td><td>${o.shipping?money(o.shipping):"免運"}</td></tr>
+      <tr><td><b>合計</b></td><td><b>${money(o.total)}</b></td></tr></table>
+    <dl>
+      <dt>付款名稱</dt><dd>${esc(o.payer)}</dd>
+      <dt>收件人</dt><dd>${esc(o.name)}</dd>
+      <dt>手機</dt><dd><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></dd>
+      <dt>地址</dt><dd>${esc(o.addr)}</dd>
+      <dt>希望到貨</dt><dd>${esc(o.date)}</dd>
+      ${o.memo?`<dt>備註</dt><dd>${esc(o.memo)}</dd>`:""}
+    </dl>
+    <div class="edit-row">
+      <select id="st-${o.id}">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${o.status===k?"selected":""}>${v}</option>`).join("")}</select>
+      <input id="tr-${o.id}" placeholder="物流單號" value="${esc(o.tracking||"")}">
+    </div>
+    <div class="edit-row">
+      <input id="nt-${o.id}" placeholder="內部備註（客人看不到）" value="${esc(o.note||"")}">
+      <button class="btn" data-save="${o.id}">儲存</button>
+    </div>
+    <div class="edit-row" style="justify-content:space-between">
+      <button class="mini" data-copy="${o.id}">複製出貨資料</button>
+      <button class="mini" data-del="${o.id}" style="color:var(--mute)">刪除訂單</button>
+    </div>
+  </div>`;
+}
+$("#chips").onclick = e => { const b=e.target.closest("[data-f]"); if(b){ filter=b.dataset.f; renderOrders(); } };
+$("#q").oninput = renderOrders;
+$("#orderList").onclick = async e => {
+  const t = e.target.closest("[data-toggle],[data-save],[data-copy],[data-del]"); if (!t) return;
+  if (t.dataset.toggle) { openId = openId===t.dataset.toggle ? null : t.dataset.toggle; renderOrders(); return; }
+  const id = t.dataset.save || t.dataset.copy || t.dataset.del;
+  const o = orders.find(x => x.id===id);
+  if (t.dataset.save) {
+    await updateDoc(doc(db,"shop_orders",id), { status:$("#st-"+id).value, tracking:$("#tr-"+id).value.trim(), note:$("#nt-"+id).value.trim(), updatedAt:serverTimestamp() });
+    toast("已更新");
+  } else if (t.dataset.copy) {
+    const txt = `${o.name}\n${o.phone}\n${o.addr}\n到貨 ${o.date}\n` + o.items.map(i=>`${i.name} × ${i.qty}`).join("\n");
+    try { await navigator.clipboard.writeText(txt); toast("已複製"); } catch { toast("複製失敗"); }
+  } else if (t.dataset.del && confirm(`確定刪除 ${o.orderNo}？刪除後無法復原。`)) {
+    await deleteDoc(doc(db,"shop_orders",id)); toast("已刪除");
+  }
+};
+$("#csv").onclick = () => {
+  const rows = [["訂單編號","下單時間","狀態","收件人","手機","地址","希望到貨","品項","小計","運費","合計","付款名稱","備註","物流單號","內部備註"]];
+  visible().forEach(o => rows.push([o.orderNo, o.createdAt?.toDate?.().toLocaleString("zh-TW",{hour12:false})||"", STATUS[o.status], o.name, o.phone, o.addr, o.date,
+    (o.items||[]).map(i=>`${i.name}×${i.qty}`).join("、"), o.subtotal, o.shipping, o.total, o.payer, o.memo, o.tracking||"", o.note||""]));
+  const csv = "\ufeff" + rows.map(r => r.map(c => `"${String(c??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a = Object.assign(document.createElement("a"), { href:URL.createObjectURL(new Blob([csv],{type:"text/csv"})), download:`伯虎宅配訂單_${new Date().toLocaleDateString("sv-SE")}.csv` });
+  a.click();
+};
+
+/* ---------- 圖片壓縮（存進資料庫，不需另開 Storage） ---------- */
+async function compress(file, max, type="image/jpeg", q=.82){
+  const url = URL.createObjectURL(file);
+  const img = await new Promise((ok,no) => { const i=new Image(); i.onload=()=>ok(i); i.onerror=no; i.src=url; });
+  const s = Math.min(1, max/Math.max(img.width,img.height));
+  const c = Object.assign(document.createElement("canvas"), { width:Math.round(img.width*s), height:Math.round(img.height*s) });
+  const ctx = c.getContext("2d");
+  if (type==="image/jpeg") { ctx.fillStyle="#fff"; ctx.fillRect(0,0,c.width,c.height); }
+  ctx.drawImage(img,0,0,c.width,c.height);
+  URL.revokeObjectURL(url);
+  return c.toDataURL(type,q);
+}
+
+/* ---------- 商品 ---------- */
+let products = [], editing = null, pImage = "";
+const DEFAULTS = [
+  { name:"可麗露禮盒", tag:"六入", price:480, desc:"經典香草、桂花烏龍、伯爵紅茶、港口茶、提拉米蘇，五種口味綜合", sort:1 },
+  { name:"法國超人｜三太子", tag:"限定", price:110, desc:"烏魚子、明太子與瓜子，厚切法式麵包", sort:2 },
+  { name:"法國超人｜經典原味起司奶油", tag:"TOP 1", price:70, desc:"特調起司醬，烤過外酥內軟", sort:3 },
+  { name:"法國超人｜榛果巧克力", tag:"", price:80, desc:"榛果巧克力抹醬，厚切烤香", sort:4 }
+];
+function renderProducts(){
+  $("#prodList").innerHTML = products.length ? products.map(p => `
+    <div class="prod ${p.active?"":"off"}">
+      <div class="ph">${p.image?`<img src="${p.image}" alt="">`:String(p.sort??"").padStart(2,"0")}</div>
+      <div data-edit="${p.id}" style="cursor:pointer">
+        <div class="nm">${esc(p.name)}</div>
+        <div class="meta">${money(p.price)}${p.tag?`・${esc(p.tag)}`:""}${p.soldOut?"・售完":""}・排序 ${p.sort??"-"}</div>
+      </div>
+      <button class="switch ${p.active?"on":""}" data-act="${p.id}" aria-label="上架開關"></button>
+    </div>`).join("")
+    : `<div class="empty">還沒有商品<br><button class="mini" id="seed" style="margin-top:12px">匯入預設四項（可麗露禮盒、法國超人三款）</button></div>`;
+}
+$("#prodList").onclick = async e => {
+  if (e.target.id==="seed") { for (const p of DEFAULTS) await addDoc(collection(db,"shop_products"), { ...p, image:"", active:true, soldOut:false }); toast("已匯入"); return; }
+  const a = e.target.closest("[data-act]");
+  if (a) { const p = products.find(x=>x.id===a.dataset.act); await updateDoc(doc(db,"shop_products",p.id),{ active:!p.active }); toast(p.active?"已下架":"已上架"); return; }
+  const ed = e.target.closest("[data-edit]"); if (ed) openEditor(products.find(x=>x.id===ed.dataset.edit));
+};
+function openEditor(p){
+  editing = p || null; pImage = p?.image || "";
+  $("#mTitle").textContent = p ? "編輯商品" : "新增商品";
+  $("#p-name").value = p?.name||""; $("#p-price").value = p?.price??""; $("#p-tag").value = p?.tag||"";
+  $("#p-desc").value = p?.desc||""; $("#p-sort").value = p?.sort ?? (products.length+1);
+  $("#p-active").checked = p ? !!p.active : true; $("#p-soldOut").checked = !!p?.soldOut;
+  $("#pDel").classList.toggle("hide", !p);
+  showImg("#pPrev", pImage, "無圖片");
+  $("#modal").classList.remove("hide");
+}
+const showImg = (sel, src, empty) => { $(sel).innerHTML = src ? `<img src="${src}" alt="">` : empty; };
+$("#addProd").onclick = () => openEditor(null);
+$("#pCancel").onclick = () => $("#modal").classList.add("hide");
+$("#pFile").onchange = async e => { const f=e.target.files[0]; if(!f) return; pImage = await compress(f, 900); showImg("#pPrev", pImage); e.target.value=""; };
+$("#pImgClear").onclick = () => { pImage=""; showImg("#pPrev","","無圖片"); };
+$("#pSave").onclick = async () => {
+  const data = { name:$("#p-name").value.trim(), price:Number($("#p-price").value), tag:$("#p-tag").value.trim(),
+    desc:$("#p-desc").value.trim(), sort:Number($("#p-sort").value)||99, active:$("#p-active").checked, soldOut:$("#p-soldOut").checked, image:pImage };
+  if (!data.name || !(data.price>0)) { toast("請填品名與售價"); return; }
+  try {
+    if (editing) await updateDoc(doc(db,"shop_products",editing.id), data);
+    else await addDoc(collection(db,"shop_products"), data);
+    $("#modal").classList.add("hide"); toast("已儲存");
+  } catch(e){ console.error(e); toast("儲存失敗"); }
+};
+$("#pDel").onclick = async () => {
+  if (editing && confirm(`確定刪除「${editing.name}」？`)) { await deleteDoc(doc(db,"shop_products",editing.id)); $("#modal").classList.add("hide"); toast("已刪除"); }
+};
+
+/* ---------- 設定 ---------- */
+let qrImage = "";
+const SK = ["closedText","lineOaId","shipFee","freeShipOver","leadDays","intro"];
+async function loadSettings(){
+  const s = await getDoc(doc(db,"shop_settings","main")).catch(()=>null);
+  const S = { ...DEFAULT_SETTINGS, ...(s?.exists() ? s.data() : {}) };
+  SK.forEach(k => $("#s-"+k).value = S[k] ?? "");
+  $("#s-open").checked = !!S.open;
+  qrImage = S.lineQr || ""; showImg("#qrPrev", qrImage, "尚未上傳");
+}
+$("#qrFile").onchange = async e => { const f=e.target.files[0]; if(!f) return; qrImage = await compress(f, 700, "image/png"); showImg("#qrPrev", qrImage); e.target.value=""; };
+$("#saveSettings").onclick = async () => {
+  const d = { open:$("#s-open").checked, lineQr:qrImage };
+  SK.forEach(k => d[k] = ["shipFee","freeShipOver","leadDays"].includes(k) ? Number($("#s-"+k).value)||0 : $("#s-"+k).value.trim());
+  try { await setDoc(doc(db,"shop_settings","main"), d); toast("設定已儲存"); }
+  catch(e){ console.error(e); toast("儲存失敗"); }
+};
+</script>
+</body>
+</html>

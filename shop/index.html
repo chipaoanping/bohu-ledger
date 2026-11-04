@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>伯虎宅配</title>
+<meta name="description" content="伯虎在二樓 宅配訂購｜恆春手作，冷凍直送">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.wrap{max-width:620px;margin:0 auto;padding:0 20px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 20px;max-width:620px;margin:0 auto;font-size:13px;letter-spacing:.14em;color:var(--brown)}
+
+/* 主視覺：橘色上半、奶油下半，巨大 2F 跨在交界 */
+.hero{position:relative;overflow:hidden;background:linear-gradient(var(--orange) 0 62%,var(--cream) 62% 100%)}
+.hero .in{position:relative;max-width:620px;margin:0 auto;height:min(96vw,540px)}
+.giant{position:absolute;right:-4%;top:28%;font-family:"Outfit";font-weight:800;font-size:min(62vw,330px);line-height:.8;color:var(--cream);letter-spacing:-.04em;user-select:none}
+.hero .meta{position:absolute;top:22px;left:20px;right:20px;display:flex;justify-content:space-between;color:var(--ink);font-size:10px;letter-spacing:.24em;font-weight:600}
+.hero h1{position:absolute;left:20px;top:31%;color:var(--ink);font-size:min(13vw,64px);line-height:1.05}
+.hero h1 small{display:block;font-family:"Outfit";font-weight:600;font-size:12px;letter-spacing:.3em;margin-top:12px}
+.intro-wrap{background:var(--cream);padding:4px 0 56px}
+.intro{font-family:var(--serif);font-weight:700;color:var(--brown);font-size:15px;line-height:2}
+
+/* 區塊標題 */
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;margin:56px 0 22px;color:var(--brown)}
+.sec-head h2{font-size:38px;line-height:1}
+
+/* 商品 */
+.prod{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:20px 0;border-top:1px solid var(--line)}
+.prod:last-child{border-bottom:1px solid var(--line)}
+.prod .ph{width:96px;height:96px;background:var(--cream);display:grid;place-items:center;overflow:hidden}
+.prod .ph img{width:100%;height:100%;object-fit:cover}
+.prod .ph b{font-family:"Outfit";font-weight:800;font-size:34px;color:var(--orange)}
+.prod .no{font-size:11px;letter-spacing:.2em;color:var(--orange);font-weight:600}
+.prod .nm{font-family:var(--serif);font-weight:900;font-size:18px;line-height:1.4;color:var(--ink)}
+.prod .tg{font-family:"Outfit";font-size:11px;font-weight:600;letter-spacing:.1em;border:1px solid var(--orange);color:var(--orange);padding:0 6px;margin-left:6px;vertical-align:3px}
+.prod .ds{font-size:13px;color:var(--mute);line-height:1.7;margin:4px 0 10px}
+.prod .ft{display:flex;justify-content:space-between;align-items:center}
+.prod .pr{font-family:"Outfit";font-weight:600;font-size:18px}
+.prod.out{opacity:.45}
+.step{display:flex;align-items:center;border:1px solid var(--ink)}
+.step button{width:36px;height:34px;background:transparent;border:0;font-size:18px;color:var(--ink)}
+.step span{min-width:28px;text-align:center;font-family:"Outfit";font-weight:600}
+.soldout{font-size:12px;letter-spacing:.2em;color:var(--mute)}
+
+/* 橘色色塊跨越淺／深交界 */
+.divider{position:relative;height:150px;margin-top:64px;background:linear-gradient(var(--paper) 0 50%,var(--char) 50% 100%)}
+.divider .blk{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(72%,360px);height:112px;background:var(--orange);color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.divider .blk b{font-family:"Outfit";font-weight:600;font-size:15px;letter-spacing:.24em}
+.divider .blk span{font-size:12px;letter-spacing:.2em;opacity:.85;margin-top:4px}
+
+/* 深色收件區 */
+.dark{background:var(--char);color:var(--paper);padding-bottom:150px}
+.dark .sec-head{color:var(--paper);margin-top:40px}
+.dark .sec-head h2{font-size:38px}
+.row{display:flex;gap:18px}.row>.field{flex:1}
+.ship-note{font-size:13px;opacity:.7;margin:-4px 0 28px}
+.sum div{display:flex;justify-content:space-between;font-size:14px;padding:4px 0;opacity:.85}
+.sum .total{opacity:1;border-top:1px solid rgba(255,255,255,.25);margin-top:10px;padding-top:14px;font-size:15px;align-items:baseline}
+.sum .total b{font-family:"Outfit";font-weight:600;font-size:30px;color:var(--orange-2)}
+.err{color:var(--orange-2);font-size:14px;margin-top:14px}
+.dark footer{margin-top:72px;display:flex;justify-content:space-between;font-size:12px;letter-spacing:.12em;opacity:.6;line-height:1.9}
+
+/* 底部列 */
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--paper);padding:12px 20px calc(12px + env(safe-area-inset-bottom));z-index:10}
+.bar .in{max-width:620px;margin:0 auto;display:flex;align-items:center;gap:16px}
+.bar .amt{flex:1;font-size:11px;letter-spacing:.2em;opacity:.8}
+.bar .amt b{display:block;font-family:"Outfit";font-weight:600;font-size:22px;letter-spacing:0;opacity:1}
+
+/* 付款頁 */
+#pay{min-height:100vh;background:var(--char);color:var(--paper)}
+#pay .head{background:var(--orange);color:var(--ink);padding:22px 0 100px}
+#pay .head .in{max-width:620px;margin:0 auto;padding:0 20px}
+#pay .head .line1{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.2em;font-weight:600}
+#pay .head h2{font-size:min(12vw,56px);margin-top:36px;line-height:1.1}
+#pay .head .ono{font-family:"Outfit";font-weight:600;letter-spacing:.14em;margin-top:10px}
+.qrbox{max-width:300px;margin:-76px auto 0;background:var(--paper);color:var(--ink);padding:24px;text-align:center}
+.qrbox img{width:100%;aspect-ratio:1;object-fit:contain;display:block}
+.qrbox .amt{font-family:"Outfit";font-weight:600;font-size:32px;margin-top:12px;color:var(--orange)}
+.qrbox p{font-size:12px;letter-spacing:.12em;color:var(--mute)}
+.steps{list-style:none;counter-reset:s;margin:40px 0 28px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;padding:14px 0;border-top:1px solid rgba(255,255,255,.15);font-size:15px}
+.steps li::before{content:"0" counter(s);font-family:"Outfit";font-weight:600;color:var(--orange-2)}
+.btn.line{background:#06C755}
+.closed{padding:80px 0;text-align:center;font-family:var(--serif);font-weight:700;color:var(--brown)}
+</style>
+</head>
+<body>
+
+<!-- ======== 選購頁 ======== -->
+<main id="shop">
+  <section class="hero">
+    <div class="in">
+      <div class="meta"><span>{ 宅配 — 訂購 }</span><span>BUT WHO 2F</span></div>
+      <div class="giant">2F</div>
+      <h1 class="serif">伯虎<br>宅配<small>HENGCHUN // FROZEN DELIVERY</small></h1>
+    </div>
+  </section>
+  <div class="intro-wrap"><div class="wrap"><p class="intro" id="intro"></p></div></div>
+
+  <div class="wrap">
+    <div class="sec-head"><h2 class="serif">選品</h2><span class="label">{ 01 }</span></div>
+    <div id="items"><p class="label" style="padding:24px 0">載入中…</p></div>
+  </div>
+
+  <div id="closedBox" class="wrap closed hide"></div>
+
+  <div id="formArea">
+    <div class="divider"><div class="blk"><b>FROM HENGCHUN</b><span>冷凍宅配・恆春直送</span></div></div>
+    <section class="dark">
+      <div class="wrap">
+        <div class="sec-head"><h2 class="serif">收件</h2><span class="label">{ 02 }</span></div>
+        <div class="row">
+          <div class="field"><label for="name">收件人</label><input id="name" autocomplete="name" maxlength="40"></div>
+          <div class="field"><label for="phone">手機</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xxxxxxxx" maxlength="20"></div>
+        </div>
+        <div class="field"><label for="addr">收件地址</label><input id="addr" autocomplete="street-address" maxlength="200"></div>
+        <div class="row">
+          <div class="field"><label for="date">希望到貨日</label><input id="date" type="date"></div>
+          <div class="field"><label for="payer">LINE Pay 付款名稱</label><input id="payer" maxlength="60" placeholder="付款時顯示的名字"></div>
+        </div>
+        <div class="field"><label for="memo">備註</label><textarea id="memo" maxlength="500" placeholder="送禮對象、到貨時段，或想對我們說的話"></textarea></div>
+        <p class="ship-note" id="shipNote"></p>
+        <div class="sum">
+          <div><span>商品小計</span><span id="sSub">$0</span></div>
+          <div><span>冷凍運費</span><span id="sShip">$0</span></div>
+          <div class="total"><span>合計</span><b id="sTotal">$0</b></div>
+        </div>
+        <p class="err hide" id="err"></p>
+        <footer><span>伯虎在二樓<br>恆春鎮中山路48號2樓</span><span style="text-align:right">[ LINE Pay ]<br>@BUT_WHO2F</span></footer>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="bar" id="bar">
+  <div class="in">
+    <div class="amt">TOTAL<b id="barTotal">$0</b></div>
+    <button class="btn" id="next" disabled>前往付款</button>
+  </div>
+</div>
+
+<!-- ======== 付款頁 ======== -->
+<section id="pay" class="hide">
+  <div class="head"><div class="in">
+    <div class="line1"><span>{ 付款 — LINE Pay }</span><span>BUT WHO 2F</span></div>
+    <h2 class="serif">訂單已送出</h2>
+    <div class="ono" id="oNo"></div>
+  </div></div>
+  <div class="qrbox">
+    <img id="qrImg" alt="伯虎在二樓 LINE Pay 收款碼">
+    <div class="amt" id="payAmt"></div>
+    <p>請以 LINE Pay 掃碼並輸入此金額</p>
+  </div>
+  <div class="wrap">
+    <ol class="steps">
+      <li>用 LINE 掃描收款碼，輸入上方金額完成付款</li>
+      <li>按下方按鈕，把訂單編號傳到伯虎官方 LINE</li>
+      <li>我們核對款項後在 LINE 回覆，訂單就此成立</li>
+    </ol>
+    <button class="btn line block" id="toLine">我已付款，通知伯虎</button>
+    <button class="btn ghost block" id="copy" style="margin-top:12px">複製訂單內容</button>
+    <p style="font-size:13px;opacity:.6;text-align:center;margin:28px 0 60px;line-height:1.9">請先截圖保存這個畫面。三天內未完成付款的訂單，我們會為你取消。</p>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { firebaseConfig, SDK, DEFAULT_SETTINGS, esc, money } from "./firebase-config.js";
+const { initializeApp } = await import(`${SDK}/firebase-app.js`);
+const { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp } = await import(`${SDK}/firebase-firestore.js`);
+
+const db = getFirestore(initializeApp(firebaseConfig));
+const $ = s => document.querySelector(s);
+const toast = t => { const el=$("#toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"),2200); };
+
+let S = { ...DEFAULT_SETTINGS }, products = [], qty = {}, totals = { sub:0, ship:0, total:0 }, lastOrder = null;
+
+try {
+  const [sSnap, pSnap] = await Promise.all([ getDoc(doc(db,"shop_settings","main")), getDocs(collection(db,"shop_products")) ]);
+  if (sSnap.exists()) S = { ...S, ...sSnap.data() };
+  products = pSnap.docs.map(d => ({ id:d.id, ...d.data() })).filter(p => p.active).sort((a,b)=>(a.sort??99)-(b.sort??99));
+} catch (e) {
+  console.error(e);
+  $("#items").innerHTML = `<p class="label" style="padding:24px 0">目前無法載入商品，請稍後再試。</p>`;
+}
+
+$("#intro").textContent = S.intro;
+products.forEach(p => qty[p.id] = 0);
+
+if (!S.open) {
+  $("#items").innerHTML = "";
+  $("#closedBox").textContent = S.closedText;
+  $("#closedBox").classList.remove("hide");
+  $("#formArea").classList.add("hide");
+  $("#bar").classList.add("hide");
+} else if (products.length) {
+  $("#items").innerHTML = products.map((p,i) => `
+    <div class="prod ${p.soldOut ? "out" : ""}">
+      <div class="ph">${p.image ? `<img src="${p.image}" alt="${esc(p.name)}" loading="lazy">` : `<b>${String(i+1).padStart(2,"0")}</b>`}</div>
+      <div>
+        <div class="no">NO. ${String(i+1).padStart(2,"0")}</div>
+        <div class="nm">${esc(p.name)}${p.tag ? `<span class="tg">${esc(p.tag)}</span>` : ""}</div>
+        <div class="ds">${esc(p.desc)}</div>
+        <div class="ft">
+          <span class="pr">${money(p.price)}</span>
+          ${p.soldOut ? `<span class="soldout">SOLD OUT</span>` : `
+          <div class="step">
+            <button data-id="${p.id}" data-d="-1" aria-label="減少">−</button>
+            <span id="q-${p.id}">0</span>
+            <button data-id="${p.id}" data-d="1" aria-label="增加">＋</button>
+          </div>`}
+        </div>
+      </div>
+    </div>`).join("");
+} else if (!$("#items").textContent.includes("無法")) {
+  $("#items").innerHTML = `<p class="label" style="padding:24px 0">商品準備中。</p>`;
+}
+
+$("#items").addEventListener("click", e => {
+  const b = e.target.closest("button[data-id]"); if (!b) return;
+  const id = b.dataset.id;
+  qty[id] = Math.max(0, Math.min(99, qty[id] + Number(b.dataset.d)));
+  $("#q-"+id).textContent = qty[id];
+  calc();
+});
+
+const ymd = d => d.toLocaleDateString("sv-SE");
+const minD = new Date(); minD.setDate(minD.getDate() + Number(S.leadDays||0));
+$("#date").min = ymd(minD); $("#date").value = ymd(minD);
+$("#shipNote").textContent = `冷凍宅配運費 ${money(S.shipFee)}` + (S.freeShipOver ? `，滿 ${money(S.freeShipOver)} 免運` : "") + `，最快 ${S.leadDays} 天後到貨。`;
+
+function calc(){
+  const sub = products.reduce((s,p) => s + p.price*(qty[p.id]||0), 0);
+  const ship = sub === 0 ? 0 : (S.freeShipOver && sub >= S.freeShipOver ? 0 : Number(S.shipFee));
+  totals = { sub, ship, total: sub+ship };
+  $("#sSub").textContent = money(sub);
+  $("#sShip").textContent = (sub>0 && ship===0) ? "免運" : money(ship);
+  $("#sTotal").textContent = $("#barTotal").textContent = money(totals.total);
+  $("#next").disabled = sub === 0;
+}
+calc();
+
+$("#next").addEventListener("click", async () => {
+  const v = id => $(id).value.trim();
+  const phone = v("#phone").replace(/[-\s]/g,"");
+  let msg = "";
+  if (!v("#name")) msg = "請填寫收件人";
+  else if (!/^09\d{8}$/.test(phone)) msg = "請填寫正確的手機號碼";
+  else if (v("#addr").length < 6) msg = "請填寫完整收件地址";
+  else if (!v("#date") || v("#date") < $("#date").min) msg = `到貨日最快為 ${$("#date").min}`;
+  else if (!v("#payer")) msg = "請填寫 LINE Pay 付款名稱，方便我們對帳";
+  const err = $("#err");
+  if (msg) { err.textContent = msg; err.classList.remove("hide"); err.scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  err.classList.add("hide");
+
+  const btn = $("#next"); btn.disabled = true; btn.textContent = "送出中…";
+  const now = new Date();
+  const order = {
+    orderNo: "BH" + ymd(now).replace(/-/g,"").slice(2) + String(Math.floor(Math.random()*9000)+1000),
+    items: products.filter(p => qty[p.id] > 0).map(p => ({ id:p.id, name:p.name, price:p.price, qty:qty[p.id] })),
+    subtotal: totals.sub, shipping: totals.ship, total: totals.total,
+    name: v("#name"), phone, addr: v("#addr"), date: v("#date"), memo: v("#memo"), payer: v("#payer"),
+    status: "pending", createdAt: serverTimestamp()
+  };
+  try {
+    await addDoc(collection(db,"shop_orders"), order);
+  } catch (e) {
+    console.error(e); toast("送出失敗，請稍後再試");
+    btn.disabled = false; btn.textContent = "前往付款"; return;
+  }
+  lastOrder = order;
+  $("#oNo").textContent = "NO. " + order.orderNo;
+  $("#payAmt").textContent = money(order.total);
+  if (S.lineQr) $("#qrImg").src = S.lineQr; else $("#qrImg").replaceWith(Object.assign(document.createElement("p"),{textContent:"收款碼尚未設定，請直接聯繫伯虎 LINE"}));
+  $("#shop").classList.add("hide"); $("#bar").classList.add("hide"); $("#pay").classList.remove("hide");
+  window.scrollTo({top:0});
+});
+
+function orderText(){
+  const o = lastOrder;
+  return [
+    `【伯虎宅配】${o.orderNo}`,
+    ...o.items.map(i => `・${i.name} × ${i.qty}`),
+    `合計 ${money(o.total)}（運費${o.shipping ? money(o.shipping) : "免運"}）`,
+    `收件人 ${o.name}`,
+    `LINE Pay 付款名稱 ${o.payer}`,
+    `我已完成付款`
+  ].join("\n");
+}
+$("#toLine").addEventListener("click", () => {
+  if (!S.lineOaId) { toast("尚未設定伯虎 LINE"); return; }
+  location.href = `https://line.me/R/oaMessage/${encodeURIComponent(S.lineOaId)}/?${encodeURIComponent(orderText())}`;
+});
+$("#copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(orderText()); toast("已複製，可貼到伯虎 LINE"); }
+  catch { toast("複製失敗，請截圖保存"); }
+});
+</script>
+</body>
+</html>
