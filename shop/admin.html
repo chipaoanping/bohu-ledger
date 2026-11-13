@@ -98,6 +98,7 @@ main{padding-bottom:80px}
     <div class="field"><label>Email</label><input id="em" type="email" autocomplete="username"></div>
     <div class="field"><label>密碼</label><input id="pw" type="password" autocomplete="current-password"></div>
     <button class="btn block" id="doLogin">登入</button>
+    <button class="mini" id="forgot" style="display:block;margin:16px auto 0">忘記密碼？寄重設信到這個 Email</button>
     <p id="loginErr" style="color:var(--orange);font-size:13px;margin-top:12px"></p>
   </div>
 </section>
@@ -199,7 +200,7 @@ main{padding-bottom:80px}
 <script type="module">
 import { firebaseConfig, SDK, STATUS, DEFAULT_SETTINGS, esc, money } from "./firebase-config.js";
 const { initializeApp } = await import(`${SDK}/firebase-app.js`);
-const { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } = await import(`${SDK}/firebase-auth.js`);
+const { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } = await import(`${SDK}/firebase-auth.js`);
 const F = await import(`${SDK}/firebase-firestore.js`);
 const { getFirestore, collection, doc, onSnapshot, query, orderBy, limit, updateDoc, setDoc, addDoc, deleteDoc, getDoc, serverTimestamp } = F;
 
@@ -223,6 +224,12 @@ $("#doLogin").onclick = async () => {
   catch { $("#loginErr").textContent = "帳號或密碼不正確"; }
 };
 $("#pw").addEventListener("keydown", e => e.key === "Enter" && $("#doLogin").click());
+$("#forgot").onclick = async () => {
+  const em = $("#em").value.trim();
+  if (!em) { $("#loginErr").textContent = "請先在上面填 Email"; return; }
+  try { await sendPasswordResetEmail(auth, em); $("#loginErr").textContent = `重設信已寄到 ${em}，請到信箱（含垃圾郵件）點連結設定新密碼`; }
+  catch (e) { $("#loginErr").textContent = e.code==="auth/invalid-email" ? "Email 格式不對" : `寄送失敗（${e.code||"未知"}）`; }
+};
 $("#logout").onclick = () => signOut(auth);
 
 const failMsg = e => e?.code==="permission-denied"
