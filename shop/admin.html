@@ -352,13 +352,27 @@ async function compress(file, max, type="image/jpeg", q=.82){
 /* ---------- 商品 ---------- */
 let products = [], editing = null, pImage = "";
 const DEFAULTS = [
-  { name:"可麗露禮盒", tag:"六入", price:480, desc:"經典香草、桂花烏龍、伯爵紅茶、港口茶、提拉米蘇，五種口味綜合", sort:1 },
-  { name:"法國超人｜三太子", tag:"限定", price:110, desc:"烏魚子、明太子與瓜子，厚切法式麵包", sort:2 },
-  { name:"法國超人｜經典原味起司奶油", tag:"TOP 1", price:70, desc:"特調起司醬，烤過外酥內軟", sort:3 },
-  { name:"法國超人｜榛果巧克力", tag:"", price:80, desc:"榛果巧克力抹醬，厚切烤香", sort:4 }
+  { name:"海鹽奶油小餐包", tag:"四入", price:200, desc:"", sort:1 },
+  { name:"蒜了", tag:"四入", price:210, desc:"", sort:2 },
+  { name:"可麗露", tag:"六入", price:420, desc:"", sort:3 },
+  { name:"焦糖蘋果肉桂捲", tag:"四入", price:440, desc:"", sort:4 },
+  { name:"法國超人", tag:"四入", price:250, desc:"", sort:5 },
+  { name:"起司小薄餅", tag:"四入", price:230, desc:"", sort:6 },
+  { name:"巧克力酥皮菠蘿", tag:"四入", price:260, desc:"", sort:7 }
 ];
+const norm = t => String(t||"").replace(/[\s｜|/／()（）]/g,"").replace(/[四六]入|宅配|組/g,"");
+const missing = () => DEFAULTS.filter(d => !products.some(p => { const a=norm(p.name), b=norm(d.name); return a.includes(b)||b.includes(a)||(b.includes("菠蘿")&&a.includes("菠蘿")); }));
+async function importMissing(){
+  const list = missing();
+  try {
+    for (const p of list) await addDoc(collection(db,"shop_products"), { ...p, image:"", active:true, soldOut:false });
+    toast(list.length ? `已新增 ${list.length} 項` : "品項都已經在了");
+  } catch(err){ toast(failMsg(err)); }
+}
 function renderProducts(){
-  $("#prodList").innerHTML = products.length ? products.map(p => `
+  const miss = missing();
+  const bar = miss.length ? `<div class="empty" style="padding:4px 0 18px"><button class="btn dark" id="seedMissing" style="padding:9px 16px;font-size:13px">補上宅配品項（${miss.map(m=>m.name).join("、")}）</button></div>` : "";
+  $("#prodList").innerHTML = products.length ? bar + products.map(p => `
     <div class="prod ${p.active?"":"off"}">
       <div class="ph">${p.image?`<img src="${p.image}" alt="">`:String(p.sort??"").padStart(2,"0")}</div>
       <div data-edit="${p.id}" style="cursor:pointer">
@@ -367,10 +381,10 @@ function renderProducts(){
       </div>
       <button class="switch ${p.active?"on":""}" data-act="${p.id}" aria-label="上架開關"></button>
     </div>`).join("")
-    : `<div class="empty">還沒有商品<br><button class="mini" id="seed" style="margin-top:12px">匯入預設四項（可麗露禮盒、法國超人三款）</button></div>`;
+    : `<div class="empty">還沒有商品<br><button class="mini" id="seed" style="margin-top:12px">匯入宅配品項（七項）</button></div>`;
 }
 $("#prodList").onclick = async e => {
-  if (e.target.id==="seed") { try { for (const p of DEFAULTS) await addDoc(collection(db,"shop_products"), { ...p, image:"", active:true, soldOut:false }); toast("已匯入"); } catch(err){ toast(failMsg(err)); } return; }
+  if (e.target.id==="seed" || e.target.id==="seedMissing") { await importMissing(); return; }
   const a = e.target.closest("[data-act]");
   if (a) { const p = products.find(x=>x.id===a.dataset.act); await updateDoc(doc(db,"shop_products",p.id),{ active:!p.active }); toast(p.active?"已下架":"已上架"); return; }
   const ed = e.target.closest("[data-edit]"); if (ed) openEditor(products.find(x=>x.id===ed.dataset.edit));
