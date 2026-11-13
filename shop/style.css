@@ -26,5 +26,5 @@ input,textarea,select{font:inherit;font-size:16px;color:inherit}
 .field textarea{min-height:64px;resize:vertical}
 .field input:focus,.field textarea:focus{border-bottom-color:var(--orange)}
 
-.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--ink);color:var(--cream);font-size:14px;padding:9px 18px;opacity:0;transition:.3s;pointer-events:none;z-index:99;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--ink);color:var(--cream);font-size:14px;padding:9px 18px;opacity:0;transition:.3s;pointer-events:none;z-index:99;white-space:normal;max-width:90vw;text-align:center}
 .toast.on{opacity:.95}
