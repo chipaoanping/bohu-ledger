@@ -104,7 +104,7 @@ main{padding-bottom:80px}
 
 <div id="app" class="hide">
   <header class="head"><div class="in">
-    <div class="l1"><span>{ 伯虎宅配 — 後台 }</span><button id="logout">登出</button></div>
+    <div class="l1"><span>{ 伯虎宅配 — 後台 }<br><small id="who" style="opacity:.6;letter-spacing:.05em"></small></span><button id="logout">登出</button></div>
     <h1 class="serif" id="pageTitle">訂單</h1>
     <nav class="tabs">
       <button data-tab="orders" class="on">訂單</button>
@@ -214,6 +214,7 @@ onAuthStateChanged(auth, user => {
   unsubs.forEach(u => u()); unsubs = [];
   if (!user) { $("#login").classList.remove("hide"); $("#app").classList.add("hide"); return; }
   $("#login").classList.add("hide"); $("#app").classList.remove("hide");
+  $("#who").textContent = user.email || "";
   start();
 });
 $("#doLogin").onclick = async () => {
@@ -223,6 +224,10 @@ $("#doLogin").onclick = async () => {
 };
 $("#pw").addEventListener("keydown", e => e.key === "Enter" && $("#doLogin").click());
 $("#logout").onclick = () => signOut(auth);
+
+const failMsg = e => e?.code==="permission-denied"
+  ? `沒有權限：${auth.currentUser?.email||"未登入"} 尚未加入規則，或規則還沒發布`
+  : `儲存失敗（${e?.code||e?.message||"未知"}）`;
 
 /* ---------- 分頁 ---------- */
 const TITLES = { orders:"訂單", products:"商品", settings:"設定" };
@@ -358,7 +363,7 @@ function renderProducts(){
     : `<div class="empty">還沒有商品<br><button class="mini" id="seed" style="margin-top:12px">匯入預設四項（可麗露禮盒、法國超人三款）</button></div>`;
 }
 $("#prodList").onclick = async e => {
-  if (e.target.id==="seed") { for (const p of DEFAULTS) await addDoc(collection(db,"shop_products"), { ...p, image:"", active:true, soldOut:false }); toast("已匯入"); return; }
+  if (e.target.id==="seed") { try { for (const p of DEFAULTS) await addDoc(collection(db,"shop_products"), { ...p, image:"", active:true, soldOut:false }); toast("已匯入"); } catch(err){ toast(failMsg(err)); } return; }
   const a = e.target.closest("[data-act]");
   if (a) { const p = products.find(x=>x.id===a.dataset.act); await updateDoc(doc(db,"shop_products",p.id),{ active:!p.active }); toast(p.active?"已下架":"已上架"); return; }
   const ed = e.target.closest("[data-edit]"); if (ed) openEditor(products.find(x=>x.id===ed.dataset.edit));
@@ -386,7 +391,7 @@ $("#pSave").onclick = async () => {
     if (editing) await updateDoc(doc(db,"shop_products",editing.id), data);
     else await addDoc(collection(db,"shop_products"), data);
     $("#modal").classList.add("hide"); toast("已儲存");
-  } catch(e){ console.error(e); toast("儲存失敗"); }
+  } catch(e){ console.error(e); toast(failMsg(e)); }
 };
 $("#pDel").onclick = async () => {
   if (editing && confirm(`確定刪除「${editing.name}」？`)) { await deleteDoc(doc(db,"shop_products",editing.id)); $("#modal").classList.add("hide"); toast("已刪除"); }
@@ -407,7 +412,7 @@ $("#saveSettings").onclick = async () => {
   const d = { open:$("#s-open").checked, lineQr:qrImage };
   SK.forEach(k => d[k] = ["shipFee","freeShipOver","leadDays"].includes(k) ? Number($("#s-"+k).value)||0 : $("#s-"+k).value.trim());
   try { await setDoc(doc(db,"shop_settings","main"), d); toast("設定已儲存"); }
-  catch(e){ console.error(e); toast("儲存失敗"); }
+  catch(e){ console.error(e); toast(failMsg(e)); }
 };
 </script>
 </body>
