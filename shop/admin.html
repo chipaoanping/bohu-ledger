@@ -162,6 +162,11 @@ main{padding-bottom:80px}
         <h3 class="serif">前言</h3>
         <div class="field"><label>首頁介紹文字</label><textarea id="s-intro" rows="5"></textarea></div>
       </div>
+      <div class="panel">
+        <h3 class="serif">保存方式</h3>
+        <p class="hint" style="margin:-8px 0 16px">顯示在前台最下方。用 { 名稱 } 開頭當作分類標題，下面接說明。</p>
+        <div class="field"><textarea id="s-care" rows="14"></textarea></div>
+      </div>
       <button class="btn block" id="saveSettings">儲存設定</button>
     </section>
   </main>
@@ -420,7 +425,7 @@ $("#pDel").onclick = async () => {
 
 /* ---------- 設定 ---------- */
 let qrImage = "";
-const SK = ["closedText","lineOaId","shipFee","freeShipOver","leadDays","intro"];
+const SK = ["closedText","lineOaId","shipFee","freeShipOver","leadDays","intro","care"];
 async function loadSettings(){
   const s = await getDoc(doc(db,"shop_settings","main")).catch(()=>null);
   const S = { ...DEFAULT_SETTINGS, ...(s?.exists() ? s.data() : {}) };

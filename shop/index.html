@@ -83,6 +83,12 @@
 .steps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;padding:14px 0;border-top:1px solid rgba(255,255,255,.15);font-size:15px}
 .steps li::before{content:"0" counter(s);font-family:"Outfit";font-weight:600;color:var(--orange-2)}
 .btn.line{background:#06C755}
+.care{margin-top:56px}
+.care .blk{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:18px 0;border-top:1px solid rgba(255,255,255,.18);font-size:14px;line-height:1.9}
+.care .blk:last-child{border-bottom:1px solid rgba(255,255,255,.18)}
+.care h3{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--orange-2);line-height:1.6}
+.care p{white-space:pre-line;opacity:.88}
+.care .note{font-size:12px;opacity:.6;margin-top:6px}
 .closed{padding:80px 0;text-align:center;font-family:var(--serif);font-weight:700;color:var(--brown)}
 </style>
 </head>
@@ -128,6 +134,10 @@
           <div class="total"><span>合計</span><b id="sTotal">$0</b></div>
         </div>
         <p class="err hide" id="err"></p>
+        <section class="care" id="careSec">
+          <div class="sec-head" style="margin-top:0"><h2 class="serif">保存</h2><span class="label">{ 03 }</span></div>
+          <div id="care"></div>
+        </section>
         <footer><span>伯虎在二樓<br>恆春鎮中山路48號2樓</span><span style="text-align:right">[ LINE Pay ]<br>@BUT_WHO2F</span></footer>
       </div>
     </section>
@@ -188,6 +198,20 @@ try {
 }
 
 $("#intro").textContent = S.intro;
+(function renderCare(){
+  const txt = String(S.care||"").trim();
+  if (!txt) { $("#careSec").classList.add("hide"); return; }
+  const blocks = []; let cur = null;
+  txt.split("\n").forEach(line => {
+    const m = line.match(/^\s*\{\s*(.+?)\s*\}/);
+    if (m) { cur = { t:m[1], b:[] }; blocks.push(cur); }
+    else { if (!cur) { cur = { t:"", b:[] }; blocks.push(cur); } cur.b.push(line); }
+  });
+  $("#care").innerHTML = blocks.map(k => {
+    const body = k.b.join("\n").trim();
+    return `<div class="blk"><h3>${esc(k.t)}</h3><p>${esc(body)}</p></div>`;
+  }).join("");
+})();
 products.forEach(p => qty[p.id] = 0);
 
 if (!S.open) {
