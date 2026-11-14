@@ -166,12 +166,12 @@
   <div class="wrap">
     <ol class="steps">
       <li>用 LINE 掃描收款碼，輸入上方金額完成付款</li>
-      <li>按下方按鈕，把訂單編號傳到伯虎官方 LINE</li>
+      <li>按「我已完成付款」，訂單內容會自動複製，跳到伯虎官方 LINE 後貼上傳送</li>
       <li>我們核對款項後在 LINE 回覆，訂單就此成立</li>
     </ol>
-    <button class="btn line block" id="toLine">我已付款，通知伯虎</button>
+    <button class="btn line block" id="toLine">我已完成付款</button>
     <button class="btn ghost block" id="copy" style="margin-top:12px">複製訂單內容</button>
-    <a class="btn ghost block" id="addLine" style="margin-top:12px;display:block;text-align:center;text-decoration:none" target="_blank" rel="noopener">開啟伯虎 LINE（複製後貼上）</a>
+    <a class="btn ghost block" id="addLine" style="margin-top:12px;display:block;text-align:center;text-decoration:none" target="_blank" rel="noopener">聯絡伯虎官方LINE</a>
     <p style="font-size:13px;opacity:.6;text-align:center;margin:28px 0 60px;line-height:1.9">請先截圖保存這個畫面。三天內未完成付款的訂單，我們會為你取消。</p>
   </div>
 </section>
@@ -300,13 +300,11 @@ $("#next").addEventListener("click", async () => {
   $("#oNo").textContent = "NO. " + order.orderNo;
   $("#payAmt").textContent = money(order.total);
   if (S.lineQr) $("#qrImg").src = S.lineQr; else $("#qrImg").replaceWith(Object.assign(document.createElement("p"),{textContent:"收款碼尚未設定，請直接聯繫伯虎 LINE"}));
-  $("#addLine").href = `https://line.me/R/ti/p/${lineId()}`;
+  $("#addLine").href = lineUrl();
   $("#shop").classList.add("hide"); $("#bar").classList.add("hide"); $("#pay").classList.remove("hide");
   window.scrollTo({top:0});
 });
 
-// LINE 官方帳號 ID：去空白、補上 @、轉小寫；@ 不能被編碼，否則 LINE 會找不到帳號
-const lineId = () => { let id = String(S.lineOaId||"").trim().replace(/\s/g,"").toLowerCase(); if (id && !id.startsWith("@")) id = "@" + id; return id; };
 function orderText(){
   const o = lastOrder;
   return [
@@ -318,9 +316,10 @@ function orderText(){
     `我已完成付款`
   ].join("\n");
 }
-$("#toLine").addEventListener("click", () => {
-  if (!S.lineOaId) { toast("尚未設定伯虎 LINE"); return; }
-  location.href = `https://line.me/R/oaMessage/${lineId()}/?${encodeURIComponent(orderText())}`;
+const lineUrl = () => S.lineUrl || "https://lin.ee/nPARyDp";
+$("#toLine").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(orderText()); toast("訂單已複製，到 LINE 貼上傳送"); } catch {}
+  setTimeout(() => { location.href = lineUrl(); }, 700);
 });
 $("#copy").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(orderText()); toast("已複製，可貼到伯虎 LINE"); }

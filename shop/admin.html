@@ -143,8 +143,8 @@ main{padding-bottom:80px}
       </div>
       <div class="panel">
         <h3 class="serif">付款</h3>
-        <div class="field"><label>伯虎官方 LINE ID（含 @）</label><input id="s-lineOaId" placeholder="@123abcde"></div>
-        <p class="hint" style="margin:-14px 0 20px">LINE 官方帳號管理後台 → 帳號設定 →「基本 ID」，是 @ 開頭的英數字（不是帳號名稱）。<a id="testLine" target="_blank" rel="noopener" style="color:var(--orange)">測試連結</a></p>
+        <div class="field"><label>伯虎官方 LINE 連結</label><input id="s-lineUrl" placeholder="https://lin.ee/..."></div>
+        <p class="hint" style="margin:-14px 0 20px">客人按「我已完成付款」或「聯絡伯虎官方LINE」都會開這個連結。<a id="testLine" target="_blank" rel="noopener" style="color:var(--orange)">測試連結</a></p>
         <div class="imgpick">
           <div class="ph" id="qrPrev">尚未上傳</div>
           <div>
@@ -426,7 +426,7 @@ $("#pDel").onclick = async () => {
 
 /* ---------- 設定 ---------- */
 let qrImage = "";
-const SK = ["closedText","lineOaId","shipFee","freeShipOver","leadDays","intro","care"];
+const SK = ["closedText","lineUrl","shipFee","freeShipOver","leadDays","intro","care"];
 async function loadSettings(){
   const s = await getDoc(doc(db,"shop_settings","main")).catch(()=>null);
   const S = { ...DEFAULT_SETTINGS, ...(s?.exists() ? s.data() : {}) };
@@ -435,8 +435,8 @@ async function loadSettings(){
   qrImage = S.lineQr || ""; showImg("#qrPrev", qrImage, "尚未上傳"); upTest();
 }
 $("#qrFile").onchange = async e => { const f=e.target.files[0]; if(!f) return; qrImage = await compress(f, 700, "image/png"); showImg("#qrPrev", qrImage); e.target.value=""; };
-$("#s-lineOaId").addEventListener("input", upTest);
-function upTest(){ let id=$("#s-lineOaId").value.trim().replace(/\s/g,"").toLowerCase(); if(id&&!id.startsWith("@")) id="@"+id; $("#testLine").href=`https://line.me/R/ti/p/${id}`; }
+$("#s-lineUrl").addEventListener("input", upTest);
+function upTest(){ $("#testLine").href = $("#s-lineUrl").value.trim() || "https://lin.ee/nPARyDp"; }
 $("#saveSettings").onclick = async () => {
   const d = { open:$("#s-open").checked, lineQr:qrImage };
   SK.forEach(k => d[k] = ["shipFee","freeShipOver","leadDays"].includes(k) ? Number($("#s-"+k).value)||0 : $("#s-"+k).value.trim());
