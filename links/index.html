@@ -2,152 +2,248 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EFE6D6">
 <title>伯虎在二樓 BUT WHO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@400;500&family=Libre+Caslon+Display&family=Jost:wght@400;500&family=Caveat:wght@500&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --paper:#f1ece3;
-    --paper-2:#e8e1d5;
-    --ink:#2f2a25;
-    --ink-soft:#6f665c;
-    --line:#cfc5b6;
-    --sea:#5d6f73;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--paper);color:var(--ink)}
-  body{
-    font-family:"Noto Serif TC",serif;font-weight:300;
-    min-height:100vh;display:flex;justify-content:center;
-    background:
-      radial-gradient(ellipse at 50% -10%, #f8f4ec 0%, transparent 60%),
-      var(--paper);
-  }
-  main{width:100%;max-width:440px;padding:56px 24px 40px}
+/* 舊紙底＋磚紅襯線字＋墨綠手繪線稿；手機單欄，寬螢幕主視覺左右分 */
+:root{
+  --paper:#EFE6D6; --paper-2:#E7DCC8; --red:#9C3A2E; --red-deep:#7E2C22;
+  --green:#2F4636; --ink:#3A332C; --soft:#7A6E61; --line:#CDBFA8;
+  --serif:"Libre Caslon Display","Noto Serif TC",serif;
+  --zh:"Noto Serif TC","Songti TC",serif;
+  --sans:"Jost","Noto Sans TC",system-ui,sans-serif;
+  --hand:"Caveat","Noto Sans TC",cursive;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--paper)}
+body{
+  min-height:100vh;color:var(--ink);font-family:var(--zh);font-weight:400;line-height:1.8;
+  background-color:var(--paper);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .18 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+a:focus-visible{outline:1.5px solid var(--red);outline-offset:4px}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(22px,env(safe-area-inset-left,0px));padding-right:max(22px,env(safe-area-inset-right,0px))}
 
-  header{text-align:center;margin-bottom:36px}
-  .mark{
-    width:92px;height:92px;margin:0 auto 22px;border-radius:50%;
-    border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;
-    flex-direction:column;gap:2px;
-  }
-  .mark b{font-weight:400;font-size:22px;letter-spacing:.18em;padding-left:.18em}
-  .mark small{font-family:"Cormorant Garamond",serif;font-size:10px;letter-spacing:.32em;padding-left:.32em;color:var(--ink-soft)}
-  .logo{display:block;width:230px;max-width:70%;height:auto;margin:0 auto}
-  h1{font-weight:400;font-size:21px;letter-spacing:.28em;padding-left:.28em}
-  .en{font-family:"Cormorant Garamond",serif;font-size:13px;letter-spacing:.42em;padding-left:.42em;color:var(--ink-soft);margin-top:6px}
-  .bio{margin-top:26px;font-size:13.5px;line-height:2;letter-spacing:.12em;color:var(--ink-soft)}
+/* 頂列 */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:22px 0}
+.logo{display:block;width:150px;aspect-ratio:720/208;background:var(--red);
+  -webkit-mask:url(logo.png) left center/contain no-repeat;mask:url(logo.png) left center/contain no-repeat}
+.social{display:flex;gap:16px}
+.social a{color:var(--red);display:block}
+.social svg{width:21px;height:21px;display:block}
 
-  .social{display:flex;justify-content:center;gap:22px;margin-top:22px}
-  .social a{color:var(--ink);opacity:.8;transition:opacity .2s}
-  .social a:hover{opacity:1}
-  .social svg{width:20px;height:20px;display:block}
+/* 主視覺 */
+.hero{display:grid;gap:8px;padding-block:30px 26px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--sans);font-size:11px;letter-spacing:.26em;color:var(--soft);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--red)}
+h1{font-family:var(--zh);font-weight:600;color:var(--red);font-size:clamp(40px,11vw,64px);line-height:1.18;letter-spacing:.04em;margin-top:14px}
+h1 .en{display:block;font-family:var(--serif);font-weight:400;font-size:.52em;letter-spacing:.01em;margin-top:6px;color:var(--red-deep)}
+.rule{width:44px;height:1px;background:var(--red);margin:22px 0 18px}
+.lead{font-family:var(--sans);font-size:12.5px;letter-spacing:.2em;line-height:2;color:var(--ink)}
+.cta{display:flex;flex-wrap:wrap;align-items:center;gap:20px;margin-top:24px}
+.btn-red{background:var(--red);color:#F6EEE2;font-family:var(--zh);font-size:15px;letter-spacing:.14em;padding:12px 22px;display:inline-flex;gap:10px;align-items:center;transition:background .2s}
+.btn-red:hover{background:var(--red-deep)}
+.textlink{color:var(--red);font-size:15px;letter-spacing:.1em;border-bottom:1px solid transparent;transition:border-color .2s}
+.textlink:hover{border-color:var(--red)}
+.art{position:relative;margin-top:18px}
+.art svg{width:100%;height:auto;display:block}
+.note{position:absolute;font-family:var(--hand);color:var(--green);font-size:20px;line-height:1.05;transform:rotate(-4deg)}
+.note.a{right:2%;top:2%}
 
-  .label{
-    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;
-    letter-spacing:.2em;color:var(--ink-soft);text-align:center;margin:30px 0 14px;
-    display:flex;align-items:center;gap:14px;
-  }
-  .label::before,.label::after{content:"";flex:1;height:1px;background:var(--line)}
+/* 區塊標 */
+.label{font-family:var(--sans);font-size:11px;letter-spacing:.26em;color:var(--soft);text-transform:uppercase;display:flex;align-items:center;gap:10px;margin:34px 0 16px}
+.label::before{content:"";width:14px;height:1px;background:var(--red)}
 
-  .feature{
-    display:block;text-decoration:none;color:var(--paper);
-    background:var(--sea);border-radius:4px;padding:26px 24px 24px;
-    position:relative;overflow:hidden;
-  }
-  .feature::after{
-    content:"";position:absolute;right:-40px;bottom:-60px;width:180px;height:180px;
-    border-radius:50%;border:1px solid rgba(241,236,227,.25);
-  }
-  .feature .date{font-family:"Cormorant Garamond",serif;font-size:13px;letter-spacing:.24em;opacity:.8}
-  .feature h2{font-weight:400;font-size:17px;letter-spacing:.16em;margin:10px 0 8px;line-height:1.7}
-  .feature p{font-size:13px;line-height:1.9;letter-spacing:.08em;opacity:.88}
+/* 近期活動 */
+.now{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;border:1px solid var(--red);padding:22px 20px;position:relative;transition:background .2s}
+.now:hover{background:rgba(156,58,46,.04)}
+.now .date{font-family:var(--serif);color:var(--red);font-size:15px;letter-spacing:.06em}
+.now h2{font-family:var(--zh);font-weight:600;color:var(--red);font-size:21px;line-height:1.45;letter-spacing:.04em;margin:8px 0 6px}
+.now p{font-family:var(--sans);font-size:13.5px;line-height:1.9;letter-spacing:.08em;color:var(--ink)}
+.now svg{width:78px;height:auto}
+.now h2 .pen{display:block;font-family:var(--serif);font-weight:400;font-size:.9em;letter-spacing:.02em}
+@media (max-width:560px){
+  .now{grid-template-columns:1fr;padding:20px 18px}
+  .now svg{position:absolute;right:14px;top:14px;width:46px}
+  .now h2{font-size:19px}
+  .now .date{padding-right:52px}
+}
+.now .more{display:inline-block;margin-top:12px;color:var(--red);font-size:14px;letter-spacing:.1em}
 
-  .links{display:flex;flex-direction:column;gap:12px}
-  .btn{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    text-decoration:none;color:var(--ink);
-    border:1px solid var(--ink);border-radius:4px;padding:17px 20px;
-    background:rgba(255,255,255,.18);
-    transition:background .2s,color .2s;
-  }
-  .btn:hover{background:var(--ink);color:var(--paper)}
-  .btn .t{font-size:15px;letter-spacing:.16em;font-weight:400}
-  .btn .s{display:block;font-size:12px;letter-spacing:.08em;color:var(--ink-soft);margin-top:4px;font-weight:300}
-  .btn:hover .s{color:var(--paper-2)}
-  .btn .arrow{font-family:"Cormorant Garamond",serif;font-size:18px;opacity:.6}
+/* 三張卡 */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{border:1px solid var(--line);background:rgba(255,253,248,.28);padding:14px 10px 16px;text-align:center;display:grid;gap:8px;align-content:start;transition:border-color .2s,background .2s}
+.card:hover{border-color:var(--red);background:rgba(255,253,248,.5)}
+.card .k{font-family:var(--sans);font-size:11px;letter-spacing:.22em;color:var(--red);font-weight:500}
+.card svg{width:100%;max-width:120px;height:auto;margin:0 auto;display:block}
+.card .t{font-family:var(--zh);font-weight:600;color:var(--ink);font-size:15px;letter-spacing:.04em;line-height:1.4;white-space:nowrap}
+.card .s{font-family:var(--sans);font-size:11.5px;line-height:1.7;letter-spacing:.02em;color:var(--soft);white-space:nowrap}
 
-  .info{
-    margin-top:30px;padding:22px 4px 0;border-top:1px solid var(--line);
-    font-size:13px;line-height:2.1;letter-spacing:.1em;color:var(--ink-soft);text-align:center;
-  }
-  .info a{color:inherit}
-  footer{
-    text-align:center;margin-top:34px;
-    font-family:"Cormorant Garamond",serif;font-size:12px;letter-spacing:.3em;color:var(--ink-soft);opacity:.7
-  }
+/* 文字連結列 */
+.rows{border-top:1px solid var(--line)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 2px;border-bottom:1px solid var(--line)}
+.row .t{font-family:var(--zh);font-size:17px;letter-spacing:.08em;color:var(--red)}
+.row .s{display:block;font-family:var(--sans);font-size:12.5px;letter-spacing:.06em;color:var(--soft);margin-top:2px}
+.row .ar{color:var(--red);font-family:var(--serif);font-size:20px;transition:transform .2s}
+.row:hover .ar{transform:translateX(4px)}
+
+/* 資訊 */
+.info{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;margin-top:34px;padding-bottom:10px}
+.info p{font-family:var(--sans);font-size:13px;line-height:2.05;letter-spacing:.08em;color:var(--ink)}
+.info .tel{color:var(--red);font-family:var(--serif);font-size:16px;letter-spacing:.06em;user-select:all}
+.info .hand{font-family:var(--hand);color:var(--green);font-size:21px;line-height:1.05;text-align:right;transform:rotate(-3deg)}
+footer{border-top:1px solid var(--line);margin-top:22px;padding-block:18px calc(28px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;font-family:var(--sans);font-size:11px;letter-spacing:.24em;color:var(--soft)}
+
+@media (min-width:820px){
+  .logo{width:180px}
+  .hero{grid-template-columns:1fr 1.05fr;gap:40px;align-items:center;padding-block:46px 40px}
+  .art{margin-top:0}
+  .lower{display:grid;grid-template-columns:1fr 1fr;gap:0 48px}
+}
+@media (max-width:380px){
+  .cards{gap:8px}
+  .card{padding:12px 6px 14px}
+  .card .t{font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<main>
+<div class="wrap">
 
-  <header>
-    <h1><img class="logo" src="logo.png" alt="伯虎在二樓 Hengchun BUT WHO"></h1>
-    <p class="bio">恆春　百年老屋的二樓<br>手作麵包主題空間</p>
-
+  <header class="top">
+    <a href="./" class="logo" aria-label="伯虎在二樓 Hengchun BUT WHO"></a>
     <nav class="social" aria-label="社群">
-      <a href="https://www.instagram.com/but_who2f/" aria-label="Instagram">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></svg>
-      </a>
-      <a href="https://lin.ee/nPARyDp" aria-label="LINE 官方帳號">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 4C7 4 3 7.2 3 11.1c0 3.5 3.1 6.4 7.3 7l-.4 2.4c-.1.4.3.7.7.5 2.6-1.4 6.6-4.1 8.1-6.3.9-1.1 1.3-2.3 1.3-3.6C21 7.2 17 4 12 4z"/></svg>
-      </a>
-      <a href="https://www.google.com/maps/search/?api=1&query=%E4%BC%AF%E8%99%8E%E5%9C%A8%E4%BA%8C%E6%A8%93%20%E5%B1%8F%E6%9D%B1%E7%B8%A3%E6%81%86%E6%98%A5%E9%8E%AE%E4%B8%AD%E5%B1%B1%E8%B7%AF48%E8%99%9F" aria-label="Google 地圖">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>
-      </a>
+      <a href="https://www.instagram.com/but_who2f/" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></svg></a>
+      <a href="https://lin.ee/nPARyDp" aria-label="LINE 官方帳號"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 4C7 4 3 7.2 3 11.1c0 3.5 3.1 6.4 7.3 7l-.4 2.4c-.1.4.3.7.7.5 2.6-1.4 6.6-4.1 8.1-6.3.9-1.1 1.3-2.3 1.3-3.6C21 7.2 17 4 12 4z"/></svg></a>
+      <a href="https://www.google.com/maps/search/?api=1&query=%E4%BC%AF%E8%99%8E%E5%9C%A8%E4%BA%8C%E6%A8%93%20%E5%B1%8F%E6%9D%B1%E7%B8%A3%E6%81%86%E6%98%A5%E9%8E%AE%E4%B8%AD%E5%B1%B1%E8%B7%AF48%E8%99%9F" aria-label="Google 地圖"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></a>
     </nav>
   </header>
 
-  <div class="label">now</div>
-  <a class="feature" href="https://www.instagram.com/but_who2f/">
-    <div class="date">2026.11.27 — 2027.01.03</div>
-    <h2>伯虎在二樓 × 共聲島 PeninSOUNDla</h2>
-    <p>買任一口味可麗露<br>解鎖閣樓裡的故事聲音</p>
-  </a>
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Hengchun · since 2019</div>
+      <h1>百年老屋<br>的二樓<span class="en">Bread, slowly.</span></h1>
+      <div class="rule"></div>
+      <p class="lead">恆春中山路　手作麵包主題空間<br>可麗露・法國超人・午後的一杯茶</p>
+      <div class="cta">
+        <a class="btn-red" href="https://chipaoanping.github.io/bohu-ledger/shop/">宅配訂購 <span aria-hidden="true">→</span></a>
+        <a class="textlink" href="https://lin.ee/nPARyDp">加入官方 LINE →</a>
+      </div>
+    </div>
 
-  <div class="label">links</div>
-  <div class="links">
-    <a class="btn" href="https://chipaoanping.github.io/bohu-ledger/shop/">
-      <span><span class="t">宅配訂購</span><span class="s">可麗露禮盒・法國超人｜滿 1900 免運</span></span>
-      <span class="arrow">→</span>
-    </a>
-    <a class="btn" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E7%AB%B9%E5%B7%A8%E5%9F%8E%E8%B3%BC%E7%89%A9%E4%B8%AD%E5%BF%83">
-      <span><span class="t">新竹巨城 4F 櫃位</span><span class="s">11.30 起　現場烤的法國超人</span></span>
-      <span class="arrow">→</span>
-    </a>
-    <a class="btn" href="https://www.google.com/maps/search/?api=1&query=%E4%BC%AF%E8%99%8E%E5%9C%A8%E4%BA%8C%E6%A8%93%20%E5%B1%8F%E6%9D%B1%E7%B8%A3%E6%81%86%E6%98%A5%E9%8E%AE%E4%B8%AD%E5%B1%B1%E8%B7%AF48%E8%99%9F">
-      <span><span class="t">恆春本店　怎麼走</span><span class="s">中山路 48 號 2 樓　入口在秋香麵店旁</span></span>
-      <span class="arrow">→</span>
-    </a>
-    <a class="btn" href="https://lin.ee/nPARyDp">
-      <span><span class="t">加入官方 LINE</span><span class="s">訂位・詢問・新品消息</span></span>
-      <span class="arrow">→</span>
-    </a>
-    <a class="btn" href="https://www.instagram.com/but_who2f/">
-      <span><span class="t">Instagram</span><span class="s">@but_who2f</span></span>
-      <span class="arrow">→</span>
-    </a>
+    <div class="art" aria-hidden="true">
+      <svg viewBox="0 0 520 400" fill="none" stroke="#2F4636" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <!-- 老屋拱窗 -->
+        <path d="M150 300V130c0-58 46-98 110-98s110 40 110 98v170"/>
+        <path d="M164 300V134c0-50 40-86 96-86s96 36 96 86v166"/>
+        <path d="M260 48v252M164 168h192M164 236h192"/>
+        <path d="M196 70c-8 14-12 28-12 44M222 56c-6 6-10 14-12 22" stroke-width="1.6"/>
+        <!-- 窗外的海 -->
+        <path d="M172 214c12-5 22-5 34 0s22 5 34 0M280 214c12-5 22-5 34 0s22 5 34 0" stroke-width="1.8"/>
+        <path d="M180 226c10-4 18-4 28 0M290 226c10-4 18-4 28 0" stroke-width="1.5"/>
+        <!-- 桌面 -->
+        <path d="M20 300h480M14 312h492"/>
+        <path d="M60 312l-26 80M120 312l-14 80M200 312l-6 80M300 312l6 80M390 312l16 80M460 312l28 80" stroke-width="1.6"/>
+        <!-- 可麗露 -->
+        <ellipse cx="118" cy="232" rx="30" ry="8"/>
+        <path d="M88 232c-2 22-1 44 3 64M148 232c2 22 1 44-3 64M91 296c18 6 36 6 54 0"/>
+        <path d="M100 238c-1 18 0 38 2 58M112 240c0 18 0 38 1 58M124 240c0 18 0 38-1 58M136 238c1 18 0 38-2 58" stroke-width="1.6"/>
+        <path d="M100 230c10-5 26-5 36 0" stroke-width="1.6"/>
+        <!-- 牛角 -->
+        <path d="M214 294c-14-2-22-10-20-18 4-12 22-20 46-22s46 2 58 12c6 6 6 14-2 20-6 4-14 6-22 6"/>
+        <path d="M232 256c2 12 2 24-2 36M256 254c4 12 4 26 0 40M280 258c4 10 4 22-2 34" stroke-width="1.6"/>
+        <path d="M196 284c-10 2-18 0-20-6M316 286c10 4 18 2 22-4" stroke-width="1.8"/>
+        <!-- 茶杯 -->
+        <ellipse cx="420" cy="296" rx="56" ry="10"/>
+        <path d="M384 250h72c0 26-14 42-36 42s-36-16-36-42z"/>
+        <ellipse cx="420" cy="250" rx="36" ry="7"/>
+        <path d="M456 258c14-2 20 6 16 14s-14 10-20 8"/>
+        <path d="M404 232c-8-10 8-16 0-28M424 228c-8-10 8-16 0-28M444 232c-8-10 8-16 0-28" stroke-width="1.6"/>
+        <!-- 小葉子 -->
+        <path d="M470 120c-10 30-30 52-56 66" stroke="#9C3A2E" stroke-width="1.8"/>
+        <path d="M460 140c10-2 18-10 20-22-12 0-20 8-20 22zM446 160c-12 0-20-6-24-16 12-2 22 4 24 16zM438 168c10-2 18-10 20-20-12 0-20 8-20 20z" stroke="#9C3A2E" stroke-width="1.6"/>
+      </svg>
+      <div class="note a">a little<br>piece of<br>Hengchun</div>
+    </div>
+  </section>
+
+  <div class="lower">
+    <section>
+      <div class="label">Now</div>
+      <a class="now" href="https://www.instagram.com/but_who2f/">
+        <div>
+          <div class="date">2026.11.27 — 2027.01.03</div>
+          <h2>伯虎在二樓 × 共聲島<span class="pen">PeninSOUNDla</span></h2>
+          <p>買任一口味可麗露，解鎖閣樓裡的故事聲音。</p>
+          <span class="more">看活動 →</span>
+        </div>
+        <svg viewBox="0 0 90 120" fill="none" stroke="#2F4636" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <ellipse cx="38" cy="64" rx="22" ry="6"/>
+          <path d="M16 64c-1 18 0 32 3 44M60 64c1 18 0 32-3 44M19 108c12 5 26 5 38 0"/>
+          <path d="M26 69c0 14 0 28 2 40M38 70v40M50 69c0 14 0 28-2 40" stroke-width="1.5"/>
+          <path d="M66 30c6 6 6 16 0 22M74 22c11 11 11 27 0 38M82 14c15 16 15 38 0 54" stroke="#9C3A2E" stroke-width="1.8"/>
+        </svg>
+      </a>
+    </section>
+
+    <section>
+      <div class="label">Visit</div>
+      <div class="cards">
+        <a class="card" href="https://chipaoanping.github.io/bohu-ledger/shop/">
+          <span class="k">DELIVERY</span>
+          <svg viewBox="0 0 120 90" fill="none" stroke="#2F4636" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 34l42-14 42 14v38l-42 14-42-14z"/><path d="M18 34l42 14 42-14M60 48v38"/>
+            <path d="M39 27l42 14v14" stroke="#9C3A2E" stroke-width="1.8"/>
+            <path d="M52 16c-4-8 4-12 8-6 4-6 12-2 8 6" stroke="#9C3A2E" stroke-width="1.8"/>
+          </svg>
+          <span class="t">宅配訂購</span>
+          <span class="s">滿 1900 免運</span>
+        </a>
+        <a class="card" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E7%AB%B9%E5%B7%A8%E5%9F%8E%E8%B3%BC%E7%89%A9%E4%B8%AD%E5%BF%83">
+          <span class="k">HSINCHU</span>
+          <svg viewBox="0 0 120 90" fill="none" stroke="#2F4636" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 84V30h80v54M14 84h92"/><path d="M14 30l12-14h68l12 14z"/>
+            <path d="M32 44h16v12H32zM52 44h16v12H52zM72 44h16v12H72zM32 62h16v12H32zM72 62h16v12H72z" stroke-width="1.6"/>
+            <path d="M52 84V64h16v20"/><path d="M48 24h24" stroke="#9C3A2E" stroke-width="1.8"/>
+          </svg>
+          <span class="t">巨城 4F</span>
+          <span class="s">11.30 起</span>
+        </a>
+        <a class="card" href="https://www.google.com/maps/search/?api=1&query=%E4%BC%AF%E8%99%8E%E5%9C%A8%E4%BA%8C%E6%A8%93%20%E5%B1%8F%E6%9D%B1%E7%B8%A3%E6%81%86%E6%98%A5%E9%8E%AE%E4%B8%AD%E5%B1%B1%E8%B7%AF48%E8%99%9F">
+          <span class="k">HENGCHUN</span>
+          <svg viewBox="0 0 120 90" fill="none" stroke="#2F4636" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M24 84V40h72v44M16 84h88M18 40l42-24 42 24"/>
+            <path d="M34 50h18v14H34zM68 50h18v14H68zM43 50v14M77 50v14" stroke-width="1.6"/>
+            <path d="M24 66h72" stroke-width="1.6"/>
+            <path d="M36 84V72h12v12" stroke-width="1.8"/><path d="M62 84l8-8h10l8-8" stroke="#9C3A2E" stroke-width="1.8"/>
+          </svg>
+          <span class="t">恆春本店</span>
+          <span class="s">秋香麵店旁</span>
+        </a>
+      </div>
+
+      <div class="label">Links</div>
+      <nav class="rows">
+        <a class="row" href="https://lin.ee/nPARyDp"><span><span class="t">加入官方 LINE</span><span class="s">訂位・詢問・新品消息</span></span><span class="ar" aria-hidden="true">→</span></a>
+        <a class="row" href="https://www.instagram.com/but_who2f/"><span><span class="t">Instagram</span><span class="s">@but_who2f</span></span><span class="ar" aria-hidden="true">→</span></a>
+      </nav>
+    </section>
   </div>
 
-  <div class="info">
-    屏東縣恆春鎮中山路 48 號 2 樓<br>
-    營業時間 9:30–17:00<br>營業日每月公告於 IG 簡介<br>
-    <a href="tel:0901109527">0901-109-527</a>
-  </div>
+  <section class="info">
+    <p>屏東縣恆春鎮中山路 48 號 2 樓<br>營業時間 9:30–17:00<br>營業日每月公告於 IG 簡介<br><a class="tel" href="tel:0901109527">0901-109-527</a></p>
+    <div class="hand" aria-hidden="true">good bread<br>good days</div>
+  </section>
 
-  <footer>SINCE 2019 · HENGCHUN</footer>
-</main>
+  <footer><span>BUT WHO</span><span>SINCE 2019 · HENGCHUN</span></footer>
+</div>
 </body>
 </html>
