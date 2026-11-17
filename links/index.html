@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>伯虎在二樓 BUT WHO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f1ece3;
+    --paper-2:#e8e1d5;
+    --ink:#2f2a25;
+    --ink-soft:#6f665c;
+    --line:#cfc5b6;
+    --sea:#5d6f73;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--ink)}
+  body{
+    font-family:"Noto Serif TC",serif;font-weight:300;
+    min-height:100vh;display:flex;justify-content:center;
+    background:
+      radial-gradient(ellipse at 50% -10%, #f8f4ec 0%, transparent 60%),
+      var(--paper);
+  }
+  main{width:100%;max-width:440px;padding:56px 24px 40px}
+
+  header{text-align:center;margin-bottom:36px}
+  .mark{
+    width:92px;height:92px;margin:0 auto 22px;border-radius:50%;
+    border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:2px;
+  }
+  .mark b{font-weight:400;font-size:22px;letter-spacing:.18em;padding-left:.18em}
+  .mark small{font-family:"Cormorant Garamond",serif;font-size:10px;letter-spacing:.32em;padding-left:.32em;color:var(--ink-soft)}
+  h1{font-weight:400;font-size:21px;letter-spacing:.28em;padding-left:.28em}
+  .en{font-family:"Cormorant Garamond",serif;font-size:13px;letter-spacing:.42em;padding-left:.42em;color:var(--ink-soft);margin-top:6px}
+  .bio{margin-top:20px;font-size:13.5px;line-height:2;letter-spacing:.12em;color:var(--ink-soft)}
+
+  .social{display:flex;justify-content:center;gap:22px;margin-top:22px}
+  .social a{color:var(--ink);opacity:.8;transition:opacity .2s}
+  .social a:hover{opacity:1}
+  .social svg{width:20px;height:20px;display:block}
+
+  .label{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;
+    letter-spacing:.2em;color:var(--ink-soft);text-align:center;margin:30px 0 14px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .label::before,.label::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .feature{
+    display:block;text-decoration:none;color:var(--paper);
+    background:var(--sea);border-radius:4px;padding:26px 24px 24px;
+    position:relative;overflow:hidden;
+  }
+  .feature::after{
+    content:"";position:absolute;right:-40px;bottom:-60px;width:180px;height:180px;
+    border-radius:50%;border:1px solid rgba(241,236,227,.25);
+  }
+  .feature .date{font-family:"Cormorant Garamond",serif;font-size:13px;letter-spacing:.24em;opacity:.8}
+  .feature h2{font-weight:400;font-size:17px;letter-spacing:.16em;margin:10px 0 8px;line-height:1.7}
+  .feature p{font-size:13px;line-height:1.9;letter-spacing:.08em;opacity:.88}
+
+  .links{display:flex;flex-direction:column;gap:12px}
+  .btn{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    text-decoration:none;color:var(--ink);
+    border:1px solid var(--ink);border-radius:4px;padding:17px 20px;
+    background:rgba(255,255,255,.18);
+    transition:background .2s,color .2s;
+  }
+  .btn:hover{background:var(--ink);color:var(--paper)}
+  .btn .t{font-size:15px;letter-spacing:.16em;font-weight:400}
+  .btn .s{display:block;font-size:12px;letter-spacing:.08em;color:var(--ink-soft);margin-top:4px;font-weight:300}
+  .btn:hover .s{color:var(--paper-2)}
+  .btn .arrow{font-family:"Cormorant Garamond",serif;font-size:18px;opacity:.6}
+
+  .info{
+    margin-top:30px;padding:22px 4px 0;border-top:1px solid var(--line);
+    font-size:13px;line-height:2.1;letter-spacing:.1em;color:var(--ink-soft);text-align:center;
+  }
+  .info a{color:inherit}
+  footer{
+    text-align:center;margin-top:34px;
+    font-family:"Cormorant Garamond",serif;font-size:12px;letter-spacing:.3em;color:var(--ink-soft);opacity:.7
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <div class="mark"><b>伯虎</b><small>BUT WHO</small></div>
+    <h1>伯虎在二樓</h1>
+    <div class="en">BUT WHO</div>
+    <p class="bio">恆春百年老屋的二樓<br>手作麵包與午後的茶<br>來海邊　慢慢待一會兒</p>
+
+    <nav class="social" aria-label="社群">
+      <a href="https://www.instagram.com/but_who2f/" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></svg>
+      </a>
+      <a href="https://lin.ee/nPARyDp" aria-label="LINE 官方帳號">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 4C7 4 3 7.2 3 11.1c0 3.5 3.1 6.4 7.3 7l-.4 2.4c-.1.4.3.7.7.5 2.6-1.4 6.6-4.1 8.1-6.3.9-1.1 1.3-2.3 1.3-3.6C21 7.2 17 4 12 4z"/></svg>
+      </a>
+      <a href="https://www.google.com/maps/search/?api=1&query=%E4%BC%AF%E8%99%8E%E5%9C%A8%E4%BA%8C%E6%A8%93%20%E5%B1%8F%E6%9D%B1%E7%B8%A3%E6%81%86%E6%98%A5%E9%8E%AE%E4%B8%AD%E5%B1%B1%E8%B7%AF48%E8%99%9F" aria-label="Google 地圖">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>
+      </a>
+    </nav>
+  </header>
+
+  <div class="label">now</div>
+  <a class="feature" href="https://www.instagram.com/but_who2f/">
+    <div class="date">2026.11.27 — 2027.01.03</div>
+    <h2>伯虎在二樓 × 共聲島 PeninSOUNDla</h2>
+    <p>買任一口味可麗露<br>解鎖閣樓裡的故事聲音</p>
+  </a>
+
+  <div class="label">links</div>
+  <div class="links">
+    <a class="btn" href="https://chipaoanping.github.io/bohu-ledger/shop/">
+      <span><span class="t">宅配訂購</span><span class="s">可麗露禮盒・法國超人｜滿 1900 免運</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="btn" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E7%AB%B9%E5%B7%A8%E5%9F%8E%E8%B3%BC%E7%89%A9%E4%B8%AD%E5%BF%83">
+      <span><span class="t">新竹巨城 4F 櫃位</span><span class="s">11.30 起　現場烤的法國超人</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="btn" href="https://www.google.com/maps/search/?api=1&query=%E4%BC%AF%E8%99%8E%E5%9C%A8%E4%BA%8C%E6%A8%93%20%E5%B1%8F%E6%9D%B1%E7%B8%A3%E6%81%86%E6%98%A5%E9%8E%AE%E4%B8%AD%E5%B1%B1%E8%B7%AF48%E8%99%9F">
+      <span><span class="t">恆春本店　怎麼走</span><span class="s">中山路 48 號 2 樓　入口在秋香麵店旁</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="btn" href="https://lin.ee/nPARyDp">
+      <span><span class="t">加入官方 LINE</span><span class="s">訂位・詢問・新品消息</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="btn" href="https://www.instagram.com/but_who2f/">
+      <span><span class="t">Instagram</span><span class="s">@but_who2f</span></span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+
+  <div class="info">
+    屏東縣恆春鎮中山路 48 號 2 樓<br>
+    每週四公休<br>
+    <a href="tel:0901109527">0901-109-527</a>
+  </div>
+
+  <footer>SINCE 2019 · HENGCHUN</footer>
+</main>
+</body>
+</html>
