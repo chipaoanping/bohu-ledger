@@ -3,181 +3,161 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>伯虎宅配</title>
-<meta name="description" content="伯虎在二樓 宅配訂購｜恆春手作，冷凍直送">
+<meta name="theme-color" content="#f1ece3">
+<title>宅配訂購｜伯虎在二樓 BUT WHO</title>
+<meta name="description" content="伯虎在二樓 宅配訂購｜恆春百年老屋的二樓，冷凍直送">
+<meta property="og:image" content="https://chipaoanping.github.io/bohu-ledger/shop/img/hero.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<style>
-.wrap{max-width:620px;margin:0 auto;padding:0 20px}
-.top{display:flex;justify-content:space-between;align-items:center;padding:22px 20px;max-width:620px;margin:0 auto;font-size:13px;letter-spacing:.14em;color:var(--brown)}
-
-/* 主視覺：橘色上半、奶油下半，巨大 2F 跨在交界 */
-.hero{position:relative;overflow:hidden;background:linear-gradient(var(--orange) 0 62%,var(--cream) 62% 100%)}
-.hero .in{position:relative;max-width:620px;margin:0 auto;height:min(96vw,540px)}
-.giant{position:absolute;right:-4%;top:28%;font-family:"Outfit";font-weight:800;font-size:min(62vw,330px);line-height:.8;color:var(--cream);letter-spacing:-.04em;user-select:none}
-.hero .meta{position:absolute;top:22px;left:20px;right:20px;display:flex;justify-content:space-between;color:var(--ink);font-size:10px;letter-spacing:.24em;font-weight:600}
-.hero h1{position:absolute;left:20px;top:31%;color:var(--ink);font-size:min(13vw,64px);line-height:1.05}
-.hero h1 small{display:block;font-family:"Outfit";font-weight:600;font-size:12px;letter-spacing:.3em;margin-top:12px}
-.intro-wrap{background:var(--cream);padding:4px 0 56px}
-.intro{font-family:var(--serif);font-weight:700;color:var(--brown);font-size:15px;line-height:2}
-
-/* 區塊標題 */
-.sec-head{display:flex;justify-content:space-between;align-items:baseline;margin:56px 0 22px;color:var(--brown)}
-.sec-head h2{font-size:38px;line-height:1}
-
-/* 商品 */
-.prod{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:20px 0;border-top:1px solid var(--line)}
-.prod:last-child{border-bottom:1px solid var(--line)}
-.prod .ph{width:96px;height:96px;background:var(--cream);display:grid;place-items:center;overflow:hidden}
-.prod .ph img{width:100%;height:100%;object-fit:cover}
-.prod .ph b{font-family:"Outfit";font-weight:800;font-size:34px;color:var(--orange)}
-.prod .no{font-size:11px;letter-spacing:.2em;color:var(--orange);font-weight:600}
-.prod .nm{font-family:var(--serif);font-weight:900;font-size:18px;line-height:1.4;color:var(--ink)}
-.prod .tg{font-family:"Outfit";font-size:11px;font-weight:600;letter-spacing:.1em;border:1px solid var(--orange);color:var(--orange);padding:0 6px;margin-left:6px;vertical-align:3px}
-.prod .ds{font-size:13px;color:var(--mute);line-height:1.7;margin:4px 0 10px;white-space:pre-line}
-.prod .ft{display:flex;justify-content:space-between;align-items:center}
-.prod .pr{font-family:"Outfit";font-weight:600;font-size:18px}
-.prod.out{opacity:.45}
-.step{display:flex;align-items:center;border:1px solid var(--ink)}
-.step button{width:36px;height:34px;background:transparent;border:0;font-size:18px;color:var(--ink)}
-.step span{min-width:28px;text-align:center;font-family:"Outfit";font-weight:600}
-.soldout{font-size:12px;letter-spacing:.2em;color:var(--mute)}
-
-/* 橘色色塊跨越淺／深交界 */
-.divider{position:relative;height:150px;margin-top:64px;background:linear-gradient(var(--paper) 0 50%,var(--char) 50% 100%)}
-.divider .blk{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(72%,360px);height:112px;background:var(--orange);color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center}
-.divider .blk b{font-family:"Outfit";font-weight:600;font-size:15px;letter-spacing:.24em}
-.divider .blk span{font-size:12px;letter-spacing:.2em;opacity:.85;margin-top:4px}
-
-/* 深色收件區 */
-.dark{background:var(--char);color:var(--paper);padding-bottom:150px}
-.dark .sec-head{color:var(--paper);margin-top:40px}
-.dark .sec-head h2{font-size:38px}
-.row{display:flex;gap:18px}.row>.field{flex:1}
-.ship-note{font-size:13px;opacity:.7;margin:-4px 0 28px}
-.sum div{display:flex;justify-content:space-between;font-size:14px;padding:4px 0;opacity:.85}
-.sum .total{opacity:1;border-top:1px solid rgba(255,255,255,.25);margin-top:10px;padding-top:14px;font-size:15px;align-items:baseline}
-.sum .total b{font-family:"Outfit";font-weight:600;font-size:30px;color:var(--orange-2)}
-.err{color:var(--orange-2);font-size:14px;margin-top:14px}
-.dark footer{margin-top:72px;display:flex;justify-content:space-between;font-size:12px;letter-spacing:.12em;opacity:.6;line-height:1.9}
-
-/* 底部列 */
-.bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--paper);padding:12px 20px calc(12px + env(safe-area-inset-bottom));z-index:10}
-.bar .in{max-width:620px;margin:0 auto;display:flex;align-items:center;gap:16px}
-.bar .amt{flex:1;font-size:11px;letter-spacing:.2em;opacity:.8}
-.bar .amt b{display:block;font-family:"Outfit";font-weight:600;font-size:22px;letter-spacing:0;opacity:1}
-
-/* 付款頁 */
-#pay{min-height:100vh;background:var(--char);color:var(--paper)}
-#pay .head{background:var(--orange);color:var(--ink);padding:22px 0 100px}
-#pay .head .in{max-width:620px;margin:0 auto;padding:0 20px}
-#pay .head .line1{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.2em;font-weight:600}
-#pay .head h2{font-size:min(12vw,56px);margin-top:36px;line-height:1.1}
-#pay .head .ono{font-family:"Outfit";font-weight:600;letter-spacing:.14em;margin-top:10px}
-.qrbox{max-width:300px;margin:-76px auto 0;background:var(--paper);color:var(--ink);padding:24px;text-align:center}
-.qrbox img{width:100%;aspect-ratio:1;object-fit:contain;display:block}
-.qrbox .amt{font-family:"Outfit";font-weight:600;font-size:32px;margin-top:12px;color:var(--orange)}
-.qrbox p{font-size:12px;letter-spacing:.12em;color:var(--mute)}
-.steps{list-style:none;counter-reset:s;margin:40px 0 28px}
-.steps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;padding:14px 0;border-top:1px solid rgba(255,255,255,.15);font-size:15px}
-.steps li::before{content:"0" counter(s);font-family:"Outfit";font-weight:600;color:var(--orange-2)}
-.btn.line{background:#06C755}
-.care{margin-top:56px}
-.care .blk{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:18px 0;border-top:1px solid rgba(255,255,255,.18);font-size:14px;line-height:1.9}
-.care .blk:last-child{border-bottom:1px solid rgba(255,255,255,.18)}
-.care h3{font-family:var(--serif);font-weight:900;font-size:16px;color:var(--orange-2);line-height:1.6}
-.care p{white-space:pre-line;opacity:.88}
-.care .note{font-size:12px;opacity:.6;margin-top:6px}
-.closed{padding:80px 0;text-align:center;font-family:var(--serif);font-weight:700;color:var(--brown)}
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shop.css">
 </head>
 <body>
+<main id="shop" class="frame">
+  <header class="top">
+    <span class="l cap"><span class="dot"></span> Hengchun — Frozen Delivery</span>
+    <a href="../links/"><img class="logo" src="../links/logo.png" alt="伯虎在二樓 Hengchun BUT WHO"></a>
+    <a class="r cap" href="https://lin.ee/nPARyDp">LINE <span class="dot"></span></a>
+  </header>
 
-<!-- ======== 選購頁 ======== -->
-<main id="shop">
-  <section class="hero">
-    <div class="in">
-      <div class="meta"><span>{ 宅配 — 訂購 }</span><span>BUT WHO 2F</span></div>
-      <div class="giant">2F</div>
-      <h1 class="serif">伯虎<br>宅配<small>HENGCHUN // FROZEN DELIVERY</small></h1>
+  <figure class="hero">
+    <img src="img/hero.jpg" alt="恆春的海，從兩道牆之間看出去" fetchpriority="high">
+    <figcaption class="ov"><div class="cap">宅配訂購　Delivery</div><div class="it">from the second floor, Hengchun</div></figcaption>
+  </figure>
+
+  <section class="split">
+    <div class="navcol">
+      <nav class="nav">
+        <h2 class="cap">Navigate</h2>
+        <div class="it">點一下，跳到那一段</div>
+        <ul>
+          <li><a href="#menu"><b>001.</b>選品</a></li>
+          <li><a href="#how"><b>003.</b>流程</a></li>
+          <li><a href="#recv"><b>002.</b>收件</a></li>
+          <li><a href="#keep"><b>004.</b>保存</a></li>
+        </ul>
+      </nav>
+      <img src="img/latte.jpg" alt="藤編桌上的一杯拿鐵" loading="lazy">
+    </div>
+    <div class="story">
+      <div class="w1">寄一份</div>
+      <div class="w2">恆春的</div>
+      <div class="ph"><img src="img/beach.jpg" alt="恆春的沙灘與海" loading="lazy"></div>
+      <div class="w3">午後</div>
+      <div class="txt">
+        <div class="it">our story</div>
+        <p id="intro"></p>
+        <a class="more cap" href="#menu">看選品 <span aria-hidden="true">→</span></a>
+      </div>
     </div>
   </section>
-  <div class="intro-wrap"><div class="wrap"><p class="intro" id="intro"></p></div></div>
 
-  <div class="wrap">
-    <div class="sec-head"><h2 class="serif">選品</h2><span class="label">{ 01 }</span></div>
-    <div id="items"><p class="label" style="padding:24px 0">載入中…</p></div>
-  </div>
-
-  <div id="closedBox" class="wrap closed hide"></div>
+  <div id="closedBox" class="closed hide"></div>
 
   <div id="formArea">
-    <div class="divider"><div class="blk"><b>FROM HENGCHUN</b><span>冷凍宅配・恆春直送</span></div></div>
-    <section class="dark">
-      <div class="wrap">
-        <div class="sec-head"><h2 class="serif">收件</h2><span class="label">{ 02 }</span></div>
-        <div class="row">
-          <div class="field"><label for="name">收件人</label><input id="name" autocomplete="name" maxlength="40"></div>
-          <div class="field"><label for="phone">手機</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xxxxxxxx" maxlength="20"></div>
-        </div>
-        <div class="field"><label for="addr">收件地址</label><input id="addr" autocomplete="street-address" maxlength="200"></div>
-        <div class="row">
-          <div class="field"><label for="date">希望到貨日</label><input id="date" type="date"></div>
-          <div class="field"><label for="payer">LINE Pay 付款名稱</label><input id="payer" maxlength="60" placeholder="付款時顯示的名字"></div>
-        </div>
-        <div class="field"><label for="memo">備註</label><textarea id="memo" maxlength="500" placeholder="送禮對象、到貨時段，或想對我們說的話"></textarea></div>
-        <p class="ship-note" id="shipNote"></p>
-        <div class="sum">
-          <div><span>商品小計</span><span id="sSub">$0</span></div>
-          <div><span>冷凍運費</span><span id="sShip">$0</span></div>
-          <div class="total"><span>合計</span><b id="sTotal">$0</b></div>
-        </div>
-        <p class="err hide" id="err"></p>
-        <section class="care" id="careSec">
-          <div class="sec-head" style="margin-top:0"><h2 class="serif">保存</h2><span class="label">{ 03 }</span></div>
-          <div id="care"></div>
-        </section>
-        <footer><span>伯虎在二樓<br>恆春鎮中山路48號2樓</span><span style="text-align:right">[ LINE Pay ]<br>@BUT_WHO2F</span></footer>
+    <div class="shead" id="menu">
+      <h2>選品<span class="cap">The Menu</span></h2>
+      <div class="it" id="menuHint">按 ＋ 放進這一箱</div>
+    </div>
+    <div class="menu" id="items"><p class="empty">載入中…</p></div>
+
+    <section class="proc" id="how">
+      <div class="pic">
+        <img src="img/drink.jpg" alt="木桌上的一杯特調" loading="lazy">
+        <div class="t"><div class="cap">How to order</div><div class="it" style="color:#f7f3ec">訂購流程</div></div>
+        <div class="card"><div class="cap">冷凍宅配<br>恆春直送</div><div class="it">frozen, sent with care</div></div>
       </div>
+      <div class="cell"><span class="dot on"></span><h3><b>001.</b>選品</h3><p>在上方挑好品項與數量，合計會在畫面下方顯示。</p></div>
+      <div class="cell"><span class="dot"></span><h3><b>002.</b>填寫收件</h3><p>留下收件人、手機、地址與希望到貨日。</p></div>
+      <div class="cell"><span class="dot"></span><h3><b>003.</b>LINE Pay 付款</h3><p>送出後會出現收款碼，掃碼付款並輸入金額。</p></div>
+      <div class="cell"><span class="dot"></span><h3><b>004.</b>傳到官方 LINE</h3><p>按「我已完成付款」把訂單傳給我們，核對後回覆確認。</p></div>
+    </section>
+
+    <div class="shead" id="recv">
+      <h2>收件<span class="cap">Recipient</span></h2>
+      <div class="it">寄到哪裡，交給誰</div>
+    </div>
+    <section class="form">
+      <div class="grid">
+        <div class="f"><label for="name">Name<span>收件人</span></label><input id="name" autocomplete="name" maxlength="40"></div>
+        <div class="f"><label for="phone">Mobile<span>手機</span></label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09xxxxxxxx" maxlength="20"></div>
+        <div class="f w"><label for="addr">Address<span>收件地址</span></label><input id="addr" autocomplete="street-address" maxlength="200"></div>
+        <div class="f"><label for="date">Arrival<span>希望到貨日</span></label><input id="date" type="date"></div>
+        <div class="f"><label for="payer">LINE Pay<span>付款名稱</span></label><input id="payer" maxlength="60" placeholder="付款時顯示的名字"></div>
+        <div class="f w"><label for="memo">Note<span>備註</span></label><textarea id="memo" maxlength="500" placeholder="送禮對象、到貨時段，或想對我們說的話"></textarea></div>
+      </div>
+      <p class="shipnote" id="shipNote"></p>
+      <div class="sum">
+        <span class="k">商品小計</span><span class="v" id="sSub">$0</span>
+        <span class="k">冷凍運費</span><span class="v" id="sShip">$0</span>
+        <span class="line" aria-hidden="true"></span><span class="k tk">合計</span><span class="v tv" id="sTotal">$0</span>
+      </div>
+      <p class="err hide" id="err"></p>
+    </section>
+
+    <section class="care" id="keep">
+      <div class="txt">
+        <h2>保存<span class="cap">Keeping</span></h2>
+        <div class="it">收到之後</div>
+        <div id="care"></div>
+      </div>
+      <div class="pic"><img src="img/tea.jpg" alt="港口茶與茶壺" loading="lazy"></div>
     </section>
   </div>
+
+  <footer class="foot">
+    <div class="ph"><img src="img/sunset.jpg" alt="恆春的夕陽與椰子樹" loading="lazy"><div class="t cap">BUT WHO · since 2019</div></div>
+    <div class="row">
+      <span>伯虎在二樓　屏東縣恆春鎮中山路 48 號 2 樓</span>
+      <span><a href="https://lin.ee/nPARyDp">官方 LINE</a>　<a href="https://www.instagram.com/but_who2f/">@but_who2f</a></span>
+    </div>
+  </footer>
 </main>
 
 <div class="bar" id="bar">
-  <div class="in">
-    <div class="amt">TOTAL<b id="barTotal">$0</b></div>
-    <button class="btn" id="next" disabled>前往付款</button>
+  <div class="in2">
+    <div class="amt"><span class="cap">Total</span><b id="barTotal">$0</b></div>
+    <button class="btn" id="next" disabled>前往付款 <span aria-hidden="true">→</span></button>
   </div>
 </div>
 
-<!-- ======== 付款頁 ======== -->
-<section id="pay" class="hide">
-  <div class="head"><div class="in">
-    <div class="line1"><span>{ 付款 — LINE Pay }</span><span>BUT WHO 2F</span></div>
-    <h2 class="serif">訂單已送出</h2>
-    <div class="ono" id="oNo"></div>
-  </div></div>
-  <div class="qrbox">
-    <img id="qrImg" alt="伯虎在二樓 LINE Pay 收款碼">
-    <div class="amt" id="payAmt"></div>
-    <p>請以 LINE Pay 掃碼並輸入此金額</p>
-  </div>
-  <div class="wrap">
-    <ol class="steps">
-      <li>用 LINE 掃描收款碼，輸入上方金額完成付款</li>
-      <li>按「我已完成付款」，訂單內容會自動複製，跳到伯虎官方 LINE 後貼上傳送</li>
-      <li>我們核對款項後在 LINE 回覆，訂單就此成立</li>
-    </ol>
-    <button class="btn line block" id="toLine">我已完成付款</button>
-    <button class="btn ghost block" id="copy" style="margin-top:12px">複製訂單內容</button>
-    <a class="btn ghost block" id="addLine" style="margin-top:12px;display:block;text-align:center;text-decoration:none" target="_blank" rel="noopener">聯絡伯虎官方LINE</a>
-    <p style="font-size:13px;opacity:.6;text-align:center;margin:28px 0 60px;line-height:1.9">請先截圖保存這個畫面。三天內未完成付款的訂單，我們會為你取消。</p>
-  </div>
-</section>
+<main id="pay" class="frame hide">
+  <header class="top">
+    <span class="l cap"><span class="dot"></span> Payment — LINE Pay</span>
+    <a href="../links/"><img class="logo" src="../links/logo.png" alt="伯虎在二樓 Hengchun BUT WHO"></a>
+    <a class="r cap" href="https://lin.ee/nPARyDp">LINE <span class="dot"></span></a>
+  </header>
+  <section class="payhead" style="margin-top:22px;border-top:1px solid var(--rule)">
+    <div class="t">
+      <div><div class="it">thank you</div><h2>訂單已送出</h2></div>
+      <div class="ono" id="oNo"></div>
+    </div>
+    <img src="img/sea.jpg" alt="恆春的海" loading="lazy">
+  </section>
+  <section class="paybody">
+    <div class="qr">
+      <img id="qrImg" alt="伯虎在二樓 LINE Pay 收款碼">
+      <div class="amt" id="payAmt"></div>
+      <p>請以 LINE Pay 掃碼並輸入此金額</p>
+    </div>
+    <div class="steps">
+      <ol>
+        <li>用 LINE 掃描收款碼，輸入收款碼下方的金額完成付款</li>
+        <li>按「我已完成付款」，訂單內容會自動複製，跳到伯虎官方 LINE 後貼上傳送</li>
+        <li>我們核對款項後在 LINE 回覆，訂單就此成立</li>
+      </ol>
+      <div class="btns">
+        <button class="btn block" id="toLine">我已完成付款</button>
+        <button class="btn ghost block" id="copy">複製訂單內容</button>
+        <a class="btn ghost block" id="addLine" target="_blank" rel="noopener">聯絡伯虎官方LINE</a>
+      </div>
+      <p class="note">請先截圖保存這個畫面。三天內未完成付款的訂單，我們會為你取消。</p>
+    </div>
+  </section>
+  <footer class="foot"><div class="row"><span>伯虎在二樓　屏東縣恆春鎮中山路 48 號 2 樓</span><span>BUT WHO · since 2019</span></div></footer>
+</main>
 
 <div class="toast" id="toast"></div>
-
 <script type="module">
 import { firebaseConfig, SDK, DEFAULT_SETTINGS, esc, money } from "./firebase-config.js";
 const { initializeApp } = await import(`${SDK}/firebase-app.js`);
@@ -195,13 +175,13 @@ try {
   products = pSnap.docs.map(d => ({ id:d.id, ...d.data() })).filter(p => p.active).sort((a,b)=>(a.sort??99)-(b.sort??99));
 } catch (e) {
   console.error(e);
-  $("#items").innerHTML = `<p class="label" style="padding:24px 0">目前無法載入商品，請稍後再試。</p>`;
+  $("#items").innerHTML = `<p class="empty">目前無法載入商品，請稍後再試。</p>`;
 }
 
 $("#intro").textContent = S.intro;
 (function renderCare(){
   const txt = String(S.care||"").trim();
-  if (!txt) { $("#careSec").classList.add("hide"); return; }
+  if (!txt) { $("#keep").classList.add("hide"); return; }
   const blocks = []; let cur = null;
   txt.split("\n").forEach(line => {
     const m = line.match(/^\s*\{\s*(.+?)\s*\}/);
@@ -222,26 +202,28 @@ if (!S.open) {
   $("#formArea").classList.add("hide");
   $("#bar").classList.add("hide");
 } else if (products.length) {
+  const TEX = ["t1","t2","t3","t4","t5","t6","t7","t8"];
   $("#items").innerHTML = products.map((p,i) => `
-    <div class="prod ${p.soldOut ? "out" : ""}">
-      <div class="ph">${p.image ? `<img src="${p.image}" alt="${esc(p.name)}" loading="lazy">` : `<b>${String(i+1).padStart(2,"0")}</b>`}</div>
-      <div>
-        <div class="no">NO. ${String(i+1).padStart(2,"0")}</div>
-        <div class="nm">${esc(p.name)}${p.tag ? `<span class="tg">${esc(p.tag)}</span>` : ""}</div>
-        <div class="ds">${esc(p.desc)}</div>
-        <div class="ft">
+    <article class="prod ${p.soldOut ? "out" : ""}">
+      <div class="strip">
+        <img src="${p.image || `img/${TEX[i % TEX.length]}.jpg`}" alt="${esc(p.name)}" loading="lazy">
+        <div class="lb"><b>${String(i+1).padStart(3,"0")}.</b>${esc(p.name)}</div>
+      </div>
+      <div class="row">
+        <div class="meta">${p.tag ? `<div class="tag">${esc(p.tag)}</div>` : ""}${p.desc ? `<div class="ds">${esc(p.desc)}</div>` : ""}</div>
+        <div class="buy">
           <span class="pr">${money(p.price)}</span>
-          ${p.soldOut ? `<span class="soldout">SOLD OUT</span>` : `
+          ${p.soldOut ? `<span class="so">SOLD OUT</span>` : `
           <div class="step">
-            <button data-id="${p.id}" data-d="-1" aria-label="減少">−</button>
+            <button data-id="${p.id}" data-d="-1" aria-label="減少 ${esc(p.name)}">−</button>
             <span id="q-${p.id}">0</span>
-            <button data-id="${p.id}" data-d="1" aria-label="增加">＋</button>
+            <button data-id="${p.id}" data-d="1" aria-label="增加 ${esc(p.name)}">＋</button>
           </div>`}
         </div>
       </div>
-    </div>`).join("");
+    </article>`).join("");
 } else if (!$("#items").textContent.includes("無法")) {
-  $("#items").innerHTML = `<p class="label" style="padding:24px 0">商品準備中。</p>`;
+  $("#items").innerHTML = `<p class="empty">商品準備中。</p>`;
 }
 
 $("#items").addEventListener("click", e => {
@@ -255,6 +237,7 @@ $("#items").addEventListener("click", e => {
 const ymd = d => d.toLocaleDateString("sv-SE");
 const minD = new Date(); minD.setDate(minD.getDate() + Number(S.leadDays||0));
 $("#date").min = ymd(minD); $("#date").value = ymd(minD);
+if (S.freeShipOver) $("#menuHint").textContent = `按 ＋ 放進這一箱，滿 ${money(S.freeShipOver)} 免運`;
 $("#shipNote").textContent = `冷凍宅配運費 ${money(S.shipFee)}` + (S.freeShipOver ? `，滿 ${money(S.freeShipOver)} 免運` : "") + `，最快 ${S.leadDays} 天後到貨。`;
 
 function calc(){
@@ -294,12 +277,12 @@ $("#next").addEventListener("click", async () => {
     await addDoc(collection(db,"shop_orders"), order);
   } catch (e) {
     console.error(e); toast("送出失敗，請稍後再試");
-    btn.disabled = false; btn.textContent = "前往付款"; return;
+    btn.disabled = false; btn.innerHTML = `前往付款 <span aria-hidden="true">→</span>`; return;
   }
   lastOrder = order;
   $("#oNo").textContent = "NO. " + order.orderNo;
   $("#payAmt").textContent = money(order.total);
-  if (S.lineQr) $("#qrImg").src = S.lineQr; else $("#qrImg").replaceWith(Object.assign(document.createElement("p"),{textContent:"收款碼尚未設定，請直接聯繫伯虎 LINE"}));
+  if (S.lineQr) $("#qrImg").src = S.lineQr; else $("#qrImg").replaceWith(Object.assign(document.createElement("p"),{textContent:"收款碼尚未設定，請直接聯繫伯虎官方 LINE",style:"font-size:14px;padding:40px 0"}));
   $("#addLine").href = lineUrl();
   $("#shop").classList.add("hide"); $("#bar").classList.add("hide"); $("#pay").classList.remove("hide");
   window.scrollTo({top:0});
